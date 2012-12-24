@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <title>test 1</title>
+
+  <link href="/stylesheets/main.css" media="screen" rel="stylesheet" type="text/css" />
+  <link rel="shortcut icon" href="/images/favicon.png">
+</head>
+
+<body>
+  <div class="main-container">
+    <header class="nav-container">
+      <a class="logo" href="/">data.page.title</a>
+      <ul class="nav">
+        <li><a href="/about.html">About</a></li>
+      </ul>
+    </header>
+
+    <section class="content">
+      <h3 id='liquid_is_not_programmerfriendly'>Liquid is Not Programmer-Friendly.</h3>
+
+<p>The short story is liquid is not real code and its not intended to execute real code. The point being you can&#8217;t do jackshit in liquid that hasn&#8217;t been allowed explicitly by the implementation. What&#8217;s more you can only access data-structures that have been explicitly passed to the template.</p>
+
+<p>In Jekyll&#8217;s case it is not possible to alter what is passed to Liquid without hacking the gem or running custom plugins. Both of which cannot be supported by GitHub Pages.</p>
+
+<p>As a programmer - this is very frustrating.</p>
+
+<p>But rather than look a gift horse in the mouth we are going to suck it up and view it as an opportunity to work around limitations and adopt client-side solutions when possible.</p>
+
+<p><strong>Aside</strong> <br />My personal stance is to not invest time trying to hack liquid. It&#8217;s really unnecessary <em>from a programmer&#8217;s</em> perspective. That is to say if you have the ability to run custom plugins (i.e. run arbitrary ruby code) you are better off sticking with ruby. Toward that end I&#8217;ve built <a href='http://github.com/plusjade/mustache-with-jekyll'>Mustache-with-Jekyll</a></p>
+
+<h2 id='static_assets'>Static Assets</h2>
+
+<p>Static assets are any file in the root or non-underscored subfolders that are not pages. That is they have no valid YAML Front Matter and are thus not treated as Jekyll Pages.</p>
+
+<p>Static assets should be used for images, css, and javascript files.</p>
+
+<h2 id='how_jekyll_parses_files'>How Jekyll Parses Files</h2>
+
+<p>Remember Jekyll is a processing engine. There are two main types of parsing in Jekyll.</p>
+
+<ul>
+<li><strong>Content parsing.</strong> <br />This is done with textile or markdown.</li>
+
+<li><strong>Template parsing.</strong> <br />This is done with the liquid templating language.</li>
+</ul>
+
+<p>And thus there are two main types of file formats needed for this parsing.</p>
+
+<ul>
+<li><strong>Post and Page files.</strong><br />All content in Jekyll is either a post or a page so valid posts and pages are parsed with markdown or textile.</li>
+
+<li><strong>Template files.</strong> <br />These files go in <code>_layouts</code> folder and contain your blogs <strong>templates</strong>. They should be made in HTML with the help of Liquid syntax. Since include files are simply injected into templates they are essentially parsed as if they were native to the template.</li>
+</ul>
+
+<p><strong>Arbitrary files and folders.</strong> <br />Files that <em>are not</em> valid pages are treated as static content and pass through Jekyll untouched and reside on your blog in the exact structure and format they originally existed in.</p>
+
+<h3 id='formatting_files_for_parsing'>Formatting Files for Parsing.</h3>
+
+<p>We&#8217;ve outlined the need for valid formatting using <strong>YAML Front Matter</strong>. Templates, posts, and pages all need to provide valid YAML Front Matter even if the Matter is empty. This is the only way Jekyll knows you want the file processed.</p>
+
+<p>YAML Front Matter must be prepended to the top of template/post/page files:</p>
+
+<pre><code>---
+layout: post
+category : pages
+tags : [how-to, jekyll]
+---
+
+... contents ...</code></pre>
+
+<p>Three hyphens on a new line start the Front-Matter block and three hyphens on a new line end the block. The data inside the block must be valid YAML.</p>
+
+<p>Configuration parameters for YAML Front-Matter is outlined here: <a href='https://github.com/mojombo/jekyll/wiki/YAML-Front-Matter'>A comprehensive explanation of YAML Front Matter</a></p>
+
+<h4 id='defining_layouts_for_posts_and_templates_parsing'>Defining Layouts for Posts and Templates Parsing.</h4>
+
+<p>The <code>layout</code> parameter in the YAML Front Matter defines the template file for which the given post or template should be injected into. If a template file specifies its own layout, it is effectively being used as a <code>sub-template.</code> That is to say loading a post file into a template file that refers to another template file with work in the way you&#8217;d expect; as a nested sub-template.</p>
+    </section>
+  </div>
+
+  <footer class="page-footer">
+    <ul class="nav">
+      <li><a href="/about.html">About</a></li>
+    </ul>
+  </footer>
+</body>
+</html>
