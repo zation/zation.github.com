@@ -178,7 +178,10 @@ a {
   /* line 102, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content strong {
     font-weight: bold; }
-  /* line 111, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 105, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  .article-content img {
+    width: 100%; }
+  /* line 114, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button,
   .article-content input,
   .article-content select,
@@ -187,39 +190,39 @@ a {
     margin: 0;
     vertical-align: baseline;
     *vertical-align: middle; }
-  /* line 117, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 120, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button, .article-content input {
     line-height: normal;
     *overflow: visible; }
-  /* line 121, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 124, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button::-moz-focus-inner, .article-content input::-moz-focus-inner {
     border: 0;
     padding: 0; }
-  /* line 128, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 131, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button,
   .article-content input[type="button"],
   .article-content input[type="reset"],
   .article-content input[type="submit"] {
     cursor: pointer;
     -webkit-appearance: button; }
-  /* line 132, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 135, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type=checkbox], .article-content input[type=radio] {
     cursor: pointer; }
-  /* line 136, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 139, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input:not([type="image"]), .article-content textarea {
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box; }
-  /* line 142, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 145, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type="search"] {
     -webkit-appearance: textfield;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box; }
-  /* line 148, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 151, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type="search"]::-webkit-search-decoration {
     -webkit-appearance: none; }
-  /* line 154, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 157, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content label,
   .article-content input,
   .article-content select,
@@ -229,11 +232,11 @@ a {
     font-weight: normal;
     line-height: normal;
     margin-bottom: 18px; }
-  /* line 161, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 164, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type=checkbox], .article-content input[type=radio] {
     cursor: pointer;
     margin-bottom: 0; }
-  /* line 168, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 171, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type=text],
   .article-content input[type=password],
   .article-content textarea,
@@ -250,20 +253,20 @@ a {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px; }
-  /* line 182, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 185, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content select, .article-content input[type=file] {
     height: 27px;
     line-height: 27px; }
-  /* line 186, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 189, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content textarea {
     height: auto; }
-  /* line 191, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 194, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content :-moz-placeholder {
     color: #bfbfbf; }
-  /* line 194, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 197, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content ::-webkit-input-placeholder {
     color: #bfbfbf; }
-  /* line 201, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 204, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type=text],
   .article-content input[type=password],
   .article-content select,
@@ -274,14 +277,14 @@ a {
     -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); }
-  /* line 209, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 212, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content input[type=text]:focus, .article-content input[type=password]:focus, .article-content textarea:focus {
     outline: none;
     border-color: rgba(82, 168, 236, 0.8);
     -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
     -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6); }
-  /* line 218, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 221, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button {
     display: inline-block;
     padding: 4px 14px;
@@ -312,17 +315,17 @@ a {
     transition: 0.1s linear all;
     border-color: #0064cd #0064cd #003f81;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25); }
-  /* line 249, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 252, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button:hover {
     color: #fff;
     background-position: 0 -15px;
     text-decoration: none; }
-  /* line 254, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 257, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button:active {
     -webkit-box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
     -moz-box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
     box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05); }
-  /* line 259, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
+  /* line 262, /Users/twer/Documents/Projects/github/zation.github.com/source/stylesheets/_markdown.scss */
   .article-content button::-moz-focus-inner {
     padding: 0;
     border: 0; }
