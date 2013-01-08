@@ -5,16 +5,148 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2012-12-31T00:00:00Z</updated>
+  <updated>2013-01-07T08:22:00Z</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
+    <title>Sass &amp; Compass Best Practise 1：代码组织结构</title>
+    <link rel="alternate" href="/2013/01/07/sass_compass_best_practise_1.html"/>
+    <id>/2013/01/07/sass_compass_best_practise_1.html</id>
+    <published>2013-01-07T08:22:00Z</published>
+    <updated>2013-01-07T08:22:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;&lt;strong&gt;——模块化的CSS&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;在CSS开发中你有没有遇到以下问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;一个CSS文件几百上千行，要修改一个样式要找半天；&lt;/li&gt;
+&lt;li&gt;为了不同浏览器的兼容性，同样的样式要写好几行代码；&lt;/li&gt;
+&lt;li&gt;为了防止背景图片被缓存，每次更改背景图片都要修改图片名称和代码；&lt;/li&gt;
+&lt;li&gt;当sprites修改以后，在代码中需要调试半天background-position才能适应新的sprites；&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;当你遇到其中一个或多个问题的时候，说明在CSS代码的管理和维护上出了问题。而这个时候，传统的CSS开发方式已经无法满足这些需求了，我们需要新的开发框架和工具，也就是：&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;、&lt;a href="http://compass-style.org/"&gt;Compass&lt;/a&gt;！&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;&lt;strong&gt;——模块化的CSS&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;在CSS开发中你有没有遇到以下问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;一个CSS文件几百上千行，要修改一个样式要找半天；&lt;/li&gt;
+&lt;li&gt;为了不同浏览器的兼容性，同样的样式要写好几行代码；&lt;/li&gt;
+&lt;li&gt;为了防止背景图片被缓存，每次更改背景图片都要修改图片名称和代码；&lt;/li&gt;
+&lt;li&gt;当sprites修改以后，在代码中需要调试半天background-position才能适应新的sprites；&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;当你遇到其中一个或多个问题的时候，说明在CSS代码的管理和维护上出了问题。而这个时候，传统的CSS开发方式已经无法满足这些需求了，我们需要新的开发框架和工具，也就是：&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;、&lt;a href="http://compass-style.org/"&gt;Compass&lt;/a&gt;！&lt;/p&gt;
+
+&lt;p&gt;关于Sass和Compass的基本用法，阮一峰有两片写的很好的简介：&lt;a href="http://www.ruanyifeng.com/blog/2012/06/sass.html"&gt;SASS用法指南&lt;/a&gt;、&lt;a href="http://www.ruanyifeng.com/blog/2012/11/compass.html"&gt;Compass用法指南&lt;/a&gt;。这里就不再赘述了，下面我想介绍一系列我们在使用Sass和Compass方面的最佳实践，本文为第一篇：如何模块化CSS代码，使我们的样式也有一个良好的组织结构。&lt;/p&gt;
+
+&lt;h2&gt;问题&lt;/h2&gt;
+
+&lt;p&gt;我们在写程序的时候，总是希望可以清楚的了解模块之间的依赖，这样可以方便程序人员理解代码，也方便监控我们的依赖不要过多。假设我们页面的CSS代码已经根据组件和功能划分为不同的模块和CSS文件，其中还有一些第三方的CSS库（reset）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;style/
+    reset.css
+    layout.css
+    menu.css
+    document.css
+    form/
+        form.css
+        button.css
+        input.css
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;相对应的页面&lt;code&gt;header&lt;/code&gt;就会有如下的引用：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/reset.css&amp;quot;/&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/layout.css&amp;quot;/&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/menu.css&amp;quot;/&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/document.css&amp;quot;/&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/form/form.css&amp;quot;/&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/form/button.css&amp;quot;/&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/form/input.css&amp;quot;/&amp;gt;
+&amp;lt;/header&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样我们所有的依赖都在HTML中，不利于我们快速的看到样式之间的依赖，也会产生很多额外的HTTP请求，降低页面性能。我们也可以使用&lt;code&gt;@import&lt;/code&gt;在CSS文件内部管理引用，但这同样会产生额外的HTTP请求。&lt;/p&gt;
+
+&lt;h2&gt;解决方案&lt;/h2&gt;
+
+&lt;p&gt;当我们希望在CSS代码中就管理所有依赖，并且不会产生额外的request时，就应该用到Sass了。
+下面我们看看如果使用了Sass应该是什么样子的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;style/
+    screen.scss
+    _reset.scss
+    _layout.scss
+    _menu.scss
+    _document.scss
+    form/
+        _form.scss
+        _button.scss
+        _input.scss
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在&lt;code&gt;_form.scss&lt;/code&gt;中，我们将管理所有的表单及表单控件的样式：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@import &amp;quot;button&amp;quot;;
+@import &amp;quot;input&amp;quot;;
+
+form {
+    ⋯⋯
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在&lt;code&gt;screen.scss&lt;/code&gt;中，我们将管理所有页面样式的依赖：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@import &amp;quot;reset&amp;quot;;
+@import &amp;quot;layout&amp;quot;;
+@import &amp;quot;menu&amp;quot;;
+@import &amp;quot;document&amp;quot;;
+@import &amp;quot;form&amp;quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中文件名前面的下划线是告诉Sass该文件只是一个模块，不用单独生成css文件，所以最后生成的css文件只有一个：&lt;code&gt;screen.css&lt;/code&gt;，于是我们只需要一个request就可以引入所有的css文件，写起来也非常方便：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/screen.css&amp;quot;/&amp;gt;
+&amp;lt;/header&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可能有人会担心这样调试起来会不会很麻烦？但其实如果我们使用Chrome的inspection，我们根本不必接触源代码就可以很好的调试了。&lt;/p&gt;
+
+&lt;h2&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;下面我们来总结一下在使用Sass帮助我们组织代码结构的时候应该注意的地方：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将CSS代码按照功能和组件划分为不同的模块，每个模块为一个文件，模块的文件名都以下划线开头，避免Sass生成额外的CSS文件&lt;/li&gt;
+&lt;li&gt;当一个模块的代码过多的时候，将之拆分为不同的子模块，并且在一个主模块中管理所有依赖，如：&lt;code&gt;_form.scss&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;不要有太多的层级，那样会影响代码的可读性，通常三层已经是极限了&lt;/li&gt;
+&lt;li&gt;讲所有第三方引用的库都放在一个文件管理，例如：&lt;code&gt;screen.scss&lt;/code&gt;，即使只有一个模块用到了它。因为重复的引用会在最后生成额外的CSS代码，而在众多的子模块中查找是否已经引入了某个库会非常麻烦，也不便于管理&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这样既模块化了CSS代码，相互之间的依赖又非常清晰，而且还没有增加额外的request，不失为一个最佳实践。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>不在这里重生，就在这里死去</title>
     <link rel="alternate" href="/2012/12/31/不在这里重生，就在这里死去.html"/>
     <id>/2012/12/31/不在这里重生，就在这里死去.html</id>
-    <published>2012-12-31T00:00:00Z</published>
-    <updated>2012-12-31T00:00:00Z</updated>
+    <published>2012-12-31T11:32:00Z</published>
+    <updated>2012-12-31T11:32:00Z</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -22,17 +154,35 @@
 
 &lt;p&gt;&lt;img alt="2012" src="/images/2012.png" /&gt;&lt;/p&gt;
 
-&lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：我在西安电子科技大学给大学生做了演讲，翻译了《HTML5 Mobile Development Cookbook》,在Openparty上show了一把现场写jasmine测试，学习了别人听都没听过的乐器——陶笛，通宵爬上了华山，却在穿越莫不知名的山峰时以为自己就要死在上面⋯⋯但是更多的，使我思维和观念的转变。&lt;/p&gt;
+&lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;我在西安电子科技大学给大学生做了演讲&lt;/li&gt;
+&lt;li&gt;我在公司做了两次系统的CSS Session&lt;/li&gt;
+&lt;li&gt;翻译了《HTML5 Mobile Development Cookbook》&lt;/li&gt;
+&lt;li&gt;在Openparty上show了一把现场写jasmine测试&lt;/li&gt;
+&lt;/ul&gt;
 </summary>
     <content type="html">&lt;p&gt;&lt;strong&gt;——我在ThoughtWorks的2012&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img alt="2012" src="/images/2012.png" /&gt;&lt;/p&gt;
 
-&lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：我在西安电子科技大学给大学生做了演讲，翻译了《HTML5 Mobile Development Cookbook》,在Openparty上show了一把现场写jasmine测试，学习了别人听都没听过的乐器——陶笛，通宵爬上了华山，却在穿越莫不知名的山峰时以为自己就要死在上面⋯⋯但是更多的，使我思维和观念的转变。&lt;/p&gt;
+&lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：&lt;/p&gt;
 
-&lt;h2&gt;两次系列培训&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;我在西安电子科技大学给大学生做了演讲&lt;/li&gt;
+&lt;li&gt;我在公司做了两次系统的CSS Session&lt;/li&gt;
+&lt;li&gt;翻译了《HTML5 Mobile Development Cookbook》&lt;/li&gt;
+&lt;li&gt;在Openparty上show了一把现场写jasmine测试&lt;/li&gt;
+&lt;li&gt;学习了别人听都没听过的乐器——陶笛&lt;/li&gt;
+&lt;li&gt;通宵爬上了华山，却在穿越莫不知名的山峰时以为自己就要死在上面&lt;/li&gt;
+&lt;li&gt;我开始阅读经济、创业方面的书籍&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
 
-&lt;p&gt;&lt;strong&gt;学习的最好检验方式，就是把你学到的讲出来。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;但是更多的，使我思维和观念的转变。&lt;/p&gt;
+
+&lt;h2&gt;学习的最好检验方式，就是把你学到的讲出来。&lt;/h2&gt;
 
 &lt;p&gt;记得刚进入公司的时候，就被大大叫到了小黑屋，布置了每周一个前端开发Session的任务。其实那个时候我对于前端开发并没有特别系统的认识，但还是答应下来。接着就是各种查资料和准备，但除了第一次讲得还行，其他的无论是Session还是Code Jam都不是很理想。最后发现真正收获最多的人是我自己，我终于把以前零散的知识系统的组织起来，而驱使我不断思考不断总结的，就是因为我要把它们讲出来。&lt;/p&gt;
 
@@ -44,17 +194,13 @@
 
 &lt;p&gt;最终能称得上比较成功的，是两次关于CSS的系列培训，新的一年里我会将它们带到成都办公室，进行新的一轮培训。每一次的培训都是我对自己知识体系的一次完善；都是我对培训方式的一次尝试；也是我对自己表达力、影响力的一次锻炼。&lt;/p&gt;
 
-&lt;h2&gt;四本书&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;用别人的思想，启发自己的思维&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;用别人的思想，启发自己的思维&lt;/h2&gt;
 
 &lt;p&gt;曾经只读小说和技术书籍的我，今年终于开始涉猎创业和设计方面的书籍：《精益创业》、《简约至上》、《瞬间之美》、《认知与设计》。我才发现对于启发思维，书籍是非常好的工具。其中《精益创业》对我的启发最大，读完以后我才认识到原来我们传统的产品开发模式中有如此多的浪费，其最大的浪费之处不在于效率太低，而在于我们高效率的工作在错误的方向之上，却不自知也不改变。&lt;/p&gt;
 
 &lt;p&gt;新的一年里我准备了更多创业和经济方面的书籍：《四步创业法》、《商业模式新生代》、《黑天鹅》等等，希望我可以对于自己所作的事情有更好的价值评估，对于未来的价值走向也能有一些感觉。&lt;/p&gt;
 
-&lt;h2&gt;一些技术&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;“Coding for fun, not coding for 饭”&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;“Coding for fun, not coding for 饭”&lt;/h2&gt;
 
 &lt;p&gt;进入ThoughtWorks，注定了我要开始对于技术的狂热追求，在这一年里我参与/创建了27个github repositories，学会了把Web应用发布到各种云平台上，例如Heroku、Cloud Foundry。&lt;/p&gt;
 
