@@ -6,7 +6,8 @@
   <title>Zation's Blog</title>
 
   <link href="/stylesheets/main.css" media="screen" rel="stylesheet" type="text/css" />
-  <link rel="shortcut icon" href="/images/favicon.png">
+  <script src="/javascripts/main.js" type="text/javascript"></script>
+  <link href="/images/images/favicon.png" rel="icon" type="image/png" />
 </head>
 
 <body>
@@ -19,19 +20,191 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
+        Jan 09, 2013 
+      </li>
+      
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2013/01/09/sass_compass_best_practise_2.html">Sass & Compass Best Practise 2</a>
+      </h1>
+      
+        <h2>——简化代码</h2>
+      
+    </header>
+    <div class="article-content">
+      <p><a href="/2013/01/07/sass_compass_best_practise_1.html">前一篇文章</a>中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码。</p>
+
+<h3>简化兼容性代码</h3>
+
+<p>当我们在用CSS实现渐变效果时，为了浏览器的兼容性，我们常常会用以下写法：</p>
+
+<pre><code>/* FF3.6+ */
+background: -moz-linear-gradient(top, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
+/* Chrome,Safari4+ */ 
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1e5799), color-stop(50%,#2989d8), color-stop(51%,#207cca), color-stop(100%,#7db9e8)); 
+/* Chrome10+,Safari5.1+ */
+background: -webkit-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
+/* Opera 11.10+ */
+background: -o-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
+/* IE10+ */
+background: -ms-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
+/* W3C */
+background: linear-gradient(to bottom, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
+/* IE6-9 */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=&#39;#1e5799&#39;, endColorstr=&#39;#7db9e8&#39;,GradientType=0 ); 
+</code></pre>
+
+<p>一个简单的渐变，就为了兼容性，变成了超过10行的CSS代码，并且让我们维护起来非常麻烦，一旦有任何修改，我们都必须改7个地方⋯⋯好在Compass为我们提供了解决方案，我们只需要一行代码就可以：</p>
+
+<pre><code>@include background-image(linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%)); 
+</code></pre>
+
+<p>类似的功能可以用在box-shadow：<code>@include box-shadow(red 2px 2px 10px);</code>、inline-block：<code>@include inline-block</code>、border-radius：<code>@include border-radius(25px);</code>⋯⋯等等</p>
+
+<h3>适当的使用nest</h3>
+
+<p>在CSS中我们常常需要限制样式的作用范围，例如：</p>
+
+<pre><code>.container {
+    ⋯⋯
+}
+.container .article {
+    ⋯⋯
+}
+.container .article .content {
+    ⋯⋯
+}
+.container .article .paragraph {
+    ⋯⋯
+}
+.container .article .link {
+    ⋯⋯
+}
+</code></pre>
+
+<p>这样书写在CSS中没有问题，但是重复的书写<code>.container</code>和<code>.article</code>总会让人感到厌倦，并且使同一部分的样式很容易散落在各处，不容易管理。这时候我们就可以使用nest了，它可以帮助我们：</p>
+
+<ul>
+<li>将同一部分的样式归总到一起，方便阅读和维护</li>
+<li>消除重复的selector，特别是父元素的selector</li>
+</ul>
+
+<p>下面我们来看看使用nest以后的代码：</p>
+
+<pre><code>.container {
+    ⋯⋯
+    .article {
+        ⋯⋯
+        .content {
+            ⋯⋯
+        }
+        .paragraph {
+            ⋯⋯
+        }
+        .link {
+            ⋯⋯
+        }
+    }
+}
+</code></pre>
+
+<p>但是切忌不要过分的使用nest，如下：</p>
+
+<pre><code>.container {
+    ⋯⋯
+    .article {
+        ⋯⋯
+        .content {
+            ⋯⋯
+            .paragraph {
+                ⋯⋯
+                .link {
+                    ⋯⋯
+                }
+            }
+        }       
+    }
+}
+</code></pre>
+
+<p>它会使最后生成出这样的CSS：</p>
+
+<pre><code>.container {
+    ⋯⋯
+}
+.container .article {
+    ⋯⋯
+}
+.container .article .content {
+    ⋯⋯
+}
+.container .article .content .paragraph {
+    ⋯⋯
+}
+.container .article .content .paragraph .link {
+    ⋯⋯
+}
+</code></pre>
+
+<p>我们看到最后生成的CSS甚至出现了5层selector，一般CSS中出现3层selector已经是比较多了，因为太多的selector会使CSS文件变得冗余，可读性也会变差，而且很难被复用。当你真的需要这么多selector才能完成需求的话，那么你应该反思你的HTML结构是否出现了问题？</p>
+
+<h3>谨慎的使用@extend</h3>
+
+<p><code>@extend</code>可以使我们很方便的复用其他元素的样式，假如我们现在有如下的CSS：</p>
+
+<pre><code>h1, h2 {
+    font-family: Arial;
+    font-size: 38px;
+    color: #222;
+}
+h2 {
+    font-size: 24px;
+}
+</code></pre>
+
+<p>我们可以使用<code>@extend</code>使代码看起来依赖关系更清晰，并且稍微简单一些（但它实际生成的CSS代码与前相同）：</p>
+
+<pre><code>h1 {
+    font-family: Arial;
+    font-size: 38px;
+    color: #222;
+}
+h2 {
+    @extend h1;
+    font-size: 24px;
+}
+</code></pre>
+
+<p>它有些类似于<code>@mixin</code>，不同在于它自身也是CSS，会被页面直接用到。它的目的在于消除重复，并且使依赖关系更加清晰。但是在使用的时候一定要谨慎，因为一个<code>@extend</code>可以很方便的复用代码，人们往往直接这么一用，也不管是否被复用的所有样式都是需要的，也不管最终生成的CSS是否有冗余。所以我们在使用它的时候请先想想一下问题：</p>
+
+<ul>
+<li>是否所有的CSS属性都是我所需要的，否则的话复制粘贴其中一部分也不会花太多功夫，不要为了消除重复反而造成冗余</li>
+<li>我所继承的样式中是否还继承了其他样式，不要有多重继承的情况，这样会导致代码理解变得困难</li>
+<li>最终生成的CSS代码是否有selector过长的情况，不要写到最后写成了一个reset⋯⋯</li>
+</ul>
+
+<p>鉴于<code>@extend</code>有这样那样的问题，虽然它还是有一定的作用，但是建议用之前一定要谨慎。</p>
+
+    </div>
+  </article>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
         Jan 07, 2013 
       </li>
       
     </ul>
     <header class="article-title">
-      Sass & Compass Best Practise 1：代码组织结构
+      <h1>
+        <a href="/2013/01/07/sass_compass_best_practise_1.html">Sass & Compass Best Practise 1</a>
+      </h1>
+      
+        <h2>——组织结构</h2>
+      
     </header>
     <div class="article-content">
-      <p><strong>——模块化的CSS</strong></p>
-
-<h2>前言</h2>
-
-<p>在CSS开发中你有没有遇到以下问题：</p>
+      <p>在CSS开发中你有没有遇到以下问题：</p>
 
 <ul>
 <li>一个CSS文件几百上千行，要修改一个样式要找半天；</li>
@@ -45,7 +218,7 @@
 
 <p>关于Sass和Compass的基本用法，阮一峰有两片写的很好的简介：<a href="http://www.ruanyifeng.com/blog/2012/06/sass.html">SASS用法指南</a>、<a href="http://www.ruanyifeng.com/blog/2012/11/compass.html">Compass用法指南</a>。这里就不再赘述了，下面我想介绍一系列我们在使用Sass和Compass方面的最佳实践，本文为第一篇：如何模块化CSS代码，使我们的样式也有一个良好的组织结构。</p>
 
-<h2>问题</h2>
+<h3>问题</h3>
 
 <p>我们在写程序的时候，总是希望可以清楚的了解模块之间的依赖，这样可以方便程序人员理解代码，也方便监控我们的依赖不要过多。假设我们页面的CSS代码已经根据组件和功能划分为不同的模块和CSS文件，其中还有一些第三方的CSS库（reset）：</p>
 
@@ -75,7 +248,7 @@
 
 <p>这样我们所有的依赖都在HTML中，不利于我们快速的看到样式之间的依赖，也会产生很多额外的HTTP请求，降低页面性能。我们也可以使用<code>@import</code>在CSS文件内部管理引用，但这同样会产生额外的HTTP请求。</p>
 
-<h2>解决方案</h2>
+<h3>解决方案</h3>
 
 <p>当我们希望在CSS代码中就管理所有依赖，并且不会产生额外的request时，就应该用到Sass了。
 下面我们看看如果使用了Sass应该是什么样子的：</p>
@@ -120,7 +293,9 @@ form {
 
 <p>可能有人会担心这样调试起来会不会很麻烦？但其实如果我们使用Chrome的inspection，我们根本不必接触源代码就可以很好的调试了。</p>
 
-<h2>总结</h2>
+<p>同时，Compass已经提供了丰富的CSS库，其中包括了rese，所以我们可以直接删除<code>_reset.scss</code>，只在<code>screen.scss</code>中引入就可以了。</p>
+
+<h3>总结</h3>
 
 <p>下面我们来总结一下在使用Sass帮助我们组织代码结构的时候应该注意的地方：</p>
 
@@ -143,12 +318,15 @@ form {
       
     </ul>
     <header class="article-title">
-      不在这里重生，就在这里死去
+      <h1>
+        <a href="/2012/12/31/不在这里重生，就在这里死去.html">不在这里重生，就在这里死去</a>
+      </h1>
+      
+        <h2>——我在ThoughtWorks的2012</h2>
+      
     </header>
     <div class="article-content">
-      <p><strong>——我在ThoughtWorks的2012</strong></p>
-
-<p><img alt="2012" src="/images/2012.png" /></p>
+      <p><img alt="2012" src="/images/2012.png" /></p>
 
 <p>在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：</p>
 
@@ -165,7 +343,7 @@ form {
 
 <p>但是更多的，使我思维和观念的转变。</p>
 
-<h2>学习的最好检验方式，就是把你学到的讲出来。</h2>
+<h3>学习的最好检验方式，就是把你学到的讲出来。</h3>
 
 <p>记得刚进入公司的时候，就被大大叫到了小黑屋，布置了每周一个前端开发Session的任务。其实那个时候我对于前端开发并没有特别系统的认识，但还是答应下来。接着就是各种查资料和准备，但除了第一次讲得还行，其他的无论是Session还是Code Jam都不是很理想。最后发现真正收获最多的人是我自己，我终于把以前零散的知识系统的组织起来，而驱使我不断思考不断总结的，就是因为我要把它们讲出来。</p>
 
@@ -177,13 +355,13 @@ form {
 
 <p>最终能称得上比较成功的，是两次关于CSS的系列培训，新的一年里我会将它们带到成都办公室，进行新的一轮培训。每一次的培训都是我对自己知识体系的一次完善；都是我对培训方式的一次尝试；也是我对自己表达力、影响力的一次锻炼。</p>
 
-<h2>用别人的思想，启发自己的思维</h2>
+<h3>用别人的思想，启发自己的思维</h3>
 
 <p>曾经只读小说和技术书籍的我，今年终于开始涉猎创业和设计方面的书籍：《精益创业》、《简约至上》、《瞬间之美》、《认知与设计》。我才发现对于启发思维，书籍是非常好的工具。其中《精益创业》对我的启发最大，读完以后我才认识到原来我们传统的产品开发模式中有如此多的浪费，其最大的浪费之处不在于效率太低，而在于我们高效率的工作在错误的方向之上，却不自知也不改变。</p>
 
 <p>新的一年里我准备了更多创业和经济方面的书籍：《四步创业法》、《商业模式新生代》、《黑天鹅》等等，希望我可以对于自己所作的事情有更好的价值评估，对于未来的价值走向也能有一些感觉。</p>
 
-<h2>“Coding for fun, not coding for 饭”</h2>
+<h3>“Coding for fun, not coding for 饭”</h3>
 
 <p>进入ThoughtWorks，注定了我要开始对于技术的狂热追求，在这一年里我参与/创建了27个github repositories，学会了把Web应用发布到各种云平台上，例如Heroku、Cloud Foundry。</p>
 
@@ -191,7 +369,7 @@ form {
 
 <p>细数今年那些我使用过的技术：Angular.js、Backbone.js、Sass、Compass、Rails、Redis、Responsive Design、Parallax Scrolling⋯⋯虽然并不是每个我都有非常深入的研究，但这一年是我有生以来在技术上走得最深最广的一年，感谢我的客户，我的同事们，让我感受到了代码的乐趣，借用凯桑的一句话：“Coding for fun, not coding for 饭”。</p>
 
-<h2>2013</h2>
+<h3>2013</h3>
 
 <p>从2012到2013，从一个20出头的愣头青倒向了奔往30的欧吉桑，新的一年中我希望自己有更多新的尝试，体验新的办公室，与新的同事合作，实践Lean Startup，尝试Inception，更加深入系统化的前端开发，也往移动开发方面发展⋯⋯</p>
 
