@@ -6,8 +6,8 @@
   <meta name="baidu-site-verification" content="txm3a38A5f4oWaQa" />
   <title>Zation's Blog</title>
 
-  <link href="/stylesheets/main.css" media="screen" rel="stylesheet" type="text/css" />
-  <script src="/javascripts/main.js" type="text/javascript"></script>
+  <link href="/stylesheets/main.css?1358170437" media="screen" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/main.js?1358170437" type="text/javascript"></script>
   <link href="/images/images/favicon.png" rel="icon" type="image/png" />
 </head>
 
@@ -19,6 +19,36 @@
 
     <section class="content">
         <article class="article">
+    <ul class="extro-info">
+      <li class="date">
+        Jan 13, 2013 
+      </li>
+      
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2013/01/13/sass_compass_best_practise_3.html">Sass & Compass Best Practise 3 &#10143;</a>
+      </h1>
+      
+        <h2>——图片处理</h2>
+      
+    </header>
+    <div class="article-content">
+      <p><a href="/2013/01/13/sass_compass_best_practise_2.html">前一篇文章</a>中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。</p>
+
+<p>Compass的图片处理主要有以下功能：</p>
+
+<ul>
+<li>自动将一系列单个图片拼接生成一个Sprites；</li>
+<li>根据图片名，自动计算background-position并生成CSS代码；</li>
+<li>自动给图片加上防缓存机制。</li>
+</ul>
+
+<p>下面我们就来看看如何具体实现这些功能。</p>
+
+    </div>
+  </article>
+  <article class="article">
     <ul class="extro-info">
       <li class="date">
         Jan 09, 2013 
@@ -35,6 +65,16 @@
     </header>
     <div class="article-content">
       <p><a href="/2013/01/07/sass_compass_best_practise_1.html">前一篇文章</a>中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。</p>
+
+<p>在我们的CSS开发中，你是否遇到过以下的问题：</p>
+
+<ul>
+<li>为了浏览器的兼容性，同样的效果要写很多行，维护起来很麻烦；</li>
+<li>CSS Selector需要有层级关系，但重复的写同样的父元素使代码看起来很冗余；</li>
+<li>不同的组件拥有同样的样式，但由于有一些细微的差别，导致很难复用，而一旦复用，由于CSS的特性，又不易阅读和维护。</li>
+</ul>
+
+<p>这个时候就应该用到Sass的nest和<code>@extend</code>以及Compass的一些内建mixin了。</p>
 
     </div>
   </article>
@@ -77,14 +117,14 @@
     </ul>
     <header class="article-title">
       <h1>
-        <a href="/2012/12/31/不在这里重生，就在这里死去.html">不在这里重生，就在这里死去 &#10143;</a>
+        <a href="/2012/12/31/summary_of_2012.html">不在这里重生，就在这里死去 &#10143;</a>
       </h1>
       
         <h2>——我在ThoughtWorks的2012</h2>
       
     </header>
     <div class="article-content">
-      <p><img alt="2012" src="/images/2012.png" /></p>
+      <p><img title="2012" alt="2012" src="/images/2012.png?1358133542" /></p>
 
 <p>在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：</p>
 
