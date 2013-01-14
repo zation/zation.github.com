@@ -10,15 +10,15 @@
     <name>Zation</name>
   </author>
   <entry>
-    <title>Sass &amp; Compass Best Practise 3——图片处理</title>
-    <link rel="alternate" href="/2013/01/13/sass_compass_best_practise_3.html"/>
-    <id>/2013/01/13/sass_compass_best_practise_3.html</id>
+    <title>Sass &amp; Compass Best Practices 3——图片处理</title>
+    <link rel="alternate" href="/2013/01/13/sass_compass_best_practices_3.html"/>
+    <id>/2013/01/13/sass_compass_best_practices_3.html</id>
     <published>2013-01-13T13:15:00Z</published>
     <updated>2013-01-13T13:15:00Z</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/13/sass_compass_best_practise_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
+    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/13/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
 
 &lt;p&gt;Compass的图片处理主要有以下功能：&lt;/p&gt;
 
@@ -30,7 +30,7 @@
 
 &lt;p&gt;下面我们就来看看如何具体实现这些功能。&lt;/p&gt;
 </summary>
-    <content type="html">&lt;p&gt;&lt;a href="/2013/01/13/sass_compass_best_practise_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;a href="/2013/01/13/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
 
 &lt;p&gt;Compass的图片处理主要有以下功能：&lt;/p&gt;
 
@@ -152,15 +152,15 @@ end
 </content>
   </entry>
   <entry>
-    <title>Sass &amp; Compass Best Practise 2——简化代码</title>
-    <link rel="alternate" href="/2013/01/09/sass_compass_best_practise_2.html"/>
-    <id>/2013/01/09/sass_compass_best_practise_2.html</id>
+    <title>Sass &amp; Compass Best Practices 2——简化代码</title>
+    <link rel="alternate" href="/2013/01/09/sass_compass_best_practices_2.html"/>
+    <id>/2013/01/09/sass_compass_best_practices_2.html</id>
     <published>2013-01-09T07:39:00Z</published>
     <updated>2013-01-09T07:39:00Z</updated>
     <author>
       <name>Article Author</name>
     </author>
-    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/07/sass_compass_best_practise_1.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。&lt;/p&gt;
+    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/07/sass_compass_best_practices_1.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。&lt;/p&gt;
 
 &lt;p&gt;在我们的CSS开发中，你是否遇到过以下的问题：&lt;/p&gt;
 
@@ -172,7 +172,7 @@ end
 
 &lt;p&gt;这个时候就应该用到Sass的nest和&lt;code&gt;@extend&lt;/code&gt;以及Compass的一些内建mixin了。&lt;/p&gt;
 </summary>
-    <content type="html">&lt;p&gt;&lt;a href="/2013/01/07/sass_compass_best_practise_1.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;a href="/2013/01/07/sass_compass_best_practices_1.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。&lt;/p&gt;
 
 &lt;p&gt;在我们的CSS开发中，你是否遇到过以下的问题：&lt;/p&gt;
 
@@ -337,9 +337,9 @@ h2 {
 </content>
   </entry>
   <entry>
-    <title>Sass &amp; Compass Best Practise 1——组织结构</title>
-    <link rel="alternate" href="/2013/01/07/sass_compass_best_practise_1.html"/>
-    <id>/2013/01/07/sass_compass_best_practise_1.html</id>
+    <title>Sass &amp; Compass Best Practices 1——组织结构</title>
+    <link rel="alternate" href="/2013/01/07/sass_compass_best_practices_1.html"/>
+    <id>/2013/01/07/sass_compass_best_practices_1.html</id>
     <published>2013-01-07T08:22:00Z</published>
     <updated>2013-01-07T08:22:00Z</updated>
     <author>
