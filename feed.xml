@@ -18,7 +18,7 @@
     <author>
       <name>Article Author</name>
     </author>
-    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/13/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
+    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/09/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
 
 &lt;p&gt;Compass的图片处理主要有以下功能：&lt;/p&gt;
 
@@ -30,7 +30,7 @@
 
 &lt;p&gt;下面我们就来看看如何具体实现这些功能。&lt;/p&gt;
 </summary>
-    <content type="html">&lt;p&gt;&lt;a href="/2013/01/13/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;a href="/2013/01/09/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
 
 &lt;p&gt;Compass的图片处理主要有以下功能：&lt;/p&gt;
 
