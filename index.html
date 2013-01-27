@@ -6,8 +6,8 @@
   <meta name="baidu-site-verification" content="txm3a38A5f4oWaQa" />
   <title>Zation's Blog</title>
 
-  <link href="/stylesheets/main.css?1358842552" media="screen" rel="stylesheet" type="text/css" />
-  <script src="/javascripts/main.js?1358843923" type="text/javascript"></script>
+  <link href="/stylesheets/main.css?1359303761" media="screen" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/main.js?1359309523" type="text/javascript"></script>
   <link href="/images/images/favicon.png" rel="icon" type="image/png" />
 </head>
 
@@ -19,6 +19,34 @@
 
     <section class="content">
         <article class="article">
+    <ul class="extro-info">
+      <li class="date">
+        Jan 22, 2013 
+      </li>
+      
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2013/01/22/backbone_refator.html">利用Backbone.js重构项目代码 &#10143;</a>
+      </h1>
+      
+    </header>
+    <div class="article-content">
+      <p>进入现在这个项目已经一年多了，这是我呆过时间最长的一个项目，见证了项目的前端从简单的一些效果到有了复杂的逻辑，最后需要借助JavaScript的MVC框架来重构前端代码，以避免前端代码爆炸失控。具体来说我们的前端代码在增长过程中遇到了以下问题：</p>
+
+<ul>
+<li>多个页面组件根据同一数据来源做更新显示时，会有不少逻辑上重复的代码，或者过多的回调嵌套；</li>
+<li>由于缺乏一个消息传递机制，导致全局变量很多；</li>
+<li>组件之间耦合太深，单个组件很难被重用；</li>
+<li>数据被写在DOM元素的属性中，当显示需求改变时很难只修改DOM而不破坏功能；</li>
+<li>测试代码中需要准备大量的html fixture，每个测试都是很大的集成测试，难以重构、相当耗时。</li>
+</ul>
+
+<p>当你遇到其中一个或几个问题时，请开始考虑用<a href="http://backbonejs.org/">Backbone.js</a>来重构吧，越是问题严重的时候重构的风险越大，花费的时间和精力也越多，最后可能是遗留一大堆垃圾代码而草草了结项目。</p>
+
+    </div>
+  </article>
+  <article class="article">
     <ul class="extro-info">
       <li class="date">
         Jan 13, 2013 
