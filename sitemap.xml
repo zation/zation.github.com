@@ -2,9 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>http://www.zation.me/</loc>
-    <lastmod>2013-01-28T01:58:43+08:00</lastmod>
+    <lastmod>2013-01-28T11:21:09+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>http://www.zation.me/2013/01/28/sudoku_arithmetic_research.html</loc>
+    <lastmod>2013-01-28T01:28:00+08:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/01/22/backbone_refator.html</loc>

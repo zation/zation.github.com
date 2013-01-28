@@ -5,10 +5,24 @@
   <id>http://blog.url.com/</id>
   <link href="http://zaiton.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2013-01-22T14:28:00Z</updated>
+  <updated>2013-01-28T01:28:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>数独算法浅尝</title>
+    <link rel="alternate" href="/2013/01/28/sudoku_arithmetic_research.html"/>
+    <id>/2013/01/28/sudoku_arithmetic_research.html</id>
+    <published>2013-01-28T01:28:00Z</published>
+    <updated>2013-01-28T01:28:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;test&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;test&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>利用Backbone.js重构项目代码</title>
     <link rel="alternate" href="/2013/01/22/backbone_refator.html"/>
