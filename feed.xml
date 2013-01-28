@@ -254,11 +254,11 @@ var BookView = Backbone.View.extend({
 &lt;p&gt;首先我们准备一些图标：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;img title="blogger" alt="blogger" src="/images/../stylesheets/images/icons/blogger.png" /&gt; images/icons/blogger.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="flickr" alt="flickr" src="/images/../stylesheets/images/icons/flickr.png" /&gt; images/icons/flickr.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="linkedin" alt="linkedin" src="/images/../stylesheets/images/icons/linkedin.png" /&gt; images/icons/linkedin.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="rss" alt="rss" src="/images/../stylesheets/images/icons/rss.png" /&gt; images/icons/rss.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="twitter" alt="twitter" src="/images/../stylesheets/images/icons/twitter.png" /&gt; images/icons/twitter.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="blogger" alt="blogger" src="/images/../stylesheets/images/icons-showcase/blogger.png?1359343254" /&gt; images/icons/blogger.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="flickr" alt="flickr" src="/images/../stylesheets/images/icons-showcase/flickr.png?1359343254" /&gt; images/icons/flickr.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="linkedin" alt="linkedin" src="/images/../stylesheets/images/icons-showcase/linkedin.png?1359343254" /&gt; images/icons/linkedin.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="rss" alt="rss" src="/images/../stylesheets/images/icons-showcase/rss.png?1359343254" /&gt; images/icons/rss.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="twitter" alt="twitter" src="/images/../stylesheets/images/icons-showcase/twitter.png?1359343254" /&gt; images/icons/twitter.png&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;将他们放在images/icons中：&lt;/p&gt;
