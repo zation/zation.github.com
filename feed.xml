@@ -254,11 +254,11 @@ var BookView = Backbone.View.extend({
 &lt;p&gt;首先我们准备一些图标：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;img title="blogger" alt="blogger" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="32" height="32" src="/images/../stylesheets/images/icons-showcase/blogger.png?1359343254" /&gt; images/icons/blogger.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="flickr" alt="flickr" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="32" height="32" src="/images/../stylesheets/images/icons-showcase/flickr.png?1359343254" /&gt; images/icons/flickr.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="linkedin" alt="linkedin" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="32" height="32" src="/images/../stylesheets/images/icons-showcase/linkedin.png?1359343254" /&gt; images/icons/linkedin.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="rss" alt="rss" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="32" height="32" src="/images/../stylesheets/images/icons-showcase/rss.png?1359343254" /&gt; images/icons/rss.png&lt;/li&gt;
-&lt;li&gt;&lt;img title="twitter" alt="twitter" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="32" height="32" src="/images/../stylesheets/images/icons-showcase/twitter.png?1359343254" /&gt; images/icons/twitter.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="blogger" alt="blogger" src="/images/../stylesheets/images/icons-showcase/blogger.png?1359343254" /&gt; images/icons/blogger.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="flickr" alt="flickr" src="/images/../stylesheets/images/icons-showcase/flickr.png?1359343254" /&gt; images/icons/flickr.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="linkedin" alt="linkedin" src="/images/../stylesheets/images/icons-showcase/linkedin.png?1359343254" /&gt; images/icons/linkedin.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="rss" alt="rss" src="/images/../stylesheets/images/icons-showcase/rss.png?1359343254" /&gt; images/icons/rss.png&lt;/li&gt;
+&lt;li&gt;&lt;img title="twitter" alt="twitter" src="/images/../stylesheets/images/icons-showcase/twitter.png?1359343254" /&gt; images/icons/twitter.png&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;将他们放在images/icons中：&lt;/p&gt;
@@ -674,7 +674,7 @@ form {
     <author>
       <name>Article Author</name>
     </author>
-    <summary type="html">&lt;p&gt;&lt;img title="2012" alt="2012" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="650" height="488" src="/images/2012.png?1358133542" /&gt;&lt;/p&gt;
+    <summary type="html">&lt;p&gt;&lt;img title="2012" alt="2012" src="/images/2012.png?1358133542" /&gt;&lt;/p&gt;
 
 &lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：&lt;/p&gt;
 
@@ -691,7 +691,7 @@ form {
 
 &lt;p&gt;但是更多的，使我思维和观念的转变。&lt;/p&gt;
 </summary>
-    <content type="html">&lt;p&gt;&lt;img title="2012" alt="2012" supported_extensions="[&amp;quot;.png&amp;quot;, &amp;quot;.jpg&amp;quot;, &amp;quot;.jpeg&amp;quot;, &amp;quot;.bmp&amp;quot;, &amp;quot;.gif&amp;quot;]" width="650" height="488" src="/images/2012.png?1358133542" /&gt;&lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;img title="2012" alt="2012" src="/images/2012.png?1358133542" /&gt;&lt;/p&gt;
 
 &lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：&lt;/p&gt;
 
