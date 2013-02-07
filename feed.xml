@@ -5,10 +5,159 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2013-01-28T01:28:00Z</updated>
+  <updated>2013-02-04T05:29:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>使用CSS3制作一个有趣的搜索框</title>
+    <link rel="alternate" href="/2013/02/04/use_css3_to_create_innovation_search_box.html"/>
+    <id>/2013/02/04/use_css3_to_create_innovation_search_box.html</id>
+    <published>2013-02-04T05:29:00Z</published>
+    <updated>2013-02-04T05:29:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;&lt;img alt="CSS3" src="/images/CSS3.png?1360205783" /&gt;&lt;/p&gt;
+
+&lt;p&gt;动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：&lt;a href="http://www.slideshare.net/findfado/ux-enhancing-experiences"&gt;UX: Enhancing Experiences with Animation&lt;/a&gt;。）&lt;/p&gt;
+
+&lt;p&gt;如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括&lt;strong&gt;tansform&lt;/strong&gt;、&lt;strong&gt;animation&lt;/strong&gt;、&lt;strong&gt;keyframes&lt;/strong&gt;。最终效果情况本站右上角。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;&lt;img alt="CSS3" src="/images/CSS3.png?1360205783" /&gt;&lt;/p&gt;
+
+&lt;p&gt;动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：&lt;a href="http://www.slideshare.net/findfado/ux-enhancing-experiences"&gt;UX: Enhancing Experiences with Animation&lt;/a&gt;。）&lt;/p&gt;
+
+&lt;p&gt;如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括&lt;strong&gt;tansform&lt;/strong&gt;、&lt;strong&gt;animation&lt;/strong&gt;、&lt;strong&gt;keyframes&lt;/strong&gt;。最终效果情况本站右上角。&lt;/p&gt;
+
+&lt;h3&gt;使用transform绘制搜索框的“尾巴”&lt;/h3&gt;
+
+&lt;p&gt;通常的搜索框图标都由一个圆圈加一个“尾巴”组成，例如下面的图片：&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="Search Box" src="/images/search_box.png?1360205783" /&gt;&lt;/p&gt;
+
+&lt;p&gt;一般我们都使用图片来完成这个效果，但是图片会给我们的动画效果造成很大的限制，所以这里我们使用CSS3来实现它。首先是HTML结构：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;div class=&amp;quot;search-container&amp;quot;&amp;gt;
+    &amp;lt;input placeholder=&amp;quot;Search for article title or tags&amp;quot; class=&amp;quot;search&amp;quot; type=&amp;quot;text&amp;quot;&amp;gt;
+    &amp;lt;div class=&amp;quot;search-qualifier&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里其实我希望只有一个&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;就可以实现，尾巴就在&lt;code&gt;input:after&lt;/code&gt;中实现，这样可以避免无意义的HTML标签。但是&lt;code&gt;:before&lt;/code&gt;和&lt;code&gt;:after&lt;/code&gt;这种伪类是将内容插入到某个容器中，但是如果这个容器是自闭和标签（例如：&lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt;、&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;），则这些伪类是不起效果的。所以这里我只能加入一个无意义的&lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;，仅仅用于显示“尾巴”了。&lt;/p&gt;
+
+&lt;p&gt;下面我们来看看如何将&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;变成一个圆圈（这里我就省略不同浏览器的前缀了）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.search {
+    height: 18px;
+    width: 18px;
+    border-radius: 18px;
+    background: white;
+    border: 3px solid #999999;
+    outline: none;
+    padding: 3px;
+    font-size: 0;
+    box-shadow: inset 0 0 2px #999999, 0 0 2px #999999;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;只要将&lt;code&gt;border-radius&lt;/code&gt;设置为边长，或者大于边长，&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;就会变成一个圆圈了。&lt;/p&gt;
+
+&lt;p&gt;下面我们将&lt;code&gt;&amp;lt;div class=&amp;quot;search-qualifier&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;&lt;/code&gt;设置为一个短横条，然后再将他以左边中心为原点顺时针旋转45度，一个搜索框的“尾巴”就出现了。来看看具体的代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.search-qualifier {
+     display: block;
+     height: 8px;
+     width: 0;
+     border: 3px solid #999;
+     border-radius: 3px;
+     content: &amp;quot;&amp;quot;;
+     position: absolute;
+     top: 24px;
+     right: 2px;
+     transform: rotate(-45deg);
+     transform-origin: 50% 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里要解释一下CSS3的新属性：&lt;strong&gt;transform&lt;/strong&gt;。它是用于对元素做2D或者3D变换的，包括旋转、缩放、移动和倾斜等等。&lt;code&gt;transform: rotate(-45deg)&lt;/code&gt;使&lt;code&gt;search-qualifier&lt;/code&gt;顺时针旋转45度，然后使用&lt;code&gt;transform-origin: 50% 0&lt;/code&gt;指定旋转的原点为左边的中心。具体可以参考&lt;a href="http://www.w3schools.com/cssref/css3_pr_transform.asp"&gt;w3schools&lt;/a&gt;上面的详细说明。&lt;/p&gt;
+
+&lt;h3&gt;使用animation和keyframe让“尾巴”动起来&lt;/h3&gt;
+
+&lt;p&gt;如果只是使用CSS3绘制这样的图形其实意义不大，与图片相比只是方便程序员调整大小，但是如果我们加入一些动画就不一样了，如果是好的动画效果，它会给用户心理上的惊喜，提高用户体验。下面我们就让“尾巴”可以左右摆动起来！&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@keyframes qualifier-shaking {
+    0% {
+      transform: rotate(-75deg);
+    }
+    100% {
+      transform: rotate(-30deg);
+    }
+}
+
+.search-qualifier {
+    ...
+    animation: qualifier-shaking 1s infinite alternate;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里要解释一下CSS3的新属性：&lt;strong&gt;keyframes&lt;/strong&gt;和&lt;strong&gt;animation&lt;/strong&gt;。前者用于定义动画过程，后者用于调用动画。具体定义可以参考w3shcools：&lt;a href="http://www.w3schools.com/cssref/css3_pr_keyframes.asp"&gt;keyframes&lt;/a&gt;、&lt;a href="http://www.w3schools.com/cssref/css3_pr_animation.asp"&gt;animation&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;我们首先利用&lt;code&gt;keyframes&lt;/code&gt;定义了一个名为“qualifier-shaking”的动画：在动画开始的时候，“尾巴”的旋转角度为75度，然后顺时针旋转到30度，动画结束。动画定义完成后，就是调用动画了，我们使用&lt;code&gt;animation&lt;/code&gt;来调用动画：“qualifier-shaking”表明了要调用的动画名称；“1s”是动画执行时间；“infinite”是动画执行次数，这里是执行无限次；“alternate”表明在动画多次执行过程中每次都是从头开始执行，还是以往复执行的方式。&lt;/p&gt;
+
+&lt;p&gt;仅仅是左右摇摆还是太单调了一点，我们希望这个“尾巴”可以动得更调皮一些。首先他会隐藏起来，然后每隔一段时间冒个头，摇摆一下再缩回去。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@keyframes qualifier-shaking {
+    0% {
+        height: 0;
+        border-width: 0;
+    }
+    40% {
+        height: 0;
+        border-width: 0;
+    }
+    43% {
+        transform: rotate(-45deg);
+        height: 8px;
+        border-width: 3px;
+    }
+    46% {
+        transform: rotate(-75deg);
+    }
+    49% {
+        transform: rotate(-30deg);
+    }
+    52% {
+        transform: rotate(-45deg);
+        height: 8px;
+        border-width: 3px;
+    }
+    57% {
+        transform: rotate(-45deg);
+        height: 8px;
+        border-width: 3px;
+    }
+    60% {
+        height: 0;
+        border-width: 0;
+    }
+    100% {
+        height: 0;
+        border-width: 0;
+    }
+}
+
+.search-qualifier {
+    ...
+    animation: qualifier-shaking 6s infinite;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里我们设置更多的动画段，首尾两端都让“尾巴”隐藏，然后利用&lt;code&gt;height&lt;/code&gt;和&lt;code&gt;border-width&lt;/code&gt;的改变让“尾巴”冒头和缩回，其余都跟上一个例子相同。这里的animation也设置了更长的执行时间。&lt;/p&gt;
+
+&lt;p&gt;到此为止，一个有趣的CSS3搜索框就做好了。在现代的前端开发中，CSS已经可以完成动画的操作了，那么我们就尽量用CSS来完成，js最多就只用作改变class来触发动画。因为现在js负责的前端逻辑处理已经很多了，再给js加上动画处理的代码很容易导致项目js代码的爆炸。同时CSS3动画有来自浏览器自身的支持，效率和效果上都会 更好一些。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>数独生成浅尝</title>
     <link rel="alternate" href="/2013/01/28/sudoku_arithmetic_research.html"/>
@@ -749,82 +898,6 @@ form {
 &lt;/ul&gt;
 
 &lt;p&gt;这样既模块化了CSS代码，相互之间的依赖又非常清晰，而且还没有增加额外的request，不失为一个最佳实践。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>不在这里重生，就在这里死去——我在ThoughtWorks的2012</title>
-    <link rel="alternate" href="/2012/12/31/summary_of_2012.html"/>
-    <id>/2012/12/31/summary_of_2012.html</id>
-    <published>2012-12-31T11:32:00Z</published>
-    <updated>2012-12-31T11:32:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;img title="2012" alt="2012" src="/images/2012.png?1358133542" /&gt;&lt;/p&gt;
-
-&lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;我在西安电子科技大学给大学生做了演讲&lt;/li&gt;
-&lt;li&gt;我在公司做了两次系统的CSS Session&lt;/li&gt;
-&lt;li&gt;翻译了《HTML5 Mobile Development Cookbook》&lt;/li&gt;
-&lt;li&gt;在Openparty上show了一把现场写jasmine测试&lt;/li&gt;
-&lt;li&gt;学习了别人听都没听过的乐器——陶笛&lt;/li&gt;
-&lt;li&gt;通宵爬上了华山，却在穿越莫不知名的山峰时以为自己就要死在上面&lt;/li&gt;
-&lt;li&gt;我开始阅读经济、创业方面的书籍&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;但是更多的，使我思维和观念的转变。&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;&lt;img title="2012" alt="2012" src="/images/2012.png?1358133542" /&gt;&lt;/p&gt;
-
-&lt;p&gt;在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;我在西安电子科技大学给大学生做了演讲&lt;/li&gt;
-&lt;li&gt;我在公司做了两次系统的CSS Session&lt;/li&gt;
-&lt;li&gt;翻译了《HTML5 Mobile Development Cookbook》&lt;/li&gt;
-&lt;li&gt;在Openparty上show了一把现场写jasmine测试&lt;/li&gt;
-&lt;li&gt;学习了别人听都没听过的乐器——陶笛&lt;/li&gt;
-&lt;li&gt;通宵爬上了华山，却在穿越莫不知名的山峰时以为自己就要死在上面&lt;/li&gt;
-&lt;li&gt;我开始阅读经济、创业方面的书籍&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;但是更多的，使我思维和观念的转变。&lt;/p&gt;
-
-&lt;h3&gt;学习的最好检验方式，就是把你学到的讲出来。&lt;/h3&gt;
-
-&lt;p&gt;记得刚进入公司的时候，就被大大叫到了小黑屋，布置了每周一个前端开发Session的任务。其实那个时候我对于前端开发并没有特别系统的认识，但还是答应下来。接着就是各种查资料和准备，但除了第一次讲得还行，其他的无论是Session还是Code Jam都不是很理想。最后发现真正收获最多的人是我自己，我终于把以前零散的知识系统的组织起来，而驱使我不断思考不断总结的，就是因为我要把它们讲出来。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;在准备的过程中，我会把自己假象为听众，去思考他们会有什么样的问题，这时才发现其实还有很多东西我了解的不是很清楚，于是我不断深钻，研究了所有可能的问题和知识点，再不是以前的浅尝辄止，够用就行。&lt;/li&gt;
-&lt;li&gt;在讲解的过程中，我的目的是让别人可以学习和理解我的知识。但如果只是零散的知识，那是不便于别人的理解的，这就需要我自己首先把所有的知识组织起来，总结为一个系统化的“理论”，这种“理论”不需要太深奥，只需要各个知识点都相互关联，又有逐渐深入的示例，别人就很容易理解了。&lt;/li&gt;
-&lt;li&gt;在讲解完成以后，别人会给我各种反馈，这些反馈不光是针对技术的，还有针对演讲技巧。它们可以启发我的思考，让我可以持续的对各个方面进行改进。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;最终能称得上比较成功的，是两次关于CSS的系列培训，新的一年里我会将它们带到成都办公室，进行新的一轮培训。每一次的培训都是我对自己知识体系的一次完善；都是我对培训方式的一次尝试；也是我对自己表达力、影响力的一次锻炼。&lt;/p&gt;
-
-&lt;h3&gt;用别人的思想，启发自己的思维&lt;/h3&gt;
-
-&lt;p&gt;曾经只读小说和技术书籍的我，今年终于开始涉猎创业和设计方面的书籍：《精益创业》、《简约至上》、《瞬间之美》、《认知与设计》。我才发现对于启发思维，书籍是非常好的工具。其中《精益创业》对我的启发最大，读完以后我才认识到原来我们传统的产品开发模式中有如此多的浪费，其最大的浪费之处不在于效率太低，而在于我们高效率的工作在错误的方向之上，却不自知也不改变。&lt;/p&gt;
-
-&lt;p&gt;新的一年里我准备了更多创业和经济方面的书籍：《四步创业法》、《商业模式新生代》、《黑天鹅》等等，希望我可以对于自己所作的事情有更好的价值评估，对于未来的价值走向也能有一些感觉。&lt;/p&gt;
-
-&lt;h3&gt;“Coding for fun, not coding for 饭”&lt;/h3&gt;
-
-&lt;p&gt;进入ThoughtWorks，注定了我要开始对于技术的狂热追求，在这一年里我参与/创建了27个github repositories，学会了把Web应用发布到各种云平台上，例如Heroku、Cloud Foundry。&lt;/p&gt;
-
-&lt;p&gt;在这里，我终于知道了什么是MVC，并且用在项目中利用Backbone.js做了实践；我参加了OO Bootcamp，终于了解了什么才是面向对象编程；我体验了敏捷开发方式：敏捷流程、持续集成、重构、自动化测试，终于体会到了先进的开发方式给整个IT行业带来的触动。&lt;/p&gt;
-
-&lt;p&gt;细数今年那些我使用过的技术：Angular.js、Backbone.js、Sass、Compass、Rails、Redis、Responsive Design、Parallax Scrolling⋯⋯虽然并不是每个我都有非常深入的研究，但这一年是我有生以来在技术上走得最深最广的一年，感谢我的客户，我的同事们，让我感受到了代码的乐趣，借用凯桑的一句话：“Coding for fun, not coding for 饭”。&lt;/p&gt;
-
-&lt;h3&gt;2013&lt;/h3&gt;
-
-&lt;p&gt;从2012到2013，从一个20出头的愣头青倒向了奔往30的欧吉桑，新的一年中我希望自己有更多新的尝试，体验新的办公室，与新的同事合作，实践Lean Startup，尝试Inception，更加深入系统化的前端开发，也往移动开发方面发展⋯⋯&lt;/p&gt;
-
-&lt;p&gt;“一转眼，前程似茧”，往年每每都会有这样那样的低谷，让我在心里默默的唱着这句歌词，而今年渐渐的淡忘了这首歌。来年回望，更上一层。&lt;/p&gt;
 </content>
   </entry>
 </feed>
