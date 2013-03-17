@@ -8,7 +8,7 @@
   <meta name="description"
   content="经历过各种技术和职位，最终发现前端开发才是我的归宿，现为ThoughtWorks前端程序员，专注于实践优秀的前端代码架构。同时也是ThoughtWorks UX Group一员，关注用户体验以及响应式设计、视差滚动等新兴设计元素。">
 
-  <link href="/stylesheets/main.css?1360331750" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/stylesheets/main.css?1363508965" media="screen" rel="stylesheet" type="text/css" />
   <link href="/images/favicon.png?1357395976" rel="icon" type="image/png" />
   <!--[if lt IE 9]>
     <script src="/javascripts/html5shiv-printshiv.js?1360331750" type="text/javascript"></script>
@@ -62,6 +62,55 @@
 
     <section class="content">
         <article class="article">
+    <ul class="extro-info">
+      <li class="date">
+        2013. 03. 15
+      </li>
+      
+        <li class="tag">
+          <a href="/tags/grunt.html">grunt</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/bower.html">bower</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="how-to-build-frontend-dev-env"
+          href="/2013/03/15/how-to-build-frontend-dev-env.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2013/03/15/how-to-build-frontend-dev-env.html">如何构建自动化的前端开发流程</a>
+      </h1>
+      
+    </header>
+    <div class="article-content">
+      <p>如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：</p>
+
+<ul>
+<li>我们有许多的第三方库的依赖需要管理；</li>
+<li>我们有独立的前端测试需要自动运行；</li>
+<li>我们还有很多代码需要在发布时进行打包压缩；</li>
+<li>⋯⋯</li>
+</ul>
+
+<p>所以构建一个自动化的前端开发流程是非常必要的，但现在前端开发流程的构建是百花齐放，没有一个统一的标准，还有很多依赖于后端的架构来做前端开发管理。例如在Rails开发中，就有各种前端库的gem包。但是这种依赖于后端框架的管理方式有许多问题：</p>
+
+<ul>
+<li>许多gem包的维护者并不是前端库的维护者，所以更新不一定即时；</li>
+<li>不利于前端代码与后端代码做分离；</li>
+<li>增加了前端开发者的学习和使用成本；</li>
+<li>⋯⋯</li>
+</ul>
+
+<p>于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：<a href="http://yeoman.io/">YEMAN</a>、<a href="http://jamjs.org/">Jam</a>、<a href="http://volojs.org/">volo</a>、<a href="https://github.com/component/component">component</a>、<a href="http://brunch.io/">Brunch</a>⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（<a href="http://twitter.github.com/bower/">bower</a>、<a href="http://gruntjs.com/">grunt</a>）来搭建自己的前端开发流程。 </p>
+
+    </div>
+  </article>
+  <article class="article">
     <ul class="extro-info">
       <li class="date">
         2013. 02. 04
@@ -400,7 +449,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1360331765" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1363508964" type="text/javascript"></script>
   <script type="text/javascript">
 
     var _gaq = _gaq || [];

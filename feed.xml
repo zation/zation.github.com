@@ -5,10 +5,307 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2013-02-04T05:29:00Z</updated>
+  <updated>2013-03-15T08:21:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>如何构建自动化的前端开发流程</title>
+    <link rel="alternate" href="/2013/03/15/how-to-build-frontend-dev-env.html"/>
+    <id>/2013/03/15/how-to-build-frontend-dev-env.html</id>
+    <published>2013-03-15T08:21:00Z</published>
+    <updated>2013-03-15T08:21:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;我们有许多的第三方库的依赖需要管理；&lt;/li&gt;
+&lt;li&gt;我们有独立的前端测试需要自动运行；&lt;/li&gt;
+&lt;li&gt;我们还有很多代码需要在发布时进行打包压缩；&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以构建一个自动化的前端开发流程是非常必要的，但现在前端开发流程的构建是百花齐放，没有一个统一的标准，还有很多依赖于后端的架构来做前端开发管理。例如在Rails开发中，就有各种前端库的gem包。但是这种依赖于后端框架的管理方式有许多问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;许多gem包的维护者并不是前端库的维护者，所以更新不一定即时；&lt;/li&gt;
+&lt;li&gt;不利于前端代码与后端代码做分离；&lt;/li&gt;
+&lt;li&gt;增加了前端开发者的学习和使用成本；&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。 &lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;我们有许多的第三方库的依赖需要管理；&lt;/li&gt;
+&lt;li&gt;我们有独立的前端测试需要自动运行；&lt;/li&gt;
+&lt;li&gt;我们还有很多代码需要在发布时进行打包压缩；&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以构建一个自动化的前端开发流程是非常必要的，但现在前端开发流程的构建是百花齐放，没有一个统一的标准，还有很多依赖于后端的架构来做前端开发管理。例如在Rails开发中，就有各种前端库的gem包。但是这种依赖于后端框架的管理方式有许多问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;许多gem包的维护者并不是前端库的维护者，所以更新不一定即时；&lt;/li&gt;
+&lt;li&gt;不利于前端代码与后端代码做分离；&lt;/li&gt;
+&lt;li&gt;增加了前端开发者的学习和使用成本；&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。 &lt;/p&gt;
+
+&lt;h3&gt;什么是开发流程？&lt;/h3&gt;
+
+&lt;p&gt;在我看来一个完整的开发流程应该包括：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;本地开发环境的初始化&lt;/li&gt;
+&lt;li&gt;第三方依赖的管理&lt;/li&gt;
+&lt;li&gt;源文件编译&lt;/li&gt;
+&lt;li&gt;自动化测试&lt;/li&gt;
+&lt;li&gt;发布到pipeline和各个环境&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;而现代的开发流程，就是要使上面的各个部分都可以自动化，一个命令就可以使这些流程都自动走完，并且快速的得到错误或通过的反馈，让我们可以方便快速的修复错误和release。&lt;/p&gt;
+
+&lt;h3&gt;本地开发环境的初始化&lt;/h3&gt;
+
+&lt;p&gt;这里我使用的工具是&lt;a href="http://nodejs.org/"&gt;Node.js&lt;/a&gt;和&lt;a href="https://npmjs.org/"&gt;NPM&lt;/a&gt;，它们都基于JavaScript，使用Json来配置，对于前端开发人员非常友好。&lt;/p&gt;
+
+&lt;p&gt;安装完成Node.js和NPM后，在项目根目录下创建NPM的配置文件&lt;code&gt;package.json&lt;/code&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;name&amp;quot;: &amp;quot;Project Name&amp;quot;,
+    &amp;quot;version&amp;quot;: &amp;quot;0.0.1&amp;quot;,
+    &amp;quot;description&amp;quot;: &amp;quot;Project Description&amp;quot;,
+    &amp;quot;repository&amp;quot;: {
+        &amp;quot;type&amp;quot;: &amp;quot;git&amp;quot;,
+        &amp;quot;url&amp;quot;: &amp;quot;git://github.com/path/to/your_project&amp;quot;
+    },
+    &amp;quot;author&amp;quot;: &amp;quot;Author Name&amp;quot;,
+    &amp;quot;license&amp;quot;: &amp;quot;BSD&amp;quot;,
+    &amp;quot;readmeFilename&amp;quot;: &amp;quot;README.md&amp;quot;,
+    &amp;quot;gitHead&amp;quot;: &amp;quot;git head&amp;quot;,
+    &amp;quot;devDependencies&amp;quot;: {
+        &amp;quot;grunt&amp;quot;: &amp;quot;latest&amp;quot;,
+        &amp;quot;grunt-contrib-connect&amp;quot;: &amp;quot;latest&amp;quot;,
+        &amp;quot;grunt-contrib-concat&amp;quot;: &amp;quot;latest&amp;quot;,
+        &amp;quot;grunt-contrib-jasmine&amp;quot;: &amp;quot;latest&amp;quot;,
+        &amp;quot;grunt-contrib-watch&amp;quot;: &amp;quot;latest&amp;quot;,
+        &amp;quot;grunt-contrib-compass&amp;quot;: &amp;quot;latest&amp;quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中最重要的一个配置项是&lt;strong&gt;devDependencies&lt;/strong&gt;，这是用于开发的依赖，例如：自动化测试、源文件编译等等，其中各个依赖的作用和用法将会在后面讲到。而前端生产代码的依赖会使用另一个工具来管理，也在后面讲到。创建完成以后运行&lt;code&gt;npm install&lt;/code&gt;，NPM就会将这些依赖都安装到项目根目录的&lt;code&gt;node_modules&lt;/code&gt;文件夹中。&lt;/p&gt;
+
+&lt;h3&gt;第三方依赖的管理&lt;/h3&gt;
+
+&lt;p&gt;这里我使用的工具是&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;。其实NPM也可以管理，但是NPM并不是读取第三方依赖原始的repository，而是读取自己管理的一个repository，所以更新可能会慢点，并且它使用CommonJS的接口方便Node.js项目的开发，并不是针对纯前端开发的项目；而bower是读取原始的github repository，没有更新延迟的问题，所有包都是针对纯前端开发项目的。&lt;/p&gt;
+
+&lt;p&gt;要使用bower只需要简单的三步：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;安装：&lt;code&gt;npm install bower -g&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在项目根目录中创建配置文件&lt;code&gt;.bowerrc&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在项目根目录中创建依赖配置文件&lt;code&gt;components.json&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我们首先来看看&lt;code&gt;.bowerrc&lt;/code&gt;的内容：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;directory&amp;quot; : &amp;quot;components&amp;quot;,
+    &amp;quot;json&amp;quot;      : &amp;quot;component.json&amp;quot;,
+    &amp;quot;endpoint&amp;quot;  : &amp;quot;https://bower.herokuapp.com&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中&lt;strong&gt;directory&lt;/strong&gt;指定了所有的依赖会被安装到哪里；&lt;strong&gt;json&lt;/strong&gt;指定了依赖配置文件的路径；&lt;strong&gt;endpoint&lt;/strong&gt;制定了依赖的repository的寻址服务器，你可以替换为自己的寻址服务器。&lt;/p&gt;
+
+&lt;p&gt;然后我们来看看&lt;code&gt;components.json&lt;/code&gt;的内容：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;name&amp;quot;: &amp;quot;Project Name&amp;quot;,
+    &amp;quot;version&amp;quot;: &amp;quot;0.0.1&amp;quot;,
+    &amp;quot;dependencies&amp;quot;: {
+      &amp;quot;jquery&amp;quot;: &amp;quot;latest&amp;quot;,
+      &amp;quot;underscore&amp;quot;: &amp;quot;latest&amp;quot;,
+      &amp;quot;backbone&amp;quot;: &amp;quot;latest&amp;quot;,
+      &amp;quot;jasmine-jquery&amp;quot;: &amp;quot;latest&amp;quot;,
+      &amp;quot;jasmine-ajax&amp;quot;: &amp;quot;git@github.com:pivotal/jasmine-ajax.git&amp;quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中最重要的就是&lt;strong&gt;dependencies&lt;/strong&gt;，它指定了所有前端开发依赖的包。所有bower包含的依赖都可以在&lt;a href="http://sindresorhus.com/bower-components/"&gt;这里&lt;/a&gt;查到，对于bower没有包含的依赖也可以直接指定github的repository，例如：&lt;code&gt;&amp;quot;jasmine-ajax&amp;quot;: &amp;quot;git@github.com:pivotal/jasmine-ajax.git&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;最后运行&lt;code&gt;bower install&lt;/code&gt;就可以在components文件夹中看到所有第三方依赖的文件了。但是bower有一个问题，就是它将所有github repository中的文件都下载下来了，其中有许多是我们不需要的文件。下面我们会将我们需要的文件提取出来打包放到我们指定的目录中。&lt;/p&gt;
+
+&lt;h3&gt;源文件编译&lt;/h3&gt;
+
+&lt;p&gt;这里我使用的工具是&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;，他本身主要是基于Node.js的文件操作包，其中有许多插件可以让我们完成js文件的compile和compress、sass到css的转换等等操作。要使用它需要先安装命令行工具：&lt;code&gt;npm install grunt-cli -g&lt;/code&gt;，然后在项目根目录中创建文件&lt;code&gt;Gruntfile.js&lt;/code&gt;，这个文件用于定义各种task，我们首先定义一个task将从bower下载的第三方依赖都打包到文件&lt;code&gt;app/js/lib.js&lt;/code&gt;中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
+
+    var dependencies = [
+        &amp;#39;components/jquery/jquery.js&amp;#39;,
+        &amp;#39;components/underscore/underscore.js&amp;#39;,
+        &amp;#39;components/backbone/backbone.js&amp;#39;];
+
+    grunt.initConfig({
+        concat: {
+            js: {
+                src: dependencies,
+                dest: &amp;#39;app/js/lib.js&amp;#39;
+            }
+        }
+    });
+
+    grunt.loadNpmTasks(&amp;#39;grunt-contrib-concat&amp;#39;);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里的grunt-contrib-concat就是grunt的一个插件，用于文件的合并操作，我们已经在前面的&lt;code&gt;package.json&lt;/code&gt;中引入了。&lt;code&gt;js&lt;/code&gt;是task name；&lt;code&gt;src&lt;/code&gt;指定了合并的源文件地址；&lt;code&gt;dest&lt;/code&gt;指定了合并的目标文件。这样当我们运行&lt;code&gt;grunt concat:js&lt;/code&gt;后，所有的依赖文件都会被合并为&lt;code&gt;app/js/lib.js&lt;/code&gt;。这样做的好处是我们可以控制每个依赖的引入顺序，但是麻烦的是每次引入新的依赖都需要手动加入到&lt;code&gt;dependencies&lt;/code&gt;数组中。这个暂时没有更好的解决方案，因为不是所有的包都在自己的&lt;code&gt;components.js&lt;/code&gt;中声明了main文件，很多时候必须自己手动指定。&lt;/p&gt;
+
+&lt;p&gt;JavaScript文件编译完成以后就是CSS文件，在现代的前端开发中，我们已经很少直接写CSS文件了，一般都使用SASS或者LESS。grunt也提供了这种支持，这里我使用的是&lt;a href="https://github.com/gruntjs/grunt-contrib-compass"&gt;grunt-contrib-compass&lt;/a&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
+
+    var sasses = &amp;#39;sass&amp;#39;;
+
+    grunt.initConfig({
+        compass: {
+            development: {
+                options: {
+                    sassDir: sasses,
+                    cssDir: &amp;#39;app/css&amp;#39;
+                }
+            }
+        }
+    });
+
+    grunt.loadNpmTasks(&amp;#39;grunt-contrib-compass&amp;#39;);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后运行&lt;code&gt;grunt compass:development&lt;/code&gt;就可以完成CSS文件的编译了。&lt;/p&gt;
+
+&lt;h3&gt;自动化测试&lt;/h3&gt;
+
+&lt;p&gt;这里我使用的自动化测试工具是&lt;a href="http://pivotal.github.com/jasmine/"&gt;Jasmine&lt;/a&gt;，它grunt中同样有一个插件：&lt;a href="https://github.com/gruntjs/grunt-contrib-jasmine"&gt;grunt-contrib-jasmine&lt;/a&gt;。下面我们来看看如何在&lt;code&gt;Gruntfile.js&lt;/code&gt;中定义测试的task：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
+
+    var sources = &amp;#39;app/js/**/*.js&amp;#39;,
+        specs = &amp;#39;spec/**/*Spec.js&amp;#39;;
+
+    grunt.initConfig({
+        jasmine: {
+            test: {
+                src: [sources],
+                options: {
+                    specs: specs,
+                    helpers: [&amp;#39;spec/helper/**/*.js&amp;#39;],
+                    vendor: &amp;#39;app/js/lib.js&amp;#39;
+                }
+            }
+        }
+    });
+
+    grunt.loadNpmTasks(&amp;#39;grunt-contrib-jasmine&amp;#39;);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;配置完成以后就可以运行&lt;code&gt;grunt jasmine:test&lt;/code&gt;来跑测试，但问题是每次写完代码都要手动执行一次非常麻烦，最好可以每次代码有更改都自动跑一次，让我们可以更快的得到反馈。grunt的&lt;a href="https://github.com/gruntjs/grunt-contrib-watch"&gt;watch插件&lt;/a&gt;就提供了这种支持：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
+
+    var sources = &amp;#39;app/js/**/*.js&amp;#39;,
+        specs = &amp;#39;spec/**/*Spec.js&amp;#39;;
+
+    grunt.initConfig({
+        jasmine: {
+            test: {
+                src: [sources],
+                options: {
+                    specs: specs,
+                    helpers: [&amp;#39;spec/helper/**/*.js&amp;#39;],
+                    vendor: &amp;#39;app/js/lib.js&amp;#39;
+                }
+            }
+        },
+        watch: {
+            test: {
+                files: [sources, specs],
+                tasks: [&amp;#39;jasmine:test&amp;#39;]
+            }
+        }
+    });
+
+    grunt.loadNpmTasks(&amp;#39;grunt-contrib-jasmine&amp;#39;);
+    grunt.loadNpmTasks(&amp;#39;grunt-contrib-watch&amp;#39;);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;files&lt;/code&gt;指定了需要监听变动的文件；&lt;code&gt;tasks&lt;/code&gt;指定了修改后自动触发的task。现在只要我们运行&lt;code&gt;grunt watch:test&lt;/code&gt;，那么有任何源文件、测试文件的改动，Jasmine测试都会自动运行了。有时候我们也希望测试的结果显示在网页上，便于我们做js的调试。那么可以将&lt;code&gt;tasks: [&amp;#39;jasmine:test&amp;#39;]&lt;/code&gt;改为&lt;code&gt;tasks: [&amp;#39;jasmine:test:build&amp;#39;]&lt;/code&gt;，然后打开根目录下的&lt;code&gt;_SpecRunner.html&lt;/code&gt;文件，就可以在网页中看到测试结果了，再加上一些Chrome的&lt;a href="https://chrome.google.com/webstore/detail/live-reload/pccddenngcbofbojodpghgpbheckgddn"&gt;Livereload插件&lt;/a&gt;，就可以不用刷新实时的看到测试结果，效率非常之高。虽然grunt插件中也有&lt;a href="https://github.com/gruntjs/grunt-contrib-livereload"&gt;livereload&lt;/a&gt;，但是与grunt-contrib-watch无法很好的集成，所以我没有使用这种方式。&lt;/p&gt;
+
+&lt;h3&gt;CI Pipeline&lt;/h3&gt;
+
+&lt;p&gt;由于我的项目是host在github上，所以我选择&lt;a href="https://travis-ci.org/"&gt;travis-ci&lt;/a&gt;作为我的CI服务器。要启用travis-ci需要以下几步：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;在&lt;a href="https://travis-ci.org/"&gt;travis-ci&lt;/a&gt;中注册一个账号，获取一个token；&lt;/li&gt;
+&lt;li&gt;在你的github项目的Settings--&amp;gt;Service Hooks中找到Travis，填入token并且启用；&lt;/li&gt;
+&lt;li&gt;回到&lt;a href="https://travis-ci.org/"&gt;travis-ci&lt;/a&gt;，在Accounts--&amp;gt;Repositories中打开你的项目的service hook&lt;/li&gt;
+&lt;li&gt;Push一个&lt;code&gt;.travis.yml&lt;/code&gt;到github，触发第一次build。&lt;/li&gt;
+&lt;li&gt;修改&lt;code&gt;package.json&lt;/code&gt;的&lt;code&gt;scripts&lt;/code&gt;项，指定运行测试的命令&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;下面我们来看看如何配置&lt;code&gt;.travis.yml&lt;/code&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;language: node_js
+node_js:
+  - &amp;quot;0.8&amp;quot;
+before_script:
+  - npm install -g grunt-cli
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;由于我们的环境是基于Node.js搭建的，所以在&lt;strong&gt;language&lt;/strong&gt;设置了node&lt;em&gt;js；而**node&lt;/em&gt;js&lt;strong&gt;指定了Node.js的版本；&lt;/strong&gt;before_script**指定了在测试运行前需要执行的命令，由于我们的脚本都是基于grunt的，所以需要先安装grunt的命令行包。&lt;/p&gt;
+
+&lt;p&gt;然后再修改&lt;code&gt;package.json&lt;/code&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    ⋯⋯
+    &amp;quot;scripts&amp;quot;: {
+        &amp;quot;test&amp;quot;: &amp;quot;grunt jasmine:test&amp;quot;
+    }
+    ⋯⋯
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将修改以后的&lt;code&gt;package.json&lt;/code&gt;push到github上，再次触发一个新的build，你可以看到你之前错误的build已经绿了。&lt;/p&gt;
+
+&lt;p&gt;这里还有一个小提示：如何让build状态显示在项目的readme中？很简单，只需要在README.md中加入以下代码就可以了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[![Build Status](https://travis-ci.org/path/to/your_repository.png?branch=master)](http://travis-ci.org/path/to/your_repository)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;到这里基本的环境搭建就完成了，当然我们还可以使用grund的&lt;code&gt;registerTask&lt;/code&gt;来定义一个任务序列，还可以加入template的编译⋯⋯这些都可以通过grunt来灵活设置。最重要的是现在别人拿到一个项目的代码以后，可以通过一些命令来快速的搭建本地环境，方便的进行测试和开发，而且没有依赖与后端的开发环境，只要定义好接口，前端开发可以完全独立开了。虽然这其中还有很多问题没有解决，例如：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如何让第三方依赖自申明main文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;package.json&lt;/code&gt;与&lt;code&gt;components.json&lt;/code&gt;其实有些重复&lt;/li&gt;
+&lt;li&gt;Live Reload还需要Chrome插件才能完成&lt;/li&gt;
+&lt;li&gt;⋯⋯&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这正是由于现在前端开发环境还没有后端开发的那种标准化，也正是挑战和机遇之所在！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>使用CSS3制作一个有趣的搜索框</title>
     <link rel="alternate" href="/2013/02/04/use_css3_to_create_innovation_search_box.html"/>
@@ -772,132 +1069,6 @@ h2 {
 &lt;/ul&gt;
 
 &lt;p&gt;鉴于&lt;code&gt;@extend&lt;/code&gt;有这样那样的问题，虽然它还是有一定的作用，但是建议用之前一定要谨慎。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Sass &amp; Compass Best Practices 1——组织结构</title>
-    <link rel="alternate" href="/2013/01/07/sass_compass_best_practices_1.html"/>
-    <id>/2013/01/07/sass_compass_best_practices_1.html</id>
-    <published>2013-01-07T08:22:00Z</published>
-    <updated>2013-01-07T08:22:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;在CSS开发中你有没有遇到以下问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;一个CSS文件几百上千行，要修改一个样式要找半天；&lt;/li&gt;
-&lt;li&gt;为了不同浏览器的兼容性，同样的样式要写好几行代码；&lt;/li&gt;
-&lt;li&gt;为了防止背景图片被缓存，每次更改背景图片都要修改图片名称和代码；&lt;/li&gt;
-&lt;li&gt;当sprites修改以后，在代码中需要调试半天background-position才能适应新的sprites；&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;当你遇到其中一个或多个问题的时候，说明在CSS代码的管理和维护上出了问题。而这个时候，传统的CSS开发方式已经无法满足这些需求了，我们需要新的开发框架和工具，也就是：&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;、&lt;a href="http://compass-style.org/"&gt;Compass&lt;/a&gt;！&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;在CSS开发中你有没有遇到以下问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;一个CSS文件几百上千行，要修改一个样式要找半天；&lt;/li&gt;
-&lt;li&gt;为了不同浏览器的兼容性，同样的样式要写好几行代码；&lt;/li&gt;
-&lt;li&gt;为了防止背景图片被缓存，每次更改背景图片都要修改图片名称和代码；&lt;/li&gt;
-&lt;li&gt;当sprites修改以后，在代码中需要调试半天background-position才能适应新的sprites；&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;当你遇到其中一个或多个问题的时候，说明在CSS代码的管理和维护上出了问题。而这个时候，传统的CSS开发方式已经无法满足这些需求了，我们需要新的开发框架和工具，也就是：&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;、&lt;a href="http://compass-style.org/"&gt;Compass&lt;/a&gt;！&lt;/p&gt;
-
-&lt;p&gt;关于Sass和Compass的基本用法，阮一峰有两片写的很好的简介：&lt;a href="http://www.ruanyifeng.com/blog/2012/06/sass.html"&gt;SASS用法指南&lt;/a&gt;、&lt;a href="http://www.ruanyifeng.com/blog/2012/11/compass.html"&gt;Compass用法指南&lt;/a&gt;。这里就不再赘述了，下面我想介绍一系列我们在使用Sass和Compass方面的最佳实践，本文为第一篇：如何模块化CSS代码，使我们的样式也有一个良好的组织结构。&lt;/p&gt;
-
-&lt;h3&gt;CSS代码组织的问题&lt;/h3&gt;
-
-&lt;p&gt;我们在写程序的时候，总是希望可以清楚的了解模块之间的依赖，这样可以方便程序人员理解代码，也方便监控我们的依赖不要过多。假设我们页面的CSS代码已经根据组件和功能划分为不同的模块和CSS文件，其中还有一些第三方的CSS库（reset）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;style/
-    reset.css
-    layout.css
-    menu.css
-    document.css
-    form/
-        form.css
-        button.css
-        input.css
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;相对应的页面&lt;code&gt;header&lt;/code&gt;就会有如下的引用：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/reset.css&amp;quot;/&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/layout.css&amp;quot;/&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/menu.css&amp;quot;/&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/document.css&amp;quot;/&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/form/form.css&amp;quot;/&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/form/button.css&amp;quot;/&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/form/input.css&amp;quot;/&amp;gt;
-&amp;lt;/header&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这样我们所有的依赖都在HTML中，不利于我们快速的看到样式之间的依赖，也会产生很多额外的HTTP请求，降低页面性能。我们也可以使用&lt;code&gt;@import&lt;/code&gt;在CSS文件内部管理引用，但这同样会产生额外的HTTP请求。&lt;/p&gt;
-
-&lt;h3&gt;利用&lt;code&gt;@import&lt;/code&gt;管理代码&lt;/h3&gt;
-
-&lt;p&gt;当我们希望在CSS代码中就管理所有依赖，并且不会产生额外的request时，就应该用到Sass了。
-下面我们看看如果使用了Sass应该是什么样子的：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;style/
-    screen.scss
-    _reset.scss
-    _layout.scss
-    _menu.scss
-    _document.scss
-    form/
-        _form.scss
-        _button.scss
-        _input.scss
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在&lt;code&gt;_form.scss&lt;/code&gt;中，我们将管理所有的表单及表单控件的样式：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@import &amp;quot;button&amp;quot;;
-@import &amp;quot;input&amp;quot;;
-
-form {
-    ⋯⋯
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在&lt;code&gt;screen.scss&lt;/code&gt;中，我们将管理所有页面样式的依赖：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@import &amp;quot;reset&amp;quot;;
-@import &amp;quot;layout&amp;quot;;
-@import &amp;quot;menu&amp;quot;;
-@import &amp;quot;document&amp;quot;;
-@import &amp;quot;form&amp;quot;;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中文件名前面的下划线是告诉Sass该文件只是一个模块，不用单独生成css文件，所以最后生成的css文件只有一个：&lt;code&gt;screen.css&lt;/code&gt;，于是我们只需要一个request就可以引入所有的css文件，写起来也非常方便：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
-    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;style/screen.css&amp;quot;/&amp;gt;
-&amp;lt;/header&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可能有人会担心这样调试起来会不会很麻烦？但其实如果我们使用Chrome的inspection，我们根本不必接触源代码就可以很好的调试了。&lt;/p&gt;
-
-&lt;p&gt;同时，Compass已经提供了丰富的CSS库，其中包括了rese，所以我们可以直接删除&lt;code&gt;_reset.scss&lt;/code&gt;，只在&lt;code&gt;screen.scss&lt;/code&gt;中引入就可以了。&lt;/p&gt;
-
-&lt;h3&gt;最佳实践和注意&lt;/h3&gt;
-
-&lt;p&gt;下面我们来总结一下在使用Sass帮助我们组织代码结构的时候应该注意的地方：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;将CSS代码按照功能和组件划分为不同的模块，每个模块为一个文件，模块的文件名都以下划线开头，避免Sass生成额外的CSS文件&lt;/li&gt;
-&lt;li&gt;当一个模块的代码过多的时候，将之拆分为不同的子模块，并且在一个主模块中管理所有依赖，如：&lt;code&gt;_form.scss&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;不要有太多的层级，那样会影响代码的可读性，通常三层已经是极限了&lt;/li&gt;
-&lt;li&gt;讲所有第三方引用的库都放在一个文件管理，例如：&lt;code&gt;screen.scss&lt;/code&gt;，即使只有一个模块用到了它。因为重复的引用会在最后生成额外的CSS代码，而在众多的子模块中查找是否已经引入了某个库会非常麻烦，也不便于管理&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这样既模块化了CSS代码，相互之间的依赖又非常清晰，而且还没有增加额外的request，不失为一个最佳实践。&lt;/p&gt;
 </content>
   </entry>
 </feed>
