@@ -36,7 +36,7 @@
 &lt;li&gt;⋯⋯&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。 &lt;/p&gt;
+&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看&lt;a href="https://github.com/zation/flyingtortoise"&gt;所有的代码&lt;/a&gt;。 &lt;/p&gt;
 </summary>
     <content type="html">&lt;p&gt;如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：&lt;/p&gt;
 
@@ -56,7 +56,7 @@
 &lt;li&gt;⋯⋯&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。 &lt;/p&gt;
+&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看&lt;a href="https://github.com/zation/flyingtortoise"&gt;所有的代码&lt;/a&gt;。 &lt;/p&gt;
 
 &lt;h3&gt;什么是开发流程？&lt;/h3&gt;
 
