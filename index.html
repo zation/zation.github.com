@@ -8,7 +8,7 @@
   <meta name="description"
   content="经历过各种技术和职位，最终发现前端开发才是我的归宿，现为ThoughtWorks前端程序员，专注于实践优秀的前端代码架构。同时也是ThoughtWorks UX Group一员，关注用户体验以及响应式设计、视差滚动等新兴设计元素。">
 
-  <link href="/stylesheets/main.css?1364960607" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/stylesheets/main.css?1369709686" media="screen" rel="stylesheet" type="text/css" />
   <link href="/images/favicon.png?1357395976" rel="icon" type="image/png" />
   <!--[if lt IE 9]>
     <script src="/javascripts/html5shiv-printshiv.js?1360331750" type="text/javascript"></script>
@@ -64,6 +64,42 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
+        2013. 05. 28
+      </li>
+      
+        <li class="tag">
+          <a href="/tags/mobile.html">Mobile</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/html5.html">HTML5</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/appcache.html">AppCache</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="build_offline_mobile_web_app"
+          href="/2013/05/28/build_offline_mobile_web_app.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2013/05/28/build_offline_mobile_web_app.html">打造离线使用的Mobile Web App</a>
+      </h1>
+      
+    </header>
+    <div class="article-content">
+      <p><img alt="HTML5" src="/images/appcache/html5.png?1369790634"></p>
+
+<p>最近公司举办技术大赛，我和同事一起制作了一个叫做<a href="http://10khours.me">10K Hours</a>的Mobile Web App，可以帮助你通过一万小时的努力，成为某个领域的专家。正好前段时间翻译了一本书<a href="http://book.douban.com/subject/10580867/">《HTML5 Mobile Development Cookbook》</a>，中文译本<a href="http://book.douban.com/subject/24706036/">在此</a>。其中讲到了不少移动端Web开发的Best Practices，正好就用到了10K Hours这个应用上。其中我觉得非常有用但是又让人头痛的一个功能就是AppCache：它可以让用户在访问一次网页以后，下次再来时不能访问网络的情况下，...</p>
+    </div>
+  </article>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
         2013. 03. 15
       </li>
       
@@ -106,8 +142,7 @@
 <li>⋯⋯</li>
 </ul>
 
-<p>于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：<a href="http://yeoman.io/">YEMAN</a>、<a href="http://jamjs.org/">Jam</a>、<a href="http://volojs.org/">volo</a>、<a href="https://github.com/component/component">component</a>、<a href="http://brunch.io/">Brunch</a>⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（<a href="http://twitter.github.com/bower/">bower</a>、<a href="http://gruntjs.com/">grunt</a>）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看<a href="https://github.com/zation/flyingtortoise">所有的代码</a>。 </p>
-
+<p>于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：<a href="http://yeoman.io/">YEMAN</a>、<a href="http://jamjs.org/">Jam</a>、<a href="http://volojs.org/">volo</a>、<a href="https://github.com/component/component">component</a>、<a href="http://brunch.io/">Brunch</a>⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（<a href="http://twitter.github.com/bower/">bower</a>、<a href="http://gruntjs.com/">grunt</a>）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看<a href="https://github.com/zation/flyingtortoise">所有的代码</a>。 
     </div>
   </article>
   <article class="article">
@@ -141,8 +176,7 @@
 
 <p>动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：<a href="http://www.slideshare.net/findfado/ux-enhancing-experiences">UX: Enhancing Experiences with Animation</a>。）</p>
 
-<p>如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括<strong>tansform</strong>、<strong>animation</strong>、<strong>keyframes</strong>。最终效果情况本站右上角。</p>
-
+<p>如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括<strong>tansform</strong>、<strong>animation</strong>、<strong>keyframes</strong>。最终效果情况本站右上角。
     </div>
   </article>
   <article class="article">
@@ -170,8 +204,7 @@
     <div class="article-content">
       <p><img alt="Sudoku" src="/images/sudoku/cover.jpg?1359528371" /></p>
 
-<p>数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。</p>
-
+<p>数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。
     </div>
   </article>
   <article class="article">
@@ -211,8 +244,7 @@
 <li>测试代码中需要准备大量的html fixture，每个测试都是很大的集成测试，难以重构、相当耗时。</li>
 </ul>
 
-<p>当你遇到其中一个或几个问题时，请开始考虑用<a href="http://backbonejs.org/">Backbone.js</a>来重构吧，越是问题严重的时候重构的风险越大，花费的时间和精力也越多，最后可能是遗留一大堆垃圾代码而草草了结项目。</p>
-
+<p>当你遇到其中一个或几个问题时，请开始考虑用<a href="http://backbonejs.org/">Backbone.js</a>来重构吧，越是问题严重的时候重构的风险越大，花费的时间和精力也越多，最后可能是遗留一大堆垃圾代码而草草了结项目。
     </div>
   </article>
   <article class="article">
@@ -258,8 +290,7 @@
 <li>自动给图片加上防缓存机制。</li>
 </ul>
 
-<p>下面我们就来看看如何具体实现这些功能。</p>
-
+<p>下面我们就来看看如何具体实现这些功能。
     </div>
   </article>
   <article class="article">
@@ -305,8 +336,7 @@
 <li>不同的组件拥有同样的样式，但由于有一些细微的差别，导致很难复用，而一旦复用，由于CSS的特性，又不易阅读和维护。</li>
 </ul>
 
-<p>这个时候就应该用到Sass的nest和<code>@extend</code>以及Compass的一些内建mixin了。</p>
-
+<p>这个时候就应该用到Sass的nest和<code>@extend</code>以及Compass的一些内建mixin了。
     </div>
   </article>
   <article class="article">
@@ -352,8 +382,7 @@
 <li>⋯⋯</li>
 </ul>
 
-<p>当你遇到其中一个或多个问题的时候，说明在CSS代码的管理和维护上出了问题。而这个时候，传统的CSS开发方式已经无法满足这些需求了，我们需要新的开发框架和工具，也就是：<a href="http://sass-lang.com/">Sass</a>、<a href="http://compass-style.org/">Compass</a>！</p>
-
+<p>当你遇到其中一个或多个问题的时候，说明在CSS代码的管理和维护上出了问题。而这个时候，传统的CSS开发方式已经无法满足这些需求了，我们需要新的开发框架和工具，也就是：<a href="http://sass-lang.com/">Sass</a>、<a href="http://compass-style.org/">Compass</a>！
     </div>
   </article>
   <article class="article">
@@ -396,8 +425,7 @@
 <li>⋯⋯</li>
 </ul>
 
-<p>但是更多的，使我思维和观念的转变。</p>
-
+<p>但是更多的，使我思维和观念的转变。
     </div>
   </article>
 
@@ -449,7 +477,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1364960607" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1369790637" type="text/javascript"></script>
   <script type="text/javascript">
 
     var _gaq = _gaq || [];

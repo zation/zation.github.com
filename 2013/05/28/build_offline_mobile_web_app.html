@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <title>刘旸 Zation</title>
+  <meta name="author" content="刘旸">
+  <meta name="description"
+  content="经历过各种技术和职位，最终发现前端开发才是我的归宿，现为ThoughtWorks前端程序员，专注于实践优秀的前端代码架构。同时也是ThoughtWorks UX Group一员，关注用户体验以及响应式设计、视差滚动等新兴设计元素。">
+
+  <link href="/stylesheets/main.css?1369709686" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/images/favicon.png?1357395976" rel="icon" type="image/png" />
+  <!--[if lt IE 9]>
+    <script src="/javascripts/html5shiv-printshiv.js?1360331750" type="text/javascript"></script>
+  <![endif]-->
+</head>
+
+<body class="detail">
+  <div class="main-container">
+    <header class="nav-container">
+      <div class="search-container">
+  <div class="search-cancel-icon">✖</div>
+  <button class="search-cancel">Cancel</button>
+  <input placeholder="Search for article title or tags" class="search" type="text">
+  <div class="search-qualifier"></div>
+  <ul class="search-result">
+  </ul>
+</div>
+<ul class="social-links">
+  <li class="google-plus">
+    <a target="_blank" href="https://plus.google.com/100624981016590778324?rel=author">
+      Google
+    </a>
+  </li>
+  <li class="weibo">
+    <a target="_blank" href="http://weibo.com/zation1">
+      Weibo
+    </a>
+  </li>
+  <li class="rss">
+    <a target="_blank" href="/feed.xml">
+      RSS
+    </a>
+  </li>
+  <li class="facebook">
+    <a target="_blank" href="http://www.facebook.com/yang.liu.37669">
+      Facebook
+    </a>
+  </li>
+  <li class="github">
+    <a target="_blank" href="https://github.com/zation">
+      Github
+    </a>
+  </li>
+</ul>
+      <a href="/" class="logo">刘旸 Zation</a>
+<ul class="nav">
+  <li><a class="blog-link" href="/">Blog</a></li>
+  <li><a class="about-link" href="/about.html">About</a></li>
+</ul>
+    </header>
+
+    <section class="content">
+        <article class="article">
+    <header class="article-title">
+      <h1>
+        打造离线使用的Mobile Web App
+      </h1>
+      
+    </header>
+    <ul class="extro-info">
+      <li class="date">
+        2013. 05. 28
+      </li>
+      
+        <li class="tag">
+          <a href="/tags/mobile.html">Mobile</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/html5.html">HTML5</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/appcache.html">AppCache</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="build_offline_mobile_web_app"
+          href="#comment"></a>
+      </li>
+    </ul>
+    
+    <div class="article-content">
+      <p><img alt="HTML5" src="/images/appcache/html5.png?1369790634" /></p>
+
+<p>最近公司举办技术大赛，我和同事一起制作了一个叫做<a href="http://10khours.me">10K Hours</a>的Mobile Web App，可以帮助你通过一万小时的努力，成为某个领域的专家。正好前段时间翻译了一本书<a href="http://book.douban.com/subject/10580867/">《HTML5 Mobile Development Cookbook》</a>，中文译本<a href="http://book.douban.com/subject/24706036/">在此</a>。其中讲到了不少移动端Web开发的Best Practices，正好就用到了10K Hours这个应用上。其中我觉得非常有用但是又让人头痛的一个功能就是AppCache：它可以让用户在访问一次网页以后，下次再来时不能访问网络的情况下，也可以使用这个Web App；但是当页面资源被缓存以后，非常难去更新它们⋯⋯下面就是App Cache的详细介绍和使用技巧：</p>
+
+<h3>什么是AppCache</h3>
+
+<p>下面是来自<a href="http://www.w3.org/TR/2011/WD-html5-20110525/offline.html">W3C</a>的解释：</p>
+
+<blockquote>
+<p>In order to enable users to continue interacting with Web applications and documents even when their network connection is unavailable — for instance, because they are traveling outside of their ISP&#39;s coverage area — authors can provide a manifest which lists the files that are needed for the Web application to work offline and which causes the user&#39;s browser to keep a copy of the files for use offline.</p>
+</blockquote>
+
+<p>简单来说就是可以让开发者在网络出问题的情况下，可以部分或全部访问网站的静态资源。</p>
+
+<p>可能有些朋友会疑惑AppCache与浏览器自动缓存和localStorage的区别，这里我简单讲一下：在默认设置下，浏览器会根据request header自动缓存静态文件，但是在请求该文件时还是会发出http request，而一旦被AppCache缓存住的文件就不会发送http request，除非人工触发缓存更新；localStorage也是一种缓存，但是它缓存的是数据，而AppCache缓存的是文件。</p>
+
+<h3>如何使用AppCache</h3>
+
+<p>要引入AppCache一般有三个步骤：</p>
+
+<h4>1. 声明manifest文件</h4>
+
+<p>manifest可以告诉浏览器网站的cache行为，下面是一个完整的manifest文件示例：</p>
+
+<pre><code>CACHE MANIFEST
+# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)
+
+CACHE:
+index.html
+stylesheet.css
+images/logo.png
+scripts/main.js
+
+NETWORK:
+myApp/api
+http://api.twitter.com
+
+FALLBACK:
+images/large/ images/offline.jpg
+</code></pre>
+
+<p><code>CACHE MANIFEST</code>表明该文件用于AppCache的配置，必须放在第一行</p>
+
+<p><code># Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)</code>是一个时间戳，用于触发缓存文件的更新，这个会在后面详细讲到。</p>
+
+<p><code>CACHE</code>指定需要被缓存的文件。这些文件会被缓存到AppCache中，以后这些文件都会从AppCache中加载。</p>
+
+<p><code>NETWORK</code>指定不需要被缓存的文件。这些文件不会被缓存到AppCache中，一般用于一些动态的页面或数据。</p>
+
+<p><strong>注意</strong>：一些浏览器会给缓存容量加入上限，比如Chrome浏览器就是使用一个共有的缓存池，如果超出上限，以前缓存的文件有可能会被清除掉。</p>
+
+<p><code>FALLBACK</code>指定当网络不可用时的替代文件，这些文件在网络可用时不会从AppCache中读取，只有当网络不可用时才会从AppCache中读取。示例中指定当<code>images/large/</code>中的任意文件无法访问时，都从AppCache中读取<code>images/offline.jpg</code>文件。</p>
+
+<p>我们一般使用<code>.appcache</code>作为manifest文件的后缀，这个是WHATWG的建议，同时也获得了更多浏览器的支持。</p>
+
+<h4>2. 在页面中引入manifest文件</h4>
+
+<p>引入manifest文件需要在html标签中加入manifest属性，其值为manifest文件地址，例如：</p>
+
+<pre><code>&lt;html manifest=&quot;example.appcache&quot;&gt;
+  ...
+&lt;/html&gt;
+</code></pre>
+
+<p><strong>注意</strong>：你需要在每个用到AppCache的页面都加入manifest属性，除非该页面就在缓存列表中，而拥有manifest属性的页面会自动被缓存住，不需要再加入缓存列表了。</p>
+
+<h4>3. 修改服务器端的mime-type</h4>
+
+<p>为了让服务器端可以正确的处理manifest文件，需要在mine-type中加入<code>text/cache-manifest</code>。比如在Apache服务器中，可以添加以下行到配置文件中：</p>
+
+<pre><code>AddType text/cache-manifest .appcache
+</code></pre>
+
+<h3>更新缓存</h3>
+
+<p>完成manifest文件的配置以后，你会发现你的页面加载速度暴增，可以算是秒载，但是你也会悲催的发现，任何文件的修改将不会被反应到页面上，那么当我们有文件修改的时候应该怎么办呢？</p>
+
+<h4>修改manifest文件</h4>
+
+<p>有两种情况可以导致缓存更新：</p>
+
+<ol>
+<li>用户清除缓存数据。</li>
+<li>manifest文件修改。</li>
+</ol>
+
+<p>所以我们要更新缓存，其实只有一个办法，那就是修改manifest文件。这个时候我们就可以看到在上个例子中那个被注释掉的时间戳（<code># Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)</code>）的作用了，每当任意一个被缓存的文件修改后，我们都应该修改manifest文件的时间戳，让浏览器知道有文件更改，应该更新缓存。</p>
+
+<p>当浏览器检测到manifest文件更改以后，它会发起请求更新所有被缓存的文件，但是这时候还不会马上更新到页面中，还需要用户再次刷新页面，才能看到新的内容。也就是说，当我们有文件修改以后，需要用户刷新两次才能看到新的内容，这个对于用户来说是很奇怪的体验。这个时候我们可以利用AppCache提供的一些接口来解决这个问题。</p>
+
+<h4>AppCache接口</h4>
+
+<p>AppCache提供了以下的事件接口：</p>
+
+<ul>
+<li><code>checking</code>：客户端正在检查manifest文件的更新，或者尝试下载manifest文件时触发。<strong>注意</strong>：这个事件总是首先触发的。</li>
+<li><code>noupdate</code>：客户端检查manifest文件，并且manifest文件没有更新时触发。</li>
+<li><code>downloading</code>：客户端发现manifest文件需要更新并开始更新，或者开始下载manifest中列举的缓存文件时触发。</li>
+<li><code>progress</code>：客户端下载manifest中列巨额的缓存文件时触发。</li>
+<li><code>cached</code>：manifest中的文件被下载，并且被缓存以后触发。</li>
+<li><code>updateready</code>：当新的缓存文件下载完成后触发，可以利用swapCache()来应用新的文件。</li>
+</ul>
+
+<p>其中最重要的就是<code>updateready</code>这个事件，我们可以利用JavaScript绑定这个事件，在缓存更新的时候自动刷新来应用这些更新，例如：</p>
+
+<pre><code>// Check if a new cache is available on page load.
+window.addEventListener(&#39;load&#39;, function(e) {
+
+  window.applicationCache.addEventListener(&#39;updateready&#39;, function(e) {
+    if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+      // Browser downloaded a new app cache.
+      // Swap it in and reload the page to get the new hotness.
+      window.applicationCache.swapCache();
+      if (confirm(&#39;A new version of this site is available. Load it?&#39;)) {
+        window.location.reload();
+      }
+    } else {
+      // Manifest didn&#39;t changed. Nothing new to server.
+    }
+  }, false);
+
+}, false);
+</code></pre>
+
+<h3>AppCache的Debug</h3>
+
+<p>当我们在本地调试的时候，我们如何知道AppCache是否起效果，并缓存了哪些文件呢？Chrome的开发者工具提供了这些信息，打开开发者工具，在Resource =&gt; Application Cache中就可以看到缓存了哪些文件，如下图所示：</p>
+
+<p><img alt="AppCache Debug" src="/images/appcache/debug.png?1369790634" /></p>
+
+<p>但是在这里不能对Cache进行删除操作，也不能看到其他网站的Cache。如果想看到所有网站的AppCache信息，并且删除其中某一个的话，可以进入<a href="chrome://appcache-internals/">chrome://appcache-internals/</a>，这个管理页面会列出所有浏览器中的AppCache信息，包括manifest地址、缓存大小、更新时间、创建时间等等⋯⋯</p>
+
+<h3>延伸</h3>
+
+<p>到这里我们就已经讲解了关于AppCache的基础知识，这里还有一些推荐阅读的资料，同时也是我的参考资料：</p>
+
+<ul>
+<li><a href="http://www.w3.org/TR/2011/WD-html5-20110525/offline.html">W3C关于AppCache的标准文档</a></li>
+<li><a href="http://www.html5rocks.com/en/tutorials/appcache/beginner/">A Beginner&#39;s Guide to Using the Application Cache</a></li>
+<li><a href="http://blog.christian-heindel.de/2011/10/25/debugging-html5-offline-web-applications/">Debugging HTML5 Offline Web applications</a></li>
+<li><a href="http://appcachefacts.info/">Appcache Facts</a></li>
+</ul>
+
+    </div>
+  </article>
+  <div id="comment">
+    <div class="ds-thread" data-thread-key="build_offline_mobile_web_app"></div>
+  </div>
+
+    </section>
+  </div>
+
+  <footer class="page-footer">
+    <div class="nav-container">
+      <div class="search-container">
+  <div class="search-cancel-icon">✖</div>
+  <button class="search-cancel">Cancel</button>
+  <input placeholder="Search for article title or tags" class="search" type="text">
+  <div class="search-qualifier"></div>
+  <ul class="search-result">
+  </ul>
+</div>
+<ul class="social-links">
+  <li class="google-plus">
+    <a target="_blank" href="https://plus.google.com/100624981016590778324?rel=author">
+      Google
+    </a>
+  </li>
+  <li class="weibo">
+    <a target="_blank" href="http://weibo.com/zation1">
+      Weibo
+    </a>
+  </li>
+  <li class="rss">
+    <a target="_blank" href="/feed.xml">
+      RSS
+    </a>
+  </li>
+  <li class="facebook">
+    <a target="_blank" href="http://www.facebook.com/yang.liu.37669">
+      Facebook
+    </a>
+  </li>
+  <li class="github">
+    <a target="_blank" href="https://github.com/zation">
+      Github
+    </a>
+  </li>
+</ul>
+      <a href="/" class="logo">刘旸 Zation</a>
+<ul class="nav">
+  <li><a class="blog-link" href="/">Blog</a></li>
+  <li><a class="about-link" href="/about.html">About</a></li>
+</ul>
+    </div>
+  </footer>
+  <script src="/javascripts/main.js?1369790637" type="text/javascript"></script>
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8993667-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zation"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+</body>
+</html>

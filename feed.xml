@@ -5,10 +5,166 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2013-03-15T08:21:00Z</updated>
+  <updated>2013-05-28T03:04:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>打造离线使用的Mobile Web App</title>
+    <link rel="alternate" href="/2013/05/28/build_offline_mobile_web_app.html"/>
+    <id>/2013/05/28/build_offline_mobile_web_app.html</id>
+    <published>2013-05-28T03:04:00Z</published>
+    <updated>2013-05-28T03:04:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;&lt;img alt="HTML5" src="/images/appcache/html5.png?1369790634"&gt;&lt;/p&gt;
+
+&lt;p&gt;最近公司举办技术大赛，我和同事一起制作了一个叫做&lt;a href="http://10khours.me"&gt;10K Hours&lt;/a&gt;的Mobile Web App，可以帮助你通过一万小时的努力，成为某个领域的专家。正好前段时间翻译了一本书&lt;a href="http://book.douban.com/subject/10580867/"&gt;《HTML5 Mobile Development Cookbook》&lt;/a&gt;，中文译本&lt;a href="http://book.douban.com/subject/24706036/"&gt;在此&lt;/a&gt;。其中讲到了不少移动端Web开发的Best Practices，正好就用到了10K Hours这个应用上。其中我觉得非常有用但是又让人头痛的一个功能就是AppCache：它可以让用户在访问一次网页以后，下次再来时不能访问网络的情况下，...&lt;/p&gt;</summary>
+    <content type="html">&lt;p&gt;&lt;img alt="HTML5" src="/images/appcache/html5.png?1369790634" /&gt;&lt;/p&gt;
+
+&lt;p&gt;最近公司举办技术大赛，我和同事一起制作了一个叫做&lt;a href="http://10khours.me"&gt;10K Hours&lt;/a&gt;的Mobile Web App，可以帮助你通过一万小时的努力，成为某个领域的专家。正好前段时间翻译了一本书&lt;a href="http://book.douban.com/subject/10580867/"&gt;《HTML5 Mobile Development Cookbook》&lt;/a&gt;，中文译本&lt;a href="http://book.douban.com/subject/24706036/"&gt;在此&lt;/a&gt;。其中讲到了不少移动端Web开发的Best Practices，正好就用到了10K Hours这个应用上。其中我觉得非常有用但是又让人头痛的一个功能就是AppCache：它可以让用户在访问一次网页以后，下次再来时不能访问网络的情况下，也可以使用这个Web App；但是当页面资源被缓存以后，非常难去更新它们⋯⋯下面就是App Cache的详细介绍和使用技巧：&lt;/p&gt;
+
+&lt;h3&gt;什么是AppCache&lt;/h3&gt;
+
+&lt;p&gt;下面是来自&lt;a href="http://www.w3.org/TR/2011/WD-html5-20110525/offline.html"&gt;W3C&lt;/a&gt;的解释：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;In order to enable users to continue interacting with Web applications and documents even when their network connection is unavailable — for instance, because they are traveling outside of their ISP&amp;#39;s coverage area — authors can provide a manifest which lists the files that are needed for the Web application to work offline and which causes the user&amp;#39;s browser to keep a copy of the files for use offline.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;简单来说就是可以让开发者在网络出问题的情况下，可以部分或全部访问网站的静态资源。&lt;/p&gt;
+
+&lt;p&gt;可能有些朋友会疑惑AppCache与浏览器自动缓存和localStorage的区别，这里我简单讲一下：在默认设置下，浏览器会根据request header自动缓存静态文件，但是在请求该文件时还是会发出http request，而一旦被AppCache缓存住的文件就不会发送http request，除非人工触发缓存更新；localStorage也是一种缓存，但是它缓存的是数据，而AppCache缓存的是文件。&lt;/p&gt;
+
+&lt;h3&gt;如何使用AppCache&lt;/h3&gt;
+
+&lt;p&gt;要引入AppCache一般有三个步骤：&lt;/p&gt;
+
+&lt;h4&gt;1. 声明manifest文件&lt;/h4&gt;
+
+&lt;p&gt;manifest可以告诉浏览器网站的cache行为，下面是一个完整的manifest文件示例：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;CACHE MANIFEST
+# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)
+
+CACHE:
+index.html
+stylesheet.css
+images/logo.png
+scripts/main.js
+
+NETWORK:
+myApp/api
+http://api.twitter.com
+
+FALLBACK:
+images/large/ images/offline.jpg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;CACHE MANIFEST&lt;/code&gt;表明该文件用于AppCache的配置，必须放在第一行&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)&lt;/code&gt;是一个时间戳，用于触发缓存文件的更新，这个会在后面详细讲到。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;CACHE&lt;/code&gt;指定需要被缓存的文件。这些文件会被缓存到AppCache中，以后这些文件都会从AppCache中加载。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;NETWORK&lt;/code&gt;指定不需要被缓存的文件。这些文件不会被缓存到AppCache中，一般用于一些动态的页面或数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：一些浏览器会给缓存容量加入上限，比如Chrome浏览器就是使用一个共有的缓存池，如果超出上限，以前缓存的文件有可能会被清除掉。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;FALLBACK&lt;/code&gt;指定当网络不可用时的替代文件，这些文件在网络可用时不会从AppCache中读取，只有当网络不可用时才会从AppCache中读取。示例中指定当&lt;code&gt;images/large/&lt;/code&gt;中的任意文件无法访问时，都从AppCache中读取&lt;code&gt;images/offline.jpg&lt;/code&gt;文件。&lt;/p&gt;
+
+&lt;p&gt;我们一般使用&lt;code&gt;.appcache&lt;/code&gt;作为manifest文件的后缀，这个是WHATWG的建议，同时也获得了更多浏览器的支持。&lt;/p&gt;
+
+&lt;h4&gt;2. 在页面中引入manifest文件&lt;/h4&gt;
+
+&lt;p&gt;引入manifest文件需要在html标签中加入manifest属性，其值为manifest文件地址，例如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;html manifest=&amp;quot;example.appcache&amp;quot;&amp;gt;
+  ...
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：你需要在每个用到AppCache的页面都加入manifest属性，除非该页面就在缓存列表中，而拥有manifest属性的页面会自动被缓存住，不需要再加入缓存列表了。&lt;/p&gt;
+
+&lt;h4&gt;3. 修改服务器端的mime-type&lt;/h4&gt;
+
+&lt;p&gt;为了让服务器端可以正确的处理manifest文件，需要在mine-type中加入&lt;code&gt;text/cache-manifest&lt;/code&gt;。比如在Apache服务器中，可以添加以下行到配置文件中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;AddType text/cache-manifest .appcache
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;更新缓存&lt;/h3&gt;
+
+&lt;p&gt;完成manifest文件的配置以后，你会发现你的页面加载速度暴增，可以算是秒载，但是你也会悲催的发现，任何文件的修改将不会被反应到页面上，那么当我们有文件修改的时候应该怎么办呢？&lt;/p&gt;
+
+&lt;h4&gt;修改manifest文件&lt;/h4&gt;
+
+&lt;p&gt;有两种情况可以导致缓存更新：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;用户清除缓存数据。&lt;/li&gt;
+&lt;li&gt;manifest文件修改。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;所以我们要更新缓存，其实只有一个办法，那就是修改manifest文件。这个时候我们就可以看到在上个例子中那个被注释掉的时间戳（&lt;code&gt;# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)&lt;/code&gt;）的作用了，每当任意一个被缓存的文件修改后，我们都应该修改manifest文件的时间戳，让浏览器知道有文件更改，应该更新缓存。&lt;/p&gt;
+
+&lt;p&gt;当浏览器检测到manifest文件更改以后，它会发起请求更新所有被缓存的文件，但是这时候还不会马上更新到页面中，还需要用户再次刷新页面，才能看到新的内容。也就是说，当我们有文件修改以后，需要用户刷新两次才能看到新的内容，这个对于用户来说是很奇怪的体验。这个时候我们可以利用AppCache提供的一些接口来解决这个问题。&lt;/p&gt;
+
+&lt;h4&gt;AppCache接口&lt;/h4&gt;
+
+&lt;p&gt;AppCache提供了以下的事件接口：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;checking&lt;/code&gt;：客户端正在检查manifest文件的更新，或者尝试下载manifest文件时触发。&lt;strong&gt;注意&lt;/strong&gt;：这个事件总是首先触发的。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;noupdate&lt;/code&gt;：客户端检查manifest文件，并且manifest文件没有更新时触发。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;downloading&lt;/code&gt;：客户端发现manifest文件需要更新并开始更新，或者开始下载manifest中列举的缓存文件时触发。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;progress&lt;/code&gt;：客户端下载manifest中列巨额的缓存文件时触发。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cached&lt;/code&gt;：manifest中的文件被下载，并且被缓存以后触发。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;updateready&lt;/code&gt;：当新的缓存文件下载完成后触发，可以利用swapCache()来应用新的文件。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其中最重要的就是&lt;code&gt;updateready&lt;/code&gt;这个事件，我们可以利用JavaScript绑定这个事件，在缓存更新的时候自动刷新来应用这些更新，例如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// Check if a new cache is available on page load.
+window.addEventListener(&amp;#39;load&amp;#39;, function(e) {
+
+  window.applicationCache.addEventListener(&amp;#39;updateready&amp;#39;, function(e) {
+    if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+      // Browser downloaded a new app cache.
+      // Swap it in and reload the page to get the new hotness.
+      window.applicationCache.swapCache();
+      if (confirm(&amp;#39;A new version of this site is available. Load it?&amp;#39;)) {
+        window.location.reload();
+      }
+    } else {
+      // Manifest didn&amp;#39;t changed. Nothing new to server.
+    }
+  }, false);
+
+}, false);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;AppCache的Debug&lt;/h3&gt;
+
+&lt;p&gt;当我们在本地调试的时候，我们如何知道AppCache是否起效果，并缓存了哪些文件呢？Chrome的开发者工具提供了这些信息，打开开发者工具，在Resource =&amp;gt; Application Cache中就可以看到缓存了哪些文件，如下图所示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AppCache Debug" src="/images/appcache/debug.png?1369790634" /&gt;&lt;/p&gt;
+
+&lt;p&gt;但是在这里不能对Cache进行删除操作，也不能看到其他网站的Cache。如果想看到所有网站的AppCache信息，并且删除其中某一个的话，可以进入&lt;a href="chrome://appcache-internals/"&gt;chrome://appcache-internals/&lt;/a&gt;，这个管理页面会列出所有浏览器中的AppCache信息，包括manifest地址、缓存大小、更新时间、创建时间等等⋯⋯&lt;/p&gt;
+
+&lt;h3&gt;延伸&lt;/h3&gt;
+
+&lt;p&gt;到这里我们就已经讲解了关于AppCache的基础知识，这里还有一些推荐阅读的资料，同时也是我的参考资料：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.w3.org/TR/2011/WD-html5-20110525/offline.html"&gt;W3C关于AppCache的标准文档&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.html5rocks.com/en/tutorials/appcache/beginner/"&gt;A Beginner&amp;#39;s Guide to Using the Application Cache&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://blog.christian-heindel.de/2011/10/25/debugging-html5-offline-web-applications/"&gt;Debugging HTML5 Offline Web applications&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://appcachefacts.info/"&gt;Appcache Facts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
   <entry>
     <title>如何构建自动化的前端开发流程</title>
     <link rel="alternate" href="/2013/03/15/how-to-build-frontend-dev-env.html"/>
@@ -36,8 +192,7 @@
 &lt;li&gt;⋯⋯&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看&lt;a href="https://github.com/zation/flyingtortoise"&gt;所有的代码&lt;/a&gt;。 &lt;/p&gt;
-</summary>
+&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看&lt;a href="https://github.com/zation/flyingtortoise"&gt;所有的代码&lt;/a&gt;。 </summary>
     <content type="html">&lt;p&gt;如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：&lt;/p&gt;
 
 &lt;ul&gt;
@@ -319,8 +474,7 @@ before_script:
 
 &lt;p&gt;动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：&lt;a href="http://www.slideshare.net/findfado/ux-enhancing-experiences"&gt;UX: Enhancing Experiences with Animation&lt;/a&gt;。）&lt;/p&gt;
 
-&lt;p&gt;如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括&lt;strong&gt;tansform&lt;/strong&gt;、&lt;strong&gt;animation&lt;/strong&gt;、&lt;strong&gt;keyframes&lt;/strong&gt;。最终效果情况本站右上角。&lt;/p&gt;
-</summary>
+&lt;p&gt;如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括&lt;strong&gt;tansform&lt;/strong&gt;、&lt;strong&gt;animation&lt;/strong&gt;、&lt;strong&gt;keyframes&lt;/strong&gt;。最终效果情况本站右上角。</summary>
     <content type="html">&lt;p&gt;&lt;img alt="CSS3" src="/images/CSS3.png?1360205783" /&gt;&lt;/p&gt;
 
 &lt;p&gt;动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：&lt;a href="http://www.slideshare.net/findfado/ux-enhancing-experiences"&gt;UX: Enhancing Experiences with Animation&lt;/a&gt;。）&lt;/p&gt;
@@ -466,8 +620,7 @@ before_script:
     </author>
     <summary type="html">&lt;p&gt;&lt;img alt="Sudoku" src="/images/sudoku/cover.jpg?1359528371" /&gt;&lt;/p&gt;
 
-&lt;p&gt;数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。&lt;/p&gt;
-</summary>
+&lt;p&gt;数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。</summary>
     <content type="html">&lt;p&gt;&lt;img alt="Sudoku" src="/images/sudoku/cover.jpg?1359528371" /&gt;&lt;/p&gt;
 
 &lt;p&gt;数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。&lt;/p&gt;
@@ -560,8 +713,7 @@ before_script:
 &lt;li&gt;测试代码中需要准备大量的html fixture，每个测试都是很大的集成测试，难以重构、相当耗时。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;当你遇到其中一个或几个问题时，请开始考虑用&lt;a href="http://backbonejs.org/"&gt;Backbone.js&lt;/a&gt;来重构吧，越是问题严重的时候重构的风险越大，花费的时间和精力也越多，最后可能是遗留一大堆垃圾代码而草草了结项目。&lt;/p&gt;
-</summary>
+&lt;p&gt;当你遇到其中一个或几个问题时，请开始考虑用&lt;a href="http://backbonejs.org/"&gt;Backbone.js&lt;/a&gt;来重构吧，越是问题严重的时候重构的风险越大，花费的时间和精力也越多，最后可能是遗留一大堆垃圾代码而草草了结项目。</summary>
     <content type="html">&lt;p&gt;进入现在这个项目已经一年多了，这是我呆过时间最长的一个项目，见证了项目的前端从简单的一些效果到有了复杂的逻辑，最后需要借助JavaScript的MVC框架来重构前端代码，以避免前端代码爆炸失控。具体来说我们的前端代码在增长过程中遇到了以下问题：&lt;/p&gt;
 
 &lt;ul&gt;
@@ -763,8 +915,7 @@ var BookView = Backbone.View.extend({
 &lt;li&gt;自动给图片加上防缓存机制。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;下面我们就来看看如何具体实现这些功能。&lt;/p&gt;
-</summary>
+&lt;p&gt;下面我们就来看看如何具体实现这些功能。</summary>
     <content type="html">&lt;p&gt;&lt;a href="/2013/01/09/sass_compass_best_practices_2.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来简化我们的代码，使我们的代码可复用且易维护。本文讲介绍如何使用Compass来管理我们用于样式的图片。&lt;/p&gt;
 
 &lt;p&gt;Compass的图片处理主要有以下功能：&lt;/p&gt;
@@ -884,191 +1035,6 @@ a[title=&amp;quot;sprites-example-flickr&amp;quot;] {
     end
 end
 &lt;/code&gt;&lt;/pre&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Sass &amp; Compass Best Practices 2——简化代码</title>
-    <link rel="alternate" href="/2013/01/09/sass_compass_best_practices_2.html"/>
-    <id>/2013/01/09/sass_compass_best_practices_2.html</id>
-    <published>2013-01-09T07:39:00Z</published>
-    <updated>2013-01-09T07:39:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;a href="/2013/01/07/sass_compass_best_practices_1.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。&lt;/p&gt;
-
-&lt;p&gt;在我们的CSS开发中，你是否遇到过以下的问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;为了浏览器的兼容性，同样的效果要写很多行，维护起来很麻烦；&lt;/li&gt;
-&lt;li&gt;CSS Selector需要有层级关系，但重复的写同样的父元素使代码看起来很冗余；&lt;/li&gt;
-&lt;li&gt;不同的组件拥有同样的样式，但由于有一些细微的差别，导致很难复用，而一旦复用，由于CSS的特性，又不易阅读和维护。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这个时候就应该用到Sass的nest和&lt;code&gt;@extend&lt;/code&gt;以及Compass的一些内建mixin了。&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;&lt;a href="/2013/01/07/sass_compass_best_practices_1.html"&gt;前一篇文章&lt;/a&gt;中我们介绍了如何利用Sass来组织我们的代码结构，本文中将会介绍如何利用Compass来简化我们的CSS代码，并且提高CSS代码的复用性。&lt;/p&gt;
-
-&lt;p&gt;在我们的CSS开发中，你是否遇到过以下的问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;为了浏览器的兼容性，同样的效果要写很多行，维护起来很麻烦；&lt;/li&gt;
-&lt;li&gt;CSS Selector需要有层级关系，但重复的写同样的父元素使代码看起来很冗余；&lt;/li&gt;
-&lt;li&gt;不同的组件拥有同样的样式，但由于有一些细微的差别，导致很难复用，而一旦复用，由于CSS的特性，又不易阅读和维护。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这个时候就应该用到Sass的nest和&lt;code&gt;@extend&lt;/code&gt;以及Compass的一些内建mixin了。&lt;/p&gt;
-
-&lt;h3&gt;简化兼容性代码&lt;/h3&gt;
-
-&lt;p&gt;当我们在用CSS实现渐变效果时，为了浏览器的兼容性，我们常常会用以下写法：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/* FF3.6+ */
-background: -moz-linear-gradient(top, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
-/* Chrome,Safari4+ */ 
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1e5799), color-stop(50%,#2989d8), color-stop(51%,#207cca), color-stop(100%,#7db9e8)); 
-/* Chrome10+,Safari5.1+ */
-background: -webkit-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
-/* Opera 11.10+ */
-background: -o-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
-/* IE10+ */
-background: -ms-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
-/* W3C */
-background: linear-gradient(to bottom, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); 
-/* IE6-9 */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=&amp;#39;#1e5799&amp;#39;, endColorstr=&amp;#39;#7db9e8&amp;#39;,GradientType=0 ); 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;一个简单的渐变，就为了兼容性，变成了超过10行的CSS代码，并且让我们维护起来非常麻烦，一旦有任何修改，我们都必须改7个地方⋯⋯好在Compass为我们提供了解决方案，我们只需要一行代码就可以：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@include background-image(linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%)); 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;类似的功能可以用在box-shadow：&lt;code&gt;@include box-shadow(red 2px 2px 10px);&lt;/code&gt;、inline-block：&lt;code&gt;@include inline-block&lt;/code&gt;、border-radius：&lt;code&gt;@include border-radius(25px);&lt;/code&gt;⋯⋯等等&lt;/p&gt;
-
-&lt;h3&gt;适当的使用nest&lt;/h3&gt;
-
-&lt;p&gt;在CSS中我们常常需要限制样式的作用范围，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.container {
-    ⋯⋯
-}
-.container .article {
-    ⋯⋯
-}
-.container .article .content {
-    ⋯⋯
-}
-.container .article .paragraph {
-    ⋯⋯
-}
-.container .article .link {
-    ⋯⋯
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这样书写在CSS中没有问题，但是重复的书写&lt;code&gt;.container&lt;/code&gt;和&lt;code&gt;.article&lt;/code&gt;总会让人感到厌倦，并且使同一部分的样式很容易散落在各处，不容易管理。这时候我们就可以使用nest了，它可以帮助我们：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;将同一部分的样式归总到一起，方便阅读和维护&lt;/li&gt;
-&lt;li&gt;消除重复的selector，特别是父元素的selector&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;下面我们来看看使用nest以后的代码：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.container {
-    ⋯⋯
-    .article {
-        ⋯⋯
-        .content {
-            ⋯⋯
-        }
-        .paragraph {
-            ⋯⋯
-        }
-        .link {
-            ⋯⋯
-        }
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;但是切忌不要过分的使用nest，如下：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.container {
-    ⋯⋯
-    .article {
-        ⋯⋯
-        .content {
-            ⋯⋯
-            .paragraph {
-                ⋯⋯
-                .link {
-                    ⋯⋯
-                }
-            }
-        }       
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;它会使最后生成出这样的CSS：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.container {
-    ⋯⋯
-}
-.container .article {
-    ⋯⋯
-}
-.container .article .content {
-    ⋯⋯
-}
-.container .article .content .paragraph {
-    ⋯⋯
-}
-.container .article .content .paragraph .link {
-    ⋯⋯
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;我们看到最后生成的CSS甚至出现了5层selector，一般CSS中出现3层selector已经是比较多了，因为太多的selector会使CSS文件变得冗余，可读性也会变差，而且很难被复用。当你真的需要这么多selector才能完成需求的话，那么你应该反思你的HTML结构是否出现了问题？&lt;/p&gt;
-
-&lt;h3&gt;谨慎的使用@extend&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;@extend&lt;/code&gt;可以使我们很方便的复用其他元素的样式，假如我们现在有如下的CSS：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;h1, h2 {
-    font-family: Arial;
-    font-size: 38px;
-    color: #222;
-}
-h2 {
-    font-size: 24px;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;我们可以使用&lt;code&gt;@extend&lt;/code&gt;使代码看起来依赖关系更清晰，并且稍微简单一些（但它实际生成的CSS代码与前相同）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;h1 {
-    font-family: Arial;
-    font-size: 38px;
-    color: #222;
-}
-h2 {
-    @extend h1;
-    font-size: 24px;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;它有些类似于&lt;code&gt;@mixin&lt;/code&gt;，不同在于它自身也是CSS，会被页面直接用到。它的目的在于消除重复，并且使依赖关系更加清晰。但是在使用的时候一定要谨慎，因为一个&lt;code&gt;@extend&lt;/code&gt;可以很方便的复用代码，人们往往直接这么一用，也不管是否被复用的所有样式都是需要的，也不管最终生成的CSS是否有冗余。所以我们在使用它的时候请先想想一下问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;是否所有的CSS属性都是我所需要的，否则的话复制粘贴其中一部分也不会花太多功夫，不要为了消除重复反而造成冗余&lt;/li&gt;
-&lt;li&gt;我所继承的样式中是否还继承了其他样式，不要有多重继承的情况，这样会导致代码理解变得困难&lt;/li&gt;
-&lt;li&gt;最终生成的CSS代码是否有selector过长的情况，不要写到最后写成了一个reset⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;鉴于&lt;code&gt;@extend&lt;/code&gt;有这样那样的问题，虽然它还是有一定的作用，但是建议用之前一定要谨慎。&lt;/p&gt;
 </content>
   </entry>
 </feed>
