@@ -8,10 +8,10 @@
   <meta name="description"
   content="经历过各种技术和职位，最终发现前端开发才是我的归宿，现为ThoughtWorks前端程序员，专注于实践优秀的前端代码架构。同时也是ThoughtWorks UX Group一员，关注用户体验以及响应式设计、视差滚动等新兴设计元素。">
 
-  <link href="/stylesheets/main.css?1369709686" media="screen" rel="stylesheet" type="text/css" />
-  <link href="/images/favicon.png?1357395976" rel="icon" type="image/png" />
+  <link href="/stylesheets/main.css?1401972436" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/images/favicon.png?1401972413" rel="icon" type="image/png" />
   <!--[if lt IE 9]>
-    <script src="/javascripts/html5shiv-printshiv.js?1360331750" type="text/javascript"></script>
+    <script src="/javascripts/html5shiv-printshiv.js?1401972413" type="text/javascript"></script>
   <![endif]-->
 </head>
 
@@ -85,7 +85,7 @@
     </ul>
     
     <div class="article-content">
-      <p><img alt="Sudoku" src="/images/sudoku/cover.jpg?1359528371" /></p>
+      <p><img alt="Sudoku" src="/images/sudoku/cover.jpg?1401972413" /></p>
 
 <p>数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。</p>
 
@@ -105,29 +105,29 @@
 
 <p>下面是一个数独的题目以及解答：</p>
 
-<p><img alt="Sudoku Example" src="/images/sudoku/example.png?1359528371" />
-<img alt="Sudoku Solution" src="/images/sudoku/solution.png?1359528371" /></p>
+<p><img alt="Sudoku Example" src="/images/sudoku/example.png?1401972413" />
+<img alt="Sudoku Solution" src="/images/sudoku/solution.png?1401972413" /></p>
 
 <h3>如何生成数独的解答</h3>
 
 <p>要生成一个数独，直接生成它的迷局比较困难，我们可以先从解答开始。当我们看到数独的时候，就会发现他其实就是一种数学矩阵，当我们在考虑如何生成数独的时候，也可以从矩阵变换的角度来考虑。我们可以从一个完成的数独开始，例如：</p>
 
-<p><img alt="Sudoku Origin" src="/images/sudoku/origin.jpg?1359528371" /></p>
+<p><img alt="Sudoku Origin" src="/images/sudoku/origin.jpg?1401972413" /></p>
 
 <p>对于这个9x9的矩阵，我们现在要考虑的就是如何打乱每个数字的位置，而不破坏它的规律——每行、每列、每宫都有1至9的所有数字。符合这个条件的矩阵变化有以下几种：</p>
 
 <ul>
 <li><p>交换每组（1-3行为一组，4-6行为一组，7-9行为一组）中的任意两行：</p>
 
-<p><img alt="Sudoku Transform 1" src="/images/sudoku/transform1.jpg?1359528371" /></p></li>
+<p><img alt="Sudoku Transform 1" src="/images/sudoku/transform1.jpg?1401972413" /></p></li>
 <li><p>同样也可以交换每组中的任意两列。</p></li>
 <li><p>组之间的行互换：</p>
 
-<p><img alt="Sudoku Transform 2" src="/images/sudoku/transform2.jpg?1359528371" /></p></li>
+<p><img alt="Sudoku Transform 2" src="/images/sudoku/transform2.jpg?1401972413" /></p></li>
 <li><p>同样也可以组之间的列互换。</p></li>
 <li><p>矩阵转置：</p>
 
-<p><img alt="Sudoku Transform 3" src="/images/sudoku/transform3.jpg?1359528371" /></p></li>
+<p><img alt="Sudoku Transform 3" src="/images/sudoku/transform3.jpg?1401972413" /></p></li>
 </ul>
 
 <p>几乎各种编程语言都会有矩阵计算的库，由于本人比较专注于JavaScript，所以这里推荐一个JavaScript的矩阵计算库：<a href="http://sylvester.jcoglan.com/">Sylvester</a>，有了矩阵计算库的支持，再加上前面几种等价变换，我们可以很容易生成出一个数独的结局。</p>
@@ -210,7 +210,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1369790637" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1401973155" type="text/javascript"></script>
   <script type="text/javascript">
 
     var _gaq = _gaq || [];

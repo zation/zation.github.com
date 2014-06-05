@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>http://www.zation.me/</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.00</priority>
   </url>
   <url>
     <loc>http://www.zation.me/about.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/05/28/build_offline_mobile_web_app.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/03/15/how-to-build-frontend-dev-env.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/02/04/use_css3_to_create_innovation_search_box.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/01/28/sudoku_arithmetic_research.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/01/22/backbone_refator.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/01/13/sass_compass_best_practices_3.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/01/09/sass_compass_best_practices_2.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2013/01/07/sass_compass_best_practices_1.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>http://www.zation.me/2012/12/31/summary_of_2012.html</loc>
-    <lastmod>2013-05-29T09:23:58+08:00</lastmod>
+    <lastmod>2014-06-05T20:59:15+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
