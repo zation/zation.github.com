@@ -5,10 +5,212 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2014-06-09T15:31:00Z</updated>
+  <updated>2014-12-09T03:31:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>编写易读、可测试、可运行的API文档</title>
+    <link rel="alternate" href="/2014/12/09/readable_testable_runnable_API_documentation.html"/>
+    <id>/2014/12/09/readable_testable_runnable_API_documentation.html</id>
+    <published>2014-12-09T03:31:00Z</published>
+    <updated>2014-12-09T03:31:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;&lt;img title="Document" alt="Document" src="/images/document.jpg?1418545547" /&gt;&lt;/p&gt;
+
+&lt;p&gt;自从开放的API接口在社交媒体以及Web 2.0中运用的越来越广泛，API已经成为了互联网产品的标准配置。并且不光是对外提供API，对于前后端分离的应用，API也是非常重要的一部分。编写一个好的API，不光是代码写得好，最重要的是文档写得好。但是我们在写文档的时候尝尝会遇到下面几个问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;没有统一的编写规范，这样不同的人在维护的时候尝尝会导致文档越来越乱，最终无法继续维护，也无法阅读。&lt;/li&gt;
+&lt;li&gt;API修改以后，文档没有跟着改，或者改错了，导致API的使用者无法正常调用。&lt;/li&gt;
+&lt;li&gt;作为前端开发，往往是在API开发完成以前，就要根据API的文档准备一些mock data来帮助开发，如果API文档可以直接生成一个mock server，就会非常方便&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面我们来看看如何构建能够解决以上问题的，完美的文档。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;&lt;img title="Document" alt="Document" src="/images/document.jpg?1418545547" /&gt;&lt;/p&gt;
+
+&lt;p&gt;自从开放的API接口在社交媒体以及Web 2.0中运用的越来越广泛，API已经成为了互联网产品的标准配置。并且不光是对外提供API，对于前后端分离的应用，API也是非常重要的一部分。编写一个好的API，不光是代码写得好，最重要的是文档写得好。但是我们在写文档的时候尝尝会遇到下面几个问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;没有统一的编写规范，这样不同的人在维护的时候尝尝会导致文档越来越乱，最终无法继续维护，也无法阅读。&lt;/li&gt;
+&lt;li&gt;API修改以后，文档没有跟着改，或者改错了，导致API的使用者无法正常调用。&lt;/li&gt;
+&lt;li&gt;作为前端开发，往往是在API开发完成以前，就要根据API的文档准备一些mock data来帮助开发，如果API文档可以直接生成一个mock server，就会非常方便&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面我们来看看如何构建能够解决以上问题的，完美的文档。&lt;/p&gt;
+
+&lt;h3&gt;API Blueprint&lt;/h3&gt;
+
+&lt;p&gt;所谓没有规矩，不成方圆。现在我要介绍的，就是一个API文档的规范：&lt;a href="https://apiblueprint.org/"&gt;API Blueprint&lt;/a&gt;。这个文档规范有以下的特点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;基于&lt;a href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt;，所以比较容易上手，同时机器和人都容易理解。&lt;/li&gt;
+&lt;li&gt;由于是纯文本，所以可以进行版本管理。&lt;/li&gt;
+&lt;li&gt;有非常多的相关工具，可以转为HTML，可以测试，可以作为Mock Server运行。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这里是API Blueprint的&lt;a href="https://github.com/apiaryio/api-blueprint/blob/master/API%20Blueprint%20Specification.md"&gt;格式文档&lt;/a&gt;，如果觉得字太多了不好理解，这里还有一个&lt;a href="https://github.com/apiaryio/api-blueprint/blob/master/Tutorial.md"&gt;简化的教程&lt;/a&gt;。下面是一个简单的实例，包含了基本的元素及其说明：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 这里是API的名字
+这里是API的描述
+
+## 这里是Resource的名字 [/uri/to/resouce]
+这里是Resource的描述
+
+### 这里是Action的名字，后面跟Type [GET]
+这里是Action的描述，下面就是Request与Response的示例了
+
++ Response 200
+
+    + Headers
+
+        Content-Type: application/json
+
+    + Body
+
+        {
+            &amp;quot;id&amp;quot;: 1
+            &amp;quot;name&amp;quot;: &amp;quot;some name&amp;quot;
+        }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;现在我们有了一份基本的API文档了，下面我们来介绍如何让这份文档更加可读，并且可以测试和运行。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;下面我会使用一个更加真实的&lt;a href="https://github.com/danielgtaylor/aglio/blob/master/example.md"&gt;API文档示例&lt;/a&gt;，并且之后所有的代码都可以在&lt;a href="https://github.com/zation/API-blueprint-demo"&gt;这里&lt;/a&gt;下载。&lt;/p&gt;
+
+&lt;h3&gt;转化为更加易读的HTML页面&lt;/h3&gt;
+
+&lt;p&gt;API Blueprint现在有两个开源工具可以生成静态HTML：&lt;a href="https://github.com/danielgtaylor/aglio"&gt;aglio&lt;/a&gt;和&lt;a href="https://github.com/subosito/iglo"&gt;iglo&lt;/a&gt;，这里使用aglio作为示例。并且为了我们可以实时的看到修改以后生成的HTML，我们同时引入了gulp作为实时的构建工具。&lt;/p&gt;
+
+&lt;p&gt;首先，我们定义一个task，命名为document，用来生成HTML，以及实时刷新页面：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;#39;use strict&amp;#39;;
+
+var gulp = require(&amp;#39;gulp&amp;#39;);
+var aglio = require(&amp;#39;gulp-aglio&amp;#39;);
+var connect = require(&amp;#39;gulp-connect&amp;#39;);
+var watch = require(&amp;#39;gulp-watch&amp;#39;);
+
+gulp.task(&amp;#39;document&amp;#39;, function() {
+  return gulp.src([&amp;#39;documents/API.md&amp;#39;])
+    .pipe(watch(&amp;#39;documents/API.md&amp;#39;))
+    .pipe(aglio({template: &amp;#39;default&amp;#39;, filename: &amp;#39;./.tmp/index.html&amp;#39;}))
+    .pipe(gulp.dest(&amp;#39;./.tmp/&amp;#39;))
+    .pipe(connect.reload());
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，我们创建一个task来启动静态页面服务器：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gulp.task(&amp;#39;server&amp;#39;, function() {
+  return connect.server({
+    root: [&amp;#39;./.tmp&amp;#39;],
+    port: 3456,
+    livereload: {
+      port: 35728
+    }
+  });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，为了方便，我们加上一个自动打开该静态页面的task：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var gopen = require(&amp;#39;gulp-open&amp;#39;);
+
+gulp.task(&amp;#39;open&amp;#39;, function() {
+  return gulp.src(&amp;#39;./gulpfile.js&amp;#39;)
+    .pipe(gopen(&amp;#39;&amp;#39;, {
+      url: &amp;#39;http://localhost:3456&amp;#39;
+    }));
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后，把上面的task加到默认的gulp task中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gulp.task(&amp;#39;default&amp;#39;, [&amp;#39;server&amp;#39;, &amp;#39;document&amp;#39;, &amp;#39;open&amp;#39;]);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;现在，可以运行&lt;code&gt;gulp&lt;/code&gt;来自动生成HTML的task了，并且浏览器会自动打开该页面。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;由于aglio请求了很多外部静态资源，特别是google font，所以可能页面会打不开，我们可以写自己的template修正这个问题。&lt;/li&gt;
+&lt;li&gt;由于aglio的一些依赖的需求，它只能运行在Node 11.10之前，建议使用Node 10.*。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;模块化的管理API文档&lt;/h3&gt;
+
+&lt;p&gt;我们看到现在的API.md文件有283行，这还是只包含了三个group的。如果API的数量更多，那么全都写在一个markdown文件中会非常难以维护。这个时候我们就需要把一个markdown文件，拆分成多个，并且gulp脚本也需要一定的处理。&lt;/p&gt;
+
+&lt;p&gt;首先，我们将API.md按照group，拆分为notes.md、users.md、tags.md。然后，我们需要在脚本中将这几个文件生成为一个，所以我们需要修改document task：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var gulp = require(&amp;#39;gulp&amp;#39;);
+var aglio = require(&amp;#39;gulp-aglio&amp;#39;);
+var connect = require(&amp;#39;gulp-connect&amp;#39;);
+var continuousConcat = require(&amp;#39;gulp-continuous-concat&amp;#39;);
+var watch = require(&amp;#39;gulp-watch&amp;#39;);
+
+gulp.task(&amp;#39;document&amp;#39;, function() {
+  return gulp.src([&amp;#39;documents/API.md&amp;#39;, &amp;#39;documents/*.md&amp;#39;])
+    .pipe(watch(&amp;#39;documents/*.md&amp;#39;))
+    .pipe(continuousConcat(&amp;#39;API.md&amp;#39;))
+    .pipe(aglio({template: &amp;#39;default&amp;#39;, filename: &amp;#39;./.tmp/index.html&amp;#39;}))
+    .pipe(gulp.dest(&amp;#39;./.tmp/&amp;#39;))
+    .pipe(connect.reload());
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;这里使用&lt;code&gt;gulp-continuous-concat&lt;/code&gt;而没有使用&lt;code&gt;gulp-concat&lt;/code&gt;，是因为后者只在stream结束的时候才真的进行concat，这样就没有办法跟&lt;code&gt;gulp-watch&lt;/code&gt;一起用了，因为&lt;code&gt;gulp-watch&lt;/code&gt;是会让stream永久运行的。而&lt;code&gt;gulp-continuous-concat&lt;/code&gt;就没有这个限制。&lt;/p&gt;
+
+&lt;h3&gt;将API文档作为Mock Server&lt;/h3&gt;
+
+&lt;p&gt;作为一个前端开发，可能一个最头痛的问题就是与API的集成了。在实际开发的过程中，前后端会按照相互之间商量好的API分别开发，最后再集成到一起。但是后台API是尝尝会改动的，所以我们会遇到两个问题：后台改动后没有通知前端；后台修改并且通知后，前端没有修改mock的数据。这两种情况的结果都是集成失败，并且有可能前端需要一定的返工。&lt;/p&gt;
+
+&lt;p&gt;那么怎么样才可以避免这个问题呢？只要我们保证文档就是Mock Server的数据来源，那么后台对于文档的任何修改，前端在开发过程中肯定会立刻知晓，并且也会反应在Mock Data上面。这也是我选用Api Blueprint的一大原因。下面我们来看看如何将API文档作为Mock Server启动起来。&lt;/p&gt;
+
+&lt;p&gt;实际上非常简单，只需要安装&lt;code&gt;api-mock&lt;/code&gt;，然后运行&lt;code&gt;api-mock xxx.md&lt;/code&gt;就可以了。但是由于我们之前将文档拆分了，那么在启动之前需要我们先build一份完整的文档出来，所以我们需要在gulp脚本中加入下面这个task：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var connect = require(&amp;#39;gulp-connect&amp;#39;);
+
+gulp.task(&amp;#39;build&amp;#39;, function() {
+  return gulp.src([&amp;#39;documents/API.md&amp;#39;, &amp;#39;documents/*.md&amp;#39;])
+    .pipe(concat(&amp;#39;API.md&amp;#39;))
+    .pipe(gulp.dest(&amp;#39;./.tmp/&amp;#39;));
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后为了方便运行，可以修改&lt;code&gt;package.json&lt;/code&gt;的&lt;code&gt;scrips&lt;/code&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;scripts&amp;quot;: {
+  &amp;quot;start&amp;quot;: &amp;quot;gulp build &amp;amp;&amp;amp; api-mock ./.tmp/API.md --port 3457&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后运行&lt;code&gt;npm start&lt;/code&gt;就可以启动Mock Server了，你可以访问&lt;a href="http://localhost:3457/notes/1"&gt;http://localhost:3457/notes/1&lt;/a&gt;来测试一下。&lt;/p&gt;
+
+&lt;h3&gt;测试你的文档&lt;/h3&gt;
+
+&lt;p&gt;最后，我们还剩下唯一一个问题，就是如何保证我们的API文档与真实的API是一致的？自动化测试是一个有效的保证，&lt;a href="https://github.com/apiaryio/dredd"&gt;Dredd&lt;/a&gt;就是这样一个基于API Blueprint提供自动化测试的工具。&lt;/p&gt;
+
+&lt;p&gt;Dredd的使用也很方便，只需要运行&lt;code&gt;dredd xxx.md http://url/to/api-server&lt;/code&gt;就可以了。为了方便，我们可以把测试脚本放在&lt;code&gt;package.json&lt;/code&gt;的&lt;code&gt;scripts&lt;/code&gt;中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;scripts&amp;quot;: {
+  &amp;quot;test&amp;quot;: &amp;quot;gulp build &amp;amp;&amp;amp; dredd ./.tmp/API.md http://localhost:3458&amp;quot;,
+  &amp;quot;start&amp;quot;: &amp;quot;gulp build &amp;amp;&amp;amp; api-mock ./.tmp/API.md --port 3457&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同时我用express创建了一个简单的后台，使用&lt;code&gt;node server.js&lt;/code&gt;就可以启动，然后就可以运行&lt;code&gt;npm test&lt;/code&gt;查看文档测试的结果了。&lt;/p&gt;
+
+&lt;h3&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;虽然我们有了一个非常完美的文档系统，但是文档的本质作用是用于沟通，如果团队内部相互沟通的意愿不强烈，那么再好的工具没有办法用好，也不可能使用某个工具就可以建立起沟通的意愿。所以在团队建设的过程中，沟通、优化、负责等等好的意愿的建立是首位的，然后才是寻找到适合团队的工具来帮助解决问题，更好的发挥意愿。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>国内项目天坑记（二）——Gruntfile的模块化</title>
     <link rel="alternate" href="/2014/06/09/grunt_config_as_modules.html"/>
@@ -19,8 +221,6 @@
       <name>Article Author</name>
     </author>
     <summary type="html">&lt;p&gt;在大型项目中用过Grunt的都知道，当自动化的配置和task多了一个，一个Gruntfile.js文件可能有好几百行，这样维护非常困难，于是对Gruntfile的模块化势在必行。感谢&lt;a href="http://zhuanlan.zhihu.com/tla42"&gt;墨磊&lt;/a&gt;同学帮助我们做了模块化！以下内容都是他的实践。&lt;/p&gt;
-
-&lt;p&gt;本质上Gruntfile.js就是一个node.js代码文件，所以我们可以很方便的用&lt;a href="http://www.commonjs.org"&gt;CommonJS&lt;/a&gt;的规范将Gruntfile.js模块化。下面我们首先来看看模块化以后的grunt目录结构：&lt;/p&gt;
 </summary>
     <content type="html">&lt;p&gt;在大型项目中用过Grunt的都知道，当自动化的配置和task多了一个，一个Gruntfile.js文件可能有好几百行，这样维护非常困难，于是对Gruntfile的模块化势在必行。感谢&lt;a href="http://zhuanlan.zhihu.com/tla42"&gt;墨磊&lt;/a&gt;同学帮助我们做了模块化！以下内容都是他的实践。&lt;/p&gt;
 
@@ -845,92 +1045,6 @@ before_script:
 &lt;p&gt;这里我们设置更多的动画段，首尾两端都让“尾巴”隐藏，然后利用&lt;code&gt;height&lt;/code&gt;和&lt;code&gt;border-width&lt;/code&gt;的改变让“尾巴”冒头和缩回，其余都跟上一个例子相同。这里的animation也设置了更长的执行时间。&lt;/p&gt;
 
 &lt;p&gt;到此为止，一个有趣的CSS3搜索框就做好了。在现代的前端开发中，CSS已经可以完成动画的操作了，那么我们就尽量用CSS来完成，js最多就只用作改变class来触发动画。因为现在js负责的前端逻辑处理已经很多了，再给js加上动画处理的代码很容易导致项目js代码的爆炸。同时CSS3动画有来自浏览器自身的支持，效率和效果上都会 更好一些。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>数独生成浅尝</title>
-    <link rel="alternate" href="/2013/01/28/sudoku_arithmetic_research.html"/>
-    <id>/2013/01/28/sudoku_arithmetic_research.html</id>
-    <published>2013-01-28T01:28:00Z</published>
-    <updated>2013-01-28T01:28:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;img alt="Sudoku" src="/images/sudoku/cover.jpg?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;&lt;img alt="Sudoku" src="/images/sudoku/cover.jpg?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;数独是一种非常有意思的游戏，也是我很喜欢的一种游戏，当闲来无事的时候，常常会打开手机里的数独游戏来打发时间。当我们在享受数独游戏的时候，有没有想过每一局游戏是如何生成的呢？看似简单，其实很复杂。有不少相关的算法，还有一个困惑了数学家多年的谜题（2011年12月被解开）。下面就让我们一起来看看数独的生成。&lt;/p&gt;
-
-&lt;h3&gt;什么是数独&lt;/h3&gt;
-
-&lt;p&gt;可能有些朋友还不知道什么是数独，下面是来自&lt;a href="http://zh.wikipedia.org/wiki/%E6%95%B8%E7%8D%A8"&gt;维基百科&lt;/a&gt;的解释：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;數獨 Sudoku（数独，sūdoku，すうどく）&lt;/p&gt;
-
-&lt;p&gt;/suːˈdoʊkuː/soo-DOH-koo是一種邏輯性的數字填充遊戲，玩家須以數字填進每一格，而每行、每列和每個宮（即3x3的大格）有齊1至9所有數字。遊戲設計者會提供一部份的數字，使謎題只有一個答案。&lt;/p&gt;
-
-&lt;p&gt;一個已解答的數獨其實是一種多了宮的限制的拉丁方陣，因為同一個數字不可能在同一行、列或宮中出現多於一次。&lt;/p&gt;
-
-&lt;p&gt;这种游戏只需要逻辑思维能力，与数字运算无关。虽然玩法简单，但数字排列方式却千变万化，所以不少教育者认为数独是锻炼脑筋的好方法。因为数独上的数字没有运算价值，仅仅代表相互区分的不同个体，因此可以使用其他的符号比如拉丁字母、罗马字母甚至是不图形状的图案代替。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;下面是一个数独的题目以及解答：&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Sudoku Example" src="/images/sudoku/example.png?1401972413" /&gt;
-&lt;img alt="Sudoku Solution" src="/images/sudoku/solution.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;h3&gt;如何生成数独的解答&lt;/h3&gt;
-
-&lt;p&gt;要生成一个数独，直接生成它的迷局比较困难，我们可以先从解答开始。当我们看到数独的时候，就会发现他其实就是一种数学矩阵，当我们在考虑如何生成数独的时候，也可以从矩阵变换的角度来考虑。我们可以从一个完成的数独开始，例如：&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Sudoku Origin" src="/images/sudoku/origin.jpg?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;对于这个9x9的矩阵，我们现在要考虑的就是如何打乱每个数字的位置，而不破坏它的规律——每行、每列、每宫都有1至9的所有数字。符合这个条件的矩阵变化有以下几种：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;交换每组（1-3行为一组，4-6行为一组，7-9行为一组）中的任意两行：&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Sudoku Transform 1" src="/images/sudoku/transform1.jpg?1401972413" /&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;同样也可以交换每组中的任意两列。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;组之间的行互换：&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Sudoku Transform 2" src="/images/sudoku/transform2.jpg?1401972413" /&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;同样也可以组之间的列互换。&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;矩阵转置：&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Sudoku Transform 3" src="/images/sudoku/transform3.jpg?1401972413" /&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;几乎各种编程语言都会有矩阵计算的库，由于本人比较专注于JavaScript，所以这里推荐一个JavaScript的矩阵计算库：&lt;a href="http://sylvester.jcoglan.com/"&gt;Sylvester&lt;/a&gt;，有了矩阵计算库的支持，再加上前面几种等价变换，我们可以很容易生成出一个数独的结局。&lt;/p&gt;
-
-&lt;h3&gt;如何生成数独的迷局&lt;/h3&gt;
-
-&lt;p&gt;结局生成好了以后，下一步就是要清空其中的某些数字格，从而生成迷局，这是最难也最有讲究的。数独游戏有一个“潜规则”：每个游戏只能有一个解答，如果有两个或者以上的解答，那么游戏的难度将会降低。所以我们在清空数字格的时候也不能随意的清空，我们必须保证它最后只有唯一解。&lt;/p&gt;
-
-&lt;p&gt;很遗憾的是，在我的能力范围之内以及搜索范围内没有找到有哪种算法可以保证数独只有唯一解，也没有某种算法可以验证一个谜题是否一定有多个解（除非有一组三行全为空）。不过一些研究标明，有某种pattern会导致数独一定有多个解，请见&lt;a href="http://www.sudoku.org.uk/SolvingTechniques/UniqueRectangles.asp"&gt;“Deadly Pattern”&lt;/a&gt;。我们可以做的有以下几点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;保证在去掉数字格的过程中不会同时去掉一组的三行&lt;/li&gt;
-&lt;li&gt;使用Solver验证生成的迷局是否有多个解&lt;/li&gt;
-&lt;li&gt;当出现“Deadly Pattern”时，撤销上一次去掉数字格的操作，重新去掉一个新的，再次回到上一步做验证&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;数独的数学谜题&lt;/h3&gt;
-
-&lt;p&gt;这里还有一个困扰了数学家数十年的问题：&lt;strong&gt;数独游戏最少需要多少个数字，才能保证最后有唯一解？&lt;/strong&gt;曾经有数学家找到过17个数字并且具有唯一解的数独，但是一直没有找到16个数字的唯一解数独。于是部分数学家相信17个数字就是唯一解数独的最少数字了，也有数学家任然在寻找16个数字的唯一解数独，只是一直都无法证明17这一最少数字，也一直没有找到16个数字的唯一解数独。&lt;/p&gt;
-
-&lt;p&gt;这个谜题终于在2011年12月被Gary McGuire以及他在都柏林大学的朋友们一起破解了，他们利用计算机程序遍历了所有16数字的数独，最终没有发现唯一解数独，从而以穷举的方式证明了&lt;strong&gt;数独游戏最少需要17个数字，才能保证最后有唯一解。&lt;/strong&gt;他们利用对称性去掉了所有等价的数独，任然计算了5,472,730,538次以及一年的时间才得到这个结果。&lt;/p&gt;
-
-&lt;p&gt;参考资料：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="http://blog.forret.com/2006/08/a-sudoku-challenge-generator/"&gt;A Sudoku challenge generator&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.technologyreview.com/view/426554/mathematicians-solve-minimum-sudoku-problem/"&gt;Mathematicians Solve Minimum Sudoku Problem&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </content>
   </entry>
 </feed>
