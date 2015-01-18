@@ -5,10 +5,454 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2014-12-09T03:31:00Z</updated>
+  <updated>2015-01-15T23:54:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>用React.js替换Backbone.js的View（二）——Todo MVC示例</title>
+    <link rel="alternate" href="/2015/01/15/replace_backbonejs_view_with_reactj_2.html"/>
+    <id>/2015/01/15/replace_backbonejs_view_with_reactj_2.html</id>
+    <published>2015-01-15T23:54:00Z</published>
+    <updated>2015-01-15T23:54:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;Backbone.js和React.js在设计思想上都借鉴了&lt;a href="http://en.wikipedia.org/wiki/Reactive_programming"&gt;Reactive Programming&lt;/a&gt;，即：当Model修改时，这种变更可以反向传播到View，使得View同时被更改，也就是双向绑定。但Backbone.js需要你自己来写如何修改View，而在React.js中，你只需要关心如何根据Model来显示View，如何修改可以完全交给React.js。也就是说他们都在做一种简化，而React.js做的更加彻底，这也是它的核心思想和优点。&lt;/p&gt;
+
+&lt;p&gt;真正的学习还是需要写代码，所以这里用经典的&lt;a href="https://github.com/tastejs/todomvc"&gt;Todo MVC&lt;/a&gt;作为示例。所有的代码可以在我的&lt;a href="https://github.com/zation/backbone-to-react"&gt;Github&lt;/a&gt;上找到。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;Backbone.js和React.js在设计思想上都借鉴了&lt;a href="http://en.wikipedia.org/wiki/Reactive_programming"&gt;Reactive Programming&lt;/a&gt;，即：当Model修改时，这种变更可以反向传播到View，使得View同时被更改，也就是双向绑定。但Backbone.js需要你自己来写如何修改View，而在React.js中，你只需要关心如何根据Model来显示View，如何修改可以完全交给React.js。也就是说他们都在做一种简化，而React.js做的更加彻底，这也是它的核心思想和优点。&lt;/p&gt;
+
+&lt;p&gt;真正的学习还是需要写代码，所以这里用经典的&lt;a href="https://github.com/tastejs/todomvc"&gt;Todo MVC&lt;/a&gt;作为示例。所有的代码可以在我的&lt;a href="https://github.com/zation/backbone-to-react"&gt;Github&lt;/a&gt;上找到。&lt;/p&gt;
+
+&lt;h3&gt;环境准备&lt;/h3&gt;
+
+&lt;p&gt;React.js推荐使用&lt;a href="http://facebook.github.io/react/docs/displaying-data.html"&gt;JSX&lt;/a&gt;来写View，所以我们需要准备一下JSX的环境。按照最简单的做法，我们只需要将in-browser JSX transformer引入即可：&lt;/p&gt;
+&lt;pre class="highlight shell"&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;bower install --save react
+&lt;/pre&gt;
+&lt;p&gt;然后在&lt;code&gt;index.html&lt;/code&gt;中，加入一下的代码，作为script标签的第一个：&lt;/p&gt;
+&lt;pre class="highlight html"&gt;&lt;span class="nt"&gt;&amp;lt;script &lt;/span&gt;&lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bower_components/react/react-with-addons.js&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;script &lt;/span&gt;&lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bower_components/react/JSXTransformer.js&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;这样我们的JSX代码就可以在运行时编译了。&lt;/p&gt;
+
+&lt;h3&gt;替换的方式&lt;/h3&gt;
+
+&lt;p&gt;这里我们实际上是做的一个重构（虽然没有测试），为了尽量使得每一步都比较容易验证，我们每次commit的修改都会尽量很小，而且每次commit的代码都要保证是工作的，不会破坏原有的功能。所以我们会在原有的代码的基础上增加React.js的代码，完成一部分再删除一部分Backbone.js View的代码，最后再完成整个替换。&lt;/p&gt;
+
+&lt;p&gt;一般来说我推荐先替换Template，再替换DOM事件的绑定和处理，最后再整体用某个Component替换掉Backbone.js View。下面我会用TodoItem View替换过程的开始部分作为示例，讲解一下如何重构，同时也讲解一些React.js的基本概念。&lt;/p&gt;
+
+&lt;h3&gt;Template&lt;/h3&gt;
+
+&lt;p&gt;我们之前提到过，React.js的Component其实就是View + Template的结合。那么我们应该怎样来划分Component呢？这里React.js官方给出的意见是：遵从&lt;a href="http://en.wikipedia.org/wiki/Single_responsibility_principle"&gt;单一职责的原则&lt;/a&gt;，也就是一个Component只做一件事。具体如何划分就要看你的Domain和团队自己的规则了。&lt;/p&gt;
+
+&lt;p&gt;现在我们新建TodoItem Component，新建&lt;code&gt;todo-item.jsx&lt;/code&gt;文件，将原来template中的内容挪过来，并且用React.js的方式来render：&lt;/p&gt;
+&lt;pre class="highlight javascript"&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;app&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;use strict&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TodoItem&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;React&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createClass&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+
+        &lt;span class="na"&gt;render&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;todoData&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;props&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todo&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;toJSON&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+                &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;div&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+                    &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;div&lt;/span&gt; &lt;span class="nx"&gt;className&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;view&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+                        &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;input&lt;/span&gt; &lt;span class="nx"&gt;className&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;toggle&amp;quot;&lt;/span&gt; &lt;span class="nx"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;checkbox&amp;quot;&lt;/span&gt; &lt;span class="nx"&gt;checked&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;todoData&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;completed&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;/&amp;gt;&lt;/span&gt;
+                        &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;label&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;todoData&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;title&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="sr"&gt;/&lt;/span&gt;&lt;span class="err"&gt;label&amp;gt;&lt;/span&gt;
+                        &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;button&lt;/span&gt; &lt;span class="nx"&gt;className&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;destroy&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="sr"&gt;/&lt;/span&gt;&lt;span class="err"&gt;button&amp;gt;&lt;/span&gt;
+                    &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="sr"&gt;/&lt;/span&gt;&lt;span class="err"&gt;div&amp;gt;&lt;/span&gt;
+                    &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;input&lt;/span&gt; &lt;span class="nx"&gt;className&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;edit&amp;quot;&lt;/span&gt; &lt;span class="nx"&gt;defaultValue&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;todoData&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;title&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;/&amp;gt;&lt;/span&gt;
+                &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="sr"&gt;/&lt;/span&gt;&lt;span class="err"&gt;div&amp;gt;&lt;/span&gt;
+            &lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;})();&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;替换&lt;code&gt;todo-view.js&lt;/code&gt;中的template：&lt;/p&gt;
+&lt;pre class="highlight diff"&gt;&lt;span class="gh"&gt;@@ -12,9 +12,6 @@
+&lt;/span&gt;                //... is a list tag.
+                tagName:  &amp;#39;li&amp;#39;,
+&lt;span class="err"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-               // Cache the template function for a single item.
+-               template: _.template($(&amp;#39;#item-template&amp;#39;).html()),
+-
+&lt;/span&gt;                // The DOM events specific to an item.
+                events: {
+                        &amp;#39;click .toggle&amp;#39;: &amp;#39;toggleCompleted&amp;#39;,
+&lt;span class="gh"&gt;@@ -48,7 +45,9 @@
+&lt;/span&gt;                                return;
+                        }
+&lt;span class="err"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-                       this.$el.html(this.template(this.model.toJSON()));
+&lt;/span&gt;&lt;span class="gi"&gt;+                       React.render(React.createElement(app.TodoItem, {
++                               todo: this.model
++                       }), this.$el[0]);
+&lt;/span&gt;                        this.$el.toggleClass(&amp;#39;completed&amp;#39;, this.model.get(&amp;#39;completed&amp;#39;));
+                        this.toggleVisible();
+                        this.$input = this.$(&amp;#39;.edit&amp;#39;);
+&lt;/pre&gt;
+&lt;p&gt;这里我们用到了React.js Component的&lt;code&gt;props&lt;/code&gt;属性，这个属性是由父Component传下来的数据，&lt;code&gt;props&lt;/code&gt;本身是不可以由子Component自己去改变的，后面我们会讲到，对用户操作会改变的数据，应该使用&lt;code&gt;state&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;在&lt;code&gt;index.html&lt;/code&gt;中删除原有的模板，引入&lt;code&gt;todo-item.jsx&lt;/code&gt;，同时用JSXTransformer来管理所有View的加载：&lt;/p&gt;
+&lt;pre class="highlight diff"&gt;&lt;span class="gh"&gt;@@ -23,16 +23,6 @@
+&lt;/span&gt;            &amp;lt;p&amp;gt;Written by &amp;lt;a href=&amp;quot;https://github.com/addyosmani&amp;quot;&amp;gt;Addy Osmani&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+            &amp;lt;p&amp;gt;Part of &amp;lt;a href=&amp;quot;http://todomvc.com&amp;quot;&amp;gt;TodoMVC&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+        &amp;lt;/footer&amp;gt;
+&lt;span class="gd"&gt;-       &amp;lt;script type=&amp;quot;text/template&amp;quot; id=&amp;quot;item-template&amp;quot;&amp;gt;
+-           &amp;lt;div&amp;gt;
+-               &amp;lt;div class=&amp;quot;view&amp;quot;&amp;gt;
+-                   &amp;lt;input class=&amp;quot;toggle&amp;quot; type=&amp;quot;checkbox&amp;quot; &amp;lt;%= completed ? &amp;#39;checked&amp;#39; : &amp;#39;&amp;#39; %&amp;gt;&amp;gt;
+-                   &amp;lt;label&amp;gt;&amp;lt;%- title %&amp;gt;&amp;lt;/label&amp;gt;
+-                   &amp;lt;button class=&amp;quot;destroy&amp;quot;&amp;gt;&amp;lt;/button&amp;gt;
+-               &amp;lt;/div&amp;gt;
+-               &amp;lt;input class=&amp;quot;edit&amp;quot; value=&amp;quot;&amp;lt;%- title %&amp;gt;&amp;quot;&amp;gt;
+-           &amp;lt;/div&amp;gt;
+-       &amp;lt;/script&amp;gt;
+&lt;/span&gt;        &amp;lt;script type=&amp;quot;text/template&amp;quot; id=&amp;quot;stats-template&amp;quot;&amp;gt;
+            &amp;lt;span id=&amp;quot;todo-count&amp;quot;&amp;gt;&amp;lt;strong&amp;gt;&amp;lt;%= remaining %&amp;gt;&amp;lt;/strong&amp;gt; &amp;lt;%= remaining === 1 ? &amp;#39;item&amp;#39; : &amp;#39;items&amp;#39; %&amp;gt; left&amp;lt;/span&amp;gt;
+            &amp;lt;ul id=&amp;quot;filters&amp;quot;&amp;gt;
+&lt;span class="err"&gt;
+&lt;/span&gt;&lt;span class="gh"&gt;@@ -52,16 +42,16 @@
+&lt;/span&gt;        &amp;lt;script src=&amp;quot;js/models/todo.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script src=&amp;quot;js/collections/todos.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;span class="gd"&gt;-       &amp;lt;script src=&amp;quot;js/views/todo-view.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+-       &amp;lt;script src=&amp;quot;js/views/app-view.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+-       &amp;lt;script src=&amp;quot;js/routers/router.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+-       &amp;lt;script src=&amp;quot;js/app.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+       &amp;lt;script type=&amp;quot;text/jsx&amp;quot; src=&amp;quot;js/components/todo-item.jsx&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
++       &amp;lt;script type=&amp;quot;text/jsx&amp;quot; src=&amp;quot;js/views/todo-view.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
++       &amp;lt;script type=&amp;quot;text/jsx&amp;quot; src=&amp;quot;js/views/app-view.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
++       &amp;lt;script type=&amp;quot;text/jsx&amp;quot; src=&amp;quot;js/routers/router.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
++       &amp;lt;script type=&amp;quot;text/jsx&amp;quot; src=&amp;quot;js/app.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/span&gt;    &amp;lt;/body&amp;gt;
+ &amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;到这里，替换就告一段落了。这个时候我们可以看到原有的功能都是可工作的，现在就可以做一个提交了。&lt;/p&gt;
+
+&lt;h3&gt;DOM事件&lt;/h3&gt;
+
+&lt;p&gt;下面我们开始把DOM事件的处理挪到&lt;code&gt;todo-item.jsx&lt;/code&gt;中，并且以React.js的方式来做。以toggle为例：&lt;/p&gt;
+&lt;pre class="highlight diff"&gt;&lt;span class="err"&gt;index js/components/todo-item.jsx
+&lt;/span&gt;&lt;span class="gh"&gt;@@ -5,12 +5,28 @@
+&lt;/span&gt;    app.TodoItem = React.createClass({
+&lt;span class="err"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+       getInitialState: function() {
++           return {
++               completed: this.props.todo.get(&amp;#39;completed&amp;#39;)
++           };
++       },
++
++       // Toggle the `&amp;quot;completed&amp;quot;` state of the model.
++       toggleCompleted: function () {
++           this.setState({
++               completed: this.props.todo.toggle()
++           });
++       },
++
+&lt;/span&gt;        render: function() {
+            var todoData = this.props.todo.toJSON();
+            return (
+                &amp;lt;div&amp;gt;
+                    &amp;lt;div className=&amp;quot;view&amp;quot;&amp;gt;
+&lt;span class="gd"&gt;-                       &amp;lt;input className=&amp;quot;toggle&amp;quot; type=&amp;quot;checkbox&amp;quot; checked={todoData.completed} /&amp;gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+                       &amp;lt;input className=&amp;quot;toggle&amp;quot;
++                           type=&amp;quot;checkbox&amp;quot;
++                           checked={this.state.completed}
++                           onChange={this.toggleCompleted}/&amp;gt;
+&lt;/span&gt;                        &amp;lt;label&amp;gt;{todoData.title}&amp;lt;/label&amp;gt;
+                        &amp;lt;button className=&amp;quot;destroy&amp;quot;&amp;gt;&amp;lt;/button&amp;gt;
+                    &amp;lt;/div&amp;gt;
+&lt;/pre&gt;&lt;pre class="highlight diff"&gt;&lt;span class="err"&gt;index js/models/todo.js
+&lt;/span&gt;&lt;span class="gh"&gt;@@ -18,9 +18,11 @@
+&lt;/span&gt;        // Toggle the `completed` state of this todo item.
+        toggle: function () {
+&lt;span class="gi"&gt;+           var completed = !this.get(&amp;#39;completed&amp;#39;);
+&lt;/span&gt;            this.save({
+&lt;span class="gd"&gt;-               completed: !this.get(&amp;#39;completed&amp;#39;)
+&lt;/span&gt;&lt;span class="gi"&gt;+               completed: completed
+&lt;/span&gt;            });
+&lt;span class="gi"&gt;+           return completed;
+&lt;/span&gt;        }
+    });
+ })();
+&lt;/pre&gt;&lt;pre class="highlight diff"&gt;&lt;span class="err"&gt;index js/views/todo-view.js
+&lt;/span&gt;&lt;span class="gh"&gt;@@ -14,7 +14,6 @@
+&lt;/span&gt;        // The DOM events specific to an item.
+        events: {
+&lt;span class="gd"&gt;-           &amp;#39;click .toggle&amp;#39;: &amp;#39;toggleCompleted&amp;#39;,
+&lt;/span&gt;            &amp;#39;dblclick label&amp;#39;: &amp;#39;edit&amp;#39;,
+            &amp;#39;click .destroy&amp;#39;: &amp;#39;clear&amp;#39;,
+            &amp;#39;keypress .edit&amp;#39;: &amp;#39;updateOnEnter&amp;#39;,
+&lt;span class="gh"&gt;@@ -64,11 +63,6 @@
+&lt;/span&gt;                app.TodoFilter === &amp;#39;completed&amp;#39;;
+        },
+&lt;span class="err"&gt;
+&lt;/span&gt;&lt;span class="gd"&gt;-       // Toggle the `&amp;quot;completed&amp;quot;` state of the model.
+-       toggleCompleted: function () {
+-           this.model.toggle();
+-       },
+-
+&lt;/span&gt;        // Switch this view into `&amp;quot;editing&amp;quot;` mode, displaying the input field.
+        edit: function () {
+            this.$el.addClass(&amp;#39;editing&amp;#39;);
+&lt;/pre&gt;
+&lt;p&gt;到这里toggle事件就被重构完成了。我们引入了一个新的概念，就是&lt;code&gt;state&lt;/code&gt;。我们之前提到过，&lt;code&gt;state&lt;/code&gt;是用来表示Component中，用户通过操作可能改变的数据。关于&lt;code&gt;state&lt;/code&gt;和&lt;code&gt;props&lt;/code&gt;的详细区别，这里有一篇文章（&lt;a href="https://github.com/uberVU/react-guide/blob/master/props-vs-state.md"&gt;props vs state&lt;/a&gt;）介绍得很好，这里把最关键的部分转载并翻译一下：&lt;/p&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;-&lt;/th&gt;
+&lt;th&gt;&lt;em&gt;props&lt;/em&gt;&lt;/th&gt;
+&lt;th&gt;&lt;em&gt;state&lt;/em&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;能否从&lt;strong&gt;父&lt;/strong&gt;Component获取初始值?&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;父&lt;/strong&gt;Component中的值改变，是否会影响自身的值?&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;能否在自身中设置默认值?^&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;能否在自身中改变值?&lt;/td&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;能否给子Component设置默认值?&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;自身的值改变，是否会影响传给子Component中的值?&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;^ 注意：props和state的默认值，都会被父Component传过来的默认值覆盖。&lt;/p&gt;
+
+&lt;h3&gt;DOM操作&lt;/h3&gt;
+
+&lt;p&gt;在View这一层，我们常常会有针对某个Element进行操作的需求，以前我们可能会通过Class、ID或Tag来获取到这个Element，然后调用DOM方法来操作它。而React.js提供了&lt;code&gt;refs&lt;/code&gt;来完成这个功能：&lt;/p&gt;
+&lt;pre class="highlight diff"&gt;&lt;span class="err"&gt;index js/components/todo-item.jsx
+&lt;/span&gt;&lt;span class="gh"&gt;@@ -18,6 +18,11 @@
+&lt;/span&gt;            });
+        },
+&lt;span class="err"&gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+       // Switch this view into `&amp;quot;editing&amp;quot;` mode, displaying the input field.
++       edit: function () {
++           this.refs.editInput.getDOMNode().focus();
++       },
++
+&lt;/span&gt;        render: function() {
+            var todoData = this.props.todo.toJSON();
+            return (
+&lt;span class="gh"&gt;@@ -27,10 +32,10 @@
+&lt;/span&gt;                            type=&amp;quot;checkbox&amp;quot;
+                            checked={this.state.completed}
+                            onChange={this.toggleCompleted}/&amp;gt;
+&lt;span class="gd"&gt;-                       &amp;lt;label&amp;gt;{todoData.title}&amp;lt;/label&amp;gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+                       &amp;lt;label onDoubleClick={this.edit}&amp;gt;{todoData.title}&amp;lt;/label&amp;gt;
+&lt;/span&gt;                        &amp;lt;button className=&amp;quot;destroy&amp;quot;&amp;gt;&amp;lt;/button&amp;gt;
+                    &amp;lt;/div&amp;gt;
+&lt;span class="gd"&gt;-                   &amp;lt;input className=&amp;quot;edit&amp;quot; defaultValue={todoData.title} /&amp;gt;
+&lt;/span&gt;&lt;span class="gi"&gt;+                   &amp;lt;input ref=&amp;quot;editInput&amp;quot; className=&amp;quot;edit&amp;quot; defaultValue={todoData.title} /&amp;gt;
+&lt;/span&gt;                &amp;lt;/div&amp;gt;
+            );
+        }
+&lt;/pre&gt;&lt;pre class="highlight diff"&gt;&lt;span class="err"&gt;index js/views/todo-view.js
+&lt;/span&gt;&lt;span class="gh"&gt;@@ -66,7 +66,6 @@
+&lt;/span&gt;        // Switch this view into `&amp;quot;editing&amp;quot;` mode, displaying the input field.
+        edit: function () {
+            this.$el.addClass(&amp;#39;editing&amp;#39;);
+&lt;span class="gd"&gt;-           this.$input.focus();
+&lt;/span&gt;        },
+&lt;span class="err"&gt;
+&lt;/span&gt;        // Close the `&amp;quot;editing&amp;quot;` mode, saving changes to the todo.
+&lt;/pre&gt;
+&lt;p&gt;这里之所以React.js专门提供了refs，而没有推荐使用传统方式，我觉得是因为：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;避免多余的class或ID，这样我们可以将class只用于样式上，将ID只用于form中，让他们的使用更加符合原始的设计；&lt;/li&gt;
+&lt;li&gt;refs返回的其实不单是DOM对象，而是一个称为“backing instance”的东西，这个我没有查到具体含义是什么，猜测应该是React.js中Virtual DOM中的实例。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;此间省略N步，我们得到了最后的&lt;a href="https://github.com/zation/backbone-to-react"&gt;重构成果&lt;/a&gt;，如果希望看中间过程的，可以查看中间的commit diff。&lt;/p&gt;
+
+&lt;p&gt;在替换前后之间，我们可以比较一下监听事件的不同，首先来看看替换前我们监听了哪些事件：&lt;/p&gt;
+&lt;pre class="highlight javascript"&gt;&lt;span class="c1"&gt;//todo-view.js
+&lt;/span&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="nx"&gt;initialize&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;change&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;render&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;destroy&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;remove&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;visible&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;toggleVisible&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;pre class="highlight javascript"&gt;&lt;span class="c1"&gt;//app-view.js
+&lt;/span&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="nx"&gt;initialize&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todos&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;add&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;addOne&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todos&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;reset&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;addAll&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todos&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;change:completed&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;filterOne&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todos&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;filter&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;filterAll&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listenTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todos&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;all&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;render&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;然后我们可以全文搜索一下替换后的事件监听，只剩下一个：&lt;/p&gt;
+&lt;pre class="highlight javascript"&gt;&lt;span class="c1"&gt;//app.js
+&lt;/span&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;todos&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;all&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;render&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;也就是说，不管数据如何变化，不管哪些数据变化了，我都直接拿我关心的数据来render就完了。由于Virtual DOM帮我做了增量式的DOM修改，这一部分就不用我来操心了，那么之前的一大堆事件监听以及相应的事件处理回调都可以省略了，这样代码逻辑的复杂度会降低很多，可维护和可读性会提高很多，同时也没有性能的担忧。React.js真是处理Tempate和View的一大神器啊！&lt;/p&gt;
+
+&lt;p&gt;而且重构到最后我发现，如果不是因为Backbone.js的router依赖于jQuery，连jQuery我都可以直接删了。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>用React.js替换Backbone.js的View（一）——Backbone.js View的陷阱以及React.js的优点</title>
+    <link rel="alternate" href="/2015/01/13/replace_backbonejs_view_with_reactj_1.html"/>
+    <id>/2015/01/13/replace_backbonejs_view_with_reactj_1.html</id>
+    <published>2015-01-13T14:25:00Z</published>
+    <updated>2015-01-13T14:25:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;最近终于找到时间，学习了一下Facebook出品的&lt;a href="http://facebook.github.io/react/"&gt;React.js&lt;/a&gt;，发现虽然没有很深的体会到性能上的好处，但是这种编程方式带来的好处确实是很大的。这里我准备跟Backbone.js的View做一下对比，同时下一篇文章中提供一个示例说明一下如何用React.js替换Backbone.js的View。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;最近终于找到时间，学习了一下Facebook出品的&lt;a href="http://facebook.github.io/react/"&gt;React.js&lt;/a&gt;，发现虽然没有很深的体会到性能上的好处，但是这种编程方式带来的好处确实是很大的。这里我准备跟Backbone.js的View做一下对比，同时下一篇文章中提供一个示例说明一下如何用React.js替换Backbone.js的View。&lt;/p&gt;
+
+&lt;h3&gt;Backbone.js中View的陷阱&lt;/h3&gt;
+
+&lt;p&gt;这里用陷阱这个词，是因为下面这些其实并不是Backbone.js本身所引发的问题，但却是使用Backbone.js的View时，常常会犯的错误。&lt;/p&gt;
+
+&lt;h4&gt;绑定的事件没有解绑而造成的内存泄露&lt;/h4&gt;
+
+&lt;p&gt;对于某个View，如果在它内部绑定事件的方式不正确，会造成&lt;code&gt;remove&lt;/code&gt;的时候没有解绑，最后造成内存泄露。例如：&lt;/p&gt;
+&lt;pre class="highlight text"&gt;var SomeModelView = Backbone.View.extend({
+    initialize: function() {
+        this.model.on(&amp;#39;change&amp;#39;, this.render, this);
+    },
+    render: function() {
+        // render a template
+    }
+});
+&lt;/pre&gt;
+&lt;p&gt;有两种方式可以解决这个问题，第一个是使用&lt;code&gt;listenTo&lt;/code&gt;：&lt;/p&gt;
+&lt;pre class="highlight text"&gt;var SomeModelView = Backbone.View.extend({
+    initialize: function() {
+        this.listenTo(this.model, &amp;#39;change&amp;#39;, this.render);
+    },
+    render: function() {
+        // render a template
+    }
+});
+&lt;/pre&gt;
+&lt;p&gt;第二个是显式的在&lt;code&gt;close&lt;/code&gt;方法中解绑：&lt;/p&gt;
+&lt;pre class="highlight text"&gt;var SomeModelView = Backbone.View.extend({
+    initialize: function() {
+        this.model.on(&amp;#39;change&amp;#39;, this.render, this);
+    },
+    close: function() {
+        this.model.off(&amp;#39;change&amp;#39;, this.render);
+    },
+    render: function() {
+        // render a template
+    }
+});
+&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;如果没有特殊情况，都推荐使用第一种解决方案。&lt;/p&gt;
+
+&lt;p&gt;其实以上的问题还不是真正的麻烦，真正的麻烦在于所有的View都需要以调用&lt;code&gt;remove&lt;/code&gt;的方式来删除，否则不仅是model或collection上面的事件无法解绑，DOM事件都会没有解绑，从而造成事件重复绑定或内存泄露的问题。而对于一个Backbone.js的应用来说，一个View有十多个内嵌了N层的SubView是很正常的情况，如何保证这些SubView都被remove掉了是非常大的问题，例如在切换页面的时候，需要首先删除一个页面级别的View再插入另一个。&lt;a href="http://mikeygee.com/blog/backbone.html"&gt;这里&lt;/a&gt;有一篇文章详细叙述了如何解决这个问题，我这里就不复述了。&lt;/p&gt;
+
+&lt;h4&gt;DOM的render可能效率很低&lt;/h4&gt;
+
+&lt;p&gt;如果多次使用append来插入SubView，由于每次都会导致浏览器重新计算Element的位置和大小，所以可能效率会很低，例如：&lt;/p&gt;
+&lt;pre class="highlight text"&gt;var SomeCollectionView = Backbone.View.extend({
+    initialize: function() {
+        var self = this;
+        this._views = [];
+        // create a sub view for every model in the collection
+        this.collection.each(function(model) {
+            self._views.push(new SomeModelView({
+                model: model
+            }));
+        });
+    },
+    render: function() {
+        var self = this;
+        this.$el.empty();
+        // render each subview, appending to our root element
+        _.each(this._views, function(subview) {
+            self.$el.append(subview.render().el);
+        });
+    }
+});
+&lt;/pre&gt;
+&lt;p&gt;这个时候我们可以使用&lt;code&gt;documentFragment&lt;/code&gt;来在内存中先把我们要插入的DOM组织好，再一次性的完成append操作：&lt;/p&gt;
+&lt;pre class="highlight text"&gt;render: function() {
+    this.$el.empty();
+    var container = document.createDocumentFragment();
+    // render each subview, appending to our root element
+    _.each(this._views, function(subview) {
+        container.appendChild(subview.render().el)
+    });
+    this.$el.append(container);
+}
+&lt;/pre&gt;
+&lt;p&gt;看起来这也不是真正麻烦的问题，至少我们还有解决方案，但是如果是一个大量数据的collection需要render，那么就需要我们自己在render的时候做增量式的操作，否则效率无论如何都提高不起来，这往往在老的浏览器或者移动端是无法接受的。&lt;/p&gt;
+
+&lt;h3&gt;React.js的优点&lt;/h3&gt;
+
+&lt;p&gt;如果我们有一个跟Backbone.js同样轻量级，并且又自己解决了以上问题的框架，我们为什么不试试看呢？&lt;/p&gt;
+
+&lt;h4&gt;Virtual DOM&lt;/h4&gt;
+
+&lt;p&gt;是的，所有的问题都可以使用一个Virtual DOM来解决。这个Virtual DOM由React.js来维护，每次对于DOM的修改都是增量式的，效率会非常高。并且对于删除的DOM，它上面的DOM事件会自动删除，不需要我们显式的调用一次，并且对于DOM的删除操作不需要显示的调用&lt;code&gt;remove&lt;/code&gt;，一切有React.js来搞定。&lt;/p&gt;
+
+&lt;p&gt;这样就避免了很多内存泄露的可能性，也大大提高了性能。也就是同时解决了之前的两个问题。&lt;/p&gt;
+
+&lt;h4&gt;Template与View不再分离&lt;/h4&gt;
+
+&lt;p&gt;在大多数人的观念中，Template和View是完全不同的两种事物：一个是显示的内容，一个是显示的逻辑；一个是HTML，一个是JS。但是我们在实际开发的过程中，往往是开了两个窗口，左边是Template，右边是View，我们会非常欢快的在两边频繁切换。我们会做这样的操作，就是因为View的逻辑，就是Template的逻辑；Template的内容，其实也是View的内容。这两者没有大家想想的那么大的区别，分开以后反而是导致了代码不易读的问题，我常常会为了了解Template中的一个显示是如何得到的，而在各种View中找半天。&lt;/p&gt;
+
+&lt;p&gt;Template与View的合并带来了代码可读性的提高，但是可能也有人会觉得把这两种合并到一起会让代码变得更加臃肿。这里就要提到React.js的Component这个概念了，有了Component的细化，其实每一个Component的代码是很独立，并且也很少的。&lt;/p&gt;
+
+&lt;h4&gt;Component&lt;/h4&gt;
+
+&lt;p&gt;Compnent这个概念的出现，就是为了使得页面组件可以更加容易的被重用。在React.js给出的官方&lt;a href="http://facebook.github.io/react/docs/thinking-in-react.html"&gt;示例中&lt;/a&gt;，我们可以看到Component的粒度可以非常细，同时可以利用&lt;a href="http://facebook.github.io/react/docs/transferring-props.html"&gt;Props&lt;/a&gt;来保证Component之间的解耦。&lt;/p&gt;
+
+&lt;h3&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;有了Virtual DOM，JSX（合并Template与View），Component这三大利器，React.js现在已经成为了Template和View这一层的不二框架了。再加上它本身的轻量级，还有Facebook来维护，采用它的风险可以说非常低。由于以上种种原因，是的一个两年不到的项目，在Github上有了13,120的Star数量，社区也提供了相当的热情&lt;/p&gt;
+
+&lt;h3&gt;一些资料&lt;/h3&gt;
+
+&lt;p&gt;下面是一些关于React.js的资料：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=-DX3vJiqxm4"&gt;Pete Hunt - The Secrets of React&amp;#39;s Virtual DOM&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://stackoverflow.com/questions/21109361/why-is-reacts-concept-of-virtual-dom-said-to-be-more-performant-than-dirty-mode"&gt;Why is React&amp;#39;s concept of Virtual DOM said to be more performant than dirty model checking?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://calendar.perfplanet.com/2013/diff/"&gt;React’s diff algorithm&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+  </entry>
   <entry>
     <title>编写易读、可测试、可运行的API文档</title>
     <link rel="alternate" href="/2014/12/09/readable_testable_runnable_API_documentation.html"/>
@@ -53,8 +497,7 @@
 &lt;/ul&gt;
 
 &lt;p&gt;这里是API Blueprint的&lt;a href="https://github.com/apiaryio/api-blueprint/blob/master/API%20Blueprint%20Specification.md"&gt;格式文档&lt;/a&gt;，如果觉得字太多了不好理解，这里还有一个&lt;a href="https://github.com/apiaryio/api-blueprint/blob/master/Tutorial.md"&gt;简化的教程&lt;/a&gt;。下面是一个简单的实例，包含了基本的元素及其说明：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# 这里是API的名字
+&lt;pre class="highlight text"&gt;# 这里是API的名字
 这里是API的描述
 
 ## 这里是Resource的名字 [/uri/to/resouce]
@@ -75,8 +518,7 @@
             &amp;quot;id&amp;quot;: 1
             &amp;quot;name&amp;quot;: &amp;quot;some name&amp;quot;
         }
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;现在我们有了一份基本的API文档了，下面我们来介绍如何让这份文档更加可读，并且可以测试和运行。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;下面我会使用一个更加真实的&lt;a href="https://github.com/danielgtaylor/aglio/blob/master/example.md"&gt;API文档示例&lt;/a&gt;，并且之后所有的代码都可以在&lt;a href="https://github.com/zation/API-blueprint-demo"&gt;这里&lt;/a&gt;下载。&lt;/p&gt;
@@ -86,8 +528,7 @@
 &lt;p&gt;API Blueprint现在有两个开源工具可以生成静态HTML：&lt;a href="https://github.com/danielgtaylor/aglio"&gt;aglio&lt;/a&gt;和&lt;a href="https://github.com/subosito/iglo"&gt;iglo&lt;/a&gt;，这里使用aglio作为示例。并且为了我们可以实时的看到修改以后生成的HTML，我们同时引入了gulp作为实时的构建工具。&lt;/p&gt;
 
 &lt;p&gt;首先，我们定义一个task，命名为document，用来生成HTML，以及实时刷新页面：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;#39;use strict&amp;#39;;
+&lt;pre class="highlight text"&gt;&amp;#39;use strict&amp;#39;;
 
 var gulp = require(&amp;#39;gulp&amp;#39;);
 var aglio = require(&amp;#39;gulp-aglio&amp;#39;);
@@ -101,11 +542,9 @@ gulp.task(&amp;#39;document&amp;#39;, function() {
     .pipe(gulp.dest(&amp;#39;./.tmp/&amp;#39;))
     .pipe(connect.reload());
 });
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;然后，我们创建一个task来启动静态页面服务器：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;gulp.task(&amp;#39;server&amp;#39;, function() {
+&lt;pre class="highlight text"&gt;gulp.task(&amp;#39;server&amp;#39;, function() {
   return connect.server({
     root: [&amp;#39;./.tmp&amp;#39;],
     port: 3456,
@@ -114,11 +553,9 @@ gulp.task(&amp;#39;document&amp;#39;, function() {
     }
   });
 });
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;然后，为了方便，我们加上一个自动打开该静态页面的task：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var gopen = require(&amp;#39;gulp-open&amp;#39;);
+&lt;pre class="highlight text"&gt;var gopen = require(&amp;#39;gulp-open&amp;#39;);
 
 gulp.task(&amp;#39;open&amp;#39;, function() {
   return gulp.src(&amp;#39;./gulpfile.js&amp;#39;)
@@ -126,13 +563,10 @@ gulp.task(&amp;#39;open&amp;#39;, function() {
       url: &amp;#39;http://localhost:3456&amp;#39;
     }));
 });
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;最后，把上面的task加到默认的gulp task中：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;gulp.task(&amp;#39;default&amp;#39;, [&amp;#39;server&amp;#39;, &amp;#39;document&amp;#39;, &amp;#39;open&amp;#39;]);
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre class="highlight text"&gt;gulp.task(&amp;#39;default&amp;#39;, [&amp;#39;server&amp;#39;, &amp;#39;document&amp;#39;, &amp;#39;open&amp;#39;]);
+&lt;/pre&gt;
 &lt;p&gt;现在，可以运行&lt;code&gt;gulp&lt;/code&gt;来自动生成HTML的task了，并且浏览器会自动打开该页面。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;&lt;/p&gt;
@@ -147,8 +581,7 @@ gulp.task(&amp;#39;open&amp;#39;, function() {
 &lt;p&gt;我们看到现在的API.md文件有283行，这还是只包含了三个group的。如果API的数量更多，那么全都写在一个markdown文件中会非常难以维护。这个时候我们就需要把一个markdown文件，拆分成多个，并且gulp脚本也需要一定的处理。&lt;/p&gt;
 
 &lt;p&gt;首先，我们将API.md按照group，拆分为notes.md、users.md、tags.md。然后，我们需要在脚本中将这几个文件生成为一个，所以我们需要修改document task：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var gulp = require(&amp;#39;gulp&amp;#39;);
+&lt;pre class="highlight text"&gt;var gulp = require(&amp;#39;gulp&amp;#39;);
 var aglio = require(&amp;#39;gulp-aglio&amp;#39;);
 var connect = require(&amp;#39;gulp-connect&amp;#39;);
 var continuousConcat = require(&amp;#39;gulp-continuous-concat&amp;#39;);
@@ -162,8 +595,7 @@ gulp.task(&amp;#39;document&amp;#39;, function() {
     .pipe(gulp.dest(&amp;#39;./.tmp/&amp;#39;))
     .pipe(connect.reload());
 });
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;&lt;strong&gt;注：&lt;/strong&gt;这里使用&lt;code&gt;gulp-continuous-concat&lt;/code&gt;而没有使用&lt;code&gt;gulp-concat&lt;/code&gt;，是因为后者只在stream结束的时候才真的进行concat，这样就没有办法跟&lt;code&gt;gulp-watch&lt;/code&gt;一起用了，因为&lt;code&gt;gulp-watch&lt;/code&gt;是会让stream永久运行的。而&lt;code&gt;gulp-continuous-concat&lt;/code&gt;就没有这个限制。&lt;/p&gt;
 
 &lt;h3&gt;将API文档作为Mock Server&lt;/h3&gt;
@@ -173,23 +605,19 @@ gulp.task(&amp;#39;document&amp;#39;, function() {
 &lt;p&gt;那么怎么样才可以避免这个问题呢？只要我们保证文档就是Mock Server的数据来源，那么后台对于文档的任何修改，前端在开发过程中肯定会立刻知晓，并且也会反应在Mock Data上面。这也是我选用Api Blueprint的一大原因。下面我们来看看如何将API文档作为Mock Server启动起来。&lt;/p&gt;
 
 &lt;p&gt;实际上非常简单，只需要安装&lt;code&gt;api-mock&lt;/code&gt;，然后运行&lt;code&gt;api-mock xxx.md&lt;/code&gt;就可以了。但是由于我们之前将文档拆分了，那么在启动之前需要我们先build一份完整的文档出来，所以我们需要在gulp脚本中加入下面这个task：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var connect = require(&amp;#39;gulp-connect&amp;#39;);
+&lt;pre class="highlight text"&gt;var connect = require(&amp;#39;gulp-connect&amp;#39;);
 
 gulp.task(&amp;#39;build&amp;#39;, function() {
   return gulp.src([&amp;#39;documents/API.md&amp;#39;, &amp;#39;documents/*.md&amp;#39;])
     .pipe(concat(&amp;#39;API.md&amp;#39;))
     .pipe(gulp.dest(&amp;#39;./.tmp/&amp;#39;));
 });
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;然后为了方便运行，可以修改&lt;code&gt;package.json&lt;/code&gt;的&lt;code&gt;scrips&lt;/code&gt;：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;scripts&amp;quot;: {
+&lt;pre class="highlight text"&gt;&amp;quot;scripts&amp;quot;: {
   &amp;quot;start&amp;quot;: &amp;quot;gulp build &amp;amp;&amp;amp; api-mock ./.tmp/API.md --port 3457&amp;quot;
 }
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;然后运行&lt;code&gt;npm start&lt;/code&gt;就可以启动Mock Server了，你可以访问&lt;a href="http://localhost:3457/notes/1"&gt;http://localhost:3457/notes/1&lt;/a&gt;来测试一下。&lt;/p&gt;
 
 &lt;h3&gt;测试你的文档&lt;/h3&gt;
@@ -197,13 +625,11 @@ gulp.task(&amp;#39;build&amp;#39;, function() {
 &lt;p&gt;最后，我们还剩下唯一一个问题，就是如何保证我们的API文档与真实的API是一致的？自动化测试是一个有效的保证，&lt;a href="https://github.com/apiaryio/dredd"&gt;Dredd&lt;/a&gt;就是这样一个基于API Blueprint提供自动化测试的工具。&lt;/p&gt;
 
 &lt;p&gt;Dredd的使用也很方便，只需要运行&lt;code&gt;dredd xxx.md http://url/to/api-server&lt;/code&gt;就可以了。为了方便，我们可以把测试脚本放在&lt;code&gt;package.json&lt;/code&gt;的&lt;code&gt;scripts&lt;/code&gt;中：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;scripts&amp;quot;: {
+&lt;pre class="highlight text"&gt;&amp;quot;scripts&amp;quot;: {
   &amp;quot;test&amp;quot;: &amp;quot;gulp build &amp;amp;&amp;amp; dredd ./.tmp/API.md http://localhost:3458&amp;quot;,
   &amp;quot;start&amp;quot;: &amp;quot;gulp build &amp;amp;&amp;amp; api-mock ./.tmp/API.md --port 3457&amp;quot;
 }
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;同时我用express创建了一个简单的后台，使用&lt;code&gt;node server.js&lt;/code&gt;就可以启动，然后就可以运行&lt;code&gt;npm test&lt;/code&gt;查看文档测试的结果了。&lt;/p&gt;
 
 &lt;h3&gt;总结&lt;/h3&gt;
@@ -225,8 +651,7 @@ gulp.task(&amp;#39;build&amp;#39;, function() {
     <content type="html">&lt;p&gt;在大型项目中用过Grunt的都知道，当自动化的配置和task多了一个，一个Gruntfile.js文件可能有好几百行，这样维护非常困难，于是对Gruntfile的模块化势在必行。感谢&lt;a href="http://zhuanlan.zhihu.com/tla42"&gt;墨磊&lt;/a&gt;同学帮助我们做了模块化！以下内容都是他的实践。&lt;/p&gt;
 
 &lt;p&gt;本质上Gruntfile.js就是一个node.js代码文件，所以我们可以很方便的用&lt;a href="http://www.commonjs.org"&gt;CommonJS&lt;/a&gt;的规范将Gruntfile.js模块化。下面我们首先来看看模块化以后的grunt目录结构：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Gruntfile.js
+&lt;pre class="highlight text"&gt;Gruntfile.js
 grunt/
     compile/
         compass.js
@@ -239,23 +664,19 @@ grunt/
         ...
     config.js
     tasks.js
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;这里要提一下grunt模块划分，一般是根据task的不同来划分的。而&lt;a href="http://gulpjs.com/"&gt;gulp&lt;/a&gt;是根据处理的文件类型的不同来划分的。&lt;/p&gt;
 
 &lt;p&gt;Gruntfile.js所做的事情就很简单了，只是加载tasks.js：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;#39;use strict&amp;#39;;
+&lt;pre class="highlight text"&gt;&amp;#39;use strict&amp;#39;;
 
 module.exports = function (grunt) {
     // load tasks
     require(&amp;#39;./grunt/tasks.js&amp;#39;)(grunt);
 };
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;tasks.js负责加载和注册所有的tasks和config.js：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function (grunt) {
+&lt;pre class="highlight text"&gt;module.exports = function (grunt) {
 
     require(&amp;#39;./config.js&amp;#39;)(grunt);
 
@@ -268,13 +689,11 @@ module.exports = function (grunt) {
 
     return grunt;
 };
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;这里&lt;code&gt;grunt.loadTasks()&lt;/code&gt;方法的路径是相对于Gruntfile.js的。&lt;/p&gt;
 
 &lt;p&gt;config.js负责配置项目相关的属性：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function (grunt) {
+&lt;pre class="highlight text"&gt;module.exports = function (grunt) {
     grunt.initConfig({
         // configurable paths
         server: {
@@ -295,14 +714,13 @@ module.exports = function (grunt) {
 
     return grunt;
 };
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;compile文件夹下的tasks是在build production package的时候用到的，dev文件夹下的tasks是在开发环境中用到的，这里也可以根据项目的实际情况进行分类。&lt;/p&gt;
 
 &lt;p&gt;这里我认为还可以做优化的地方在于：&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;使用.json配置文件代替.js配置文件，并且预先设订好对于不同环境的配置文件，例如：config.json.development, config.json.production, config.json.staging, config.json.test... 不同的环境中就使用不同的配置文件，这样让所有的配置文件都可以做版本管理，而且也更加统一。&lt;/li&gt;
+&lt;li&gt;使用.json配置文件代替.js配置文件，并且预先设订好对于不同环境的配置文件，例如：config.json.development, config.json.production, config.json.staging, config.json.test&amp;hellip; 不同的环境中就使用不同的配置文件，这样让所有的配置文件都可以做版本管理，而且也更加统一。&lt;/li&gt;
 &lt;li&gt;使用npm将这些配置代码都打包，放到另一个独立的github repo中，这样可以简化项目结构和代码，同时也利于这些代码在其他项目中的共用。&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -414,16 +832,14 @@ module.exports = function (grunt) {
 &lt;p&gt;前端第三方插件的管理工具现在除了&lt;a href="http://bower.io/"&gt;bower&lt;/a&gt;，我不知道有其他的选择了。&lt;/p&gt;
 
 &lt;p&gt;对于自身代码的依赖管理工具，并不是选择哪一个框架的问题，基本都是选择&lt;a href="http://requirejs.org/"&gt;require.js&lt;/a&gt;，问题在于要不要用这个工具。由于Backbone.js并没有提供模块化和依赖管理的功能，所以我们还是尝试了使用require.js来管理自身依赖，但是实际情况是我们只把require.js用作一个打包代码的工具，而不是加载代码的工具，同时在修改文件名称或路径的时候非常麻烦，因为require.js的依赖是由文件的路径和名称确定的。解决这个问题的方式是使用模块名来定义模块，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;//Explicitly defines the &amp;quot;foo/title&amp;quot; module:
+&lt;pre class="highlight text"&gt;//Explicitly defines the &amp;quot;foo/title&amp;quot; module:
 define(&amp;quot;foo/title&amp;quot;,
     [&amp;quot;my/cart&amp;quot;, &amp;quot;my/inventory&amp;quot;],
     function(cart, inventory) {
         //Define foo/title object in here.
    }
 );
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;这样不管如何移动或重命名文件都不会有问题了。&lt;/p&gt;
 
 &lt;h4&gt;Test Framework&lt;/h4&gt;
@@ -480,8 +896,7 @@ define(&amp;quot;foo/title&amp;quot;,
 &lt;h4&gt;1. 声明manifest文件&lt;/h4&gt;
 
 &lt;p&gt;manifest可以告诉浏览器网站的cache行为，下面是一个完整的manifest文件示例：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;CACHE MANIFEST
+&lt;pre class="highlight text"&gt;CACHE MANIFEST
 # Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)
 
 CACHE:
@@ -496,8 +911,7 @@ http://api.twitter.com
 
 FALLBACK:
 images/large/ images/offline.jpg
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;p&gt;&lt;code&gt;CACHE MANIFEST&lt;/code&gt;表明该文件用于AppCache的配置，必须放在第一行&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)&lt;/code&gt;是一个时间戳，用于触发缓存文件的更新，这个会在后面详细讲到。&lt;/p&gt;
@@ -515,21 +929,17 @@ images/large/ images/offline.jpg
 &lt;h4&gt;2. 在页面中引入manifest文件&lt;/h4&gt;
 
 &lt;p&gt;引入manifest文件需要在html标签中加入manifest属性，其值为manifest文件地址，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;html manifest=&amp;quot;example.appcache&amp;quot;&amp;gt;
+&lt;pre class="highlight html"&gt;&lt;span class="nt"&gt;&amp;lt;html&lt;/span&gt; &lt;span class="na"&gt;manifest=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;example.appcache&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
   ...
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;span class="nt"&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;
 &lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：你需要在每个用到AppCache的页面都加入manifest属性，除非该页面就在缓存列表中，而拥有manifest属性的页面会自动被缓存住，不需要再加入缓存列表了。&lt;/p&gt;
 
 &lt;h4&gt;3. 修改服务器端的mime-type&lt;/h4&gt;
 
 &lt;p&gt;为了让服务器端可以正确的处理manifest文件，需要在mine-type中加入&lt;code&gt;text/cache-manifest&lt;/code&gt;。比如在Apache服务器中，可以添加以下行到配置文件中：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;AddType text/cache-manifest .appcache
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre class="highlight text"&gt;AddType text/cache-manifest .appcache
+&lt;/pre&gt;
 &lt;h3&gt;更新缓存&lt;/h3&gt;
 
 &lt;p&gt;完成manifest文件的配置以后，你会发现你的页面加载速度暴增，可以算是秒载，但是你也会悲催的发现，任何文件的修改将不会被反应到页面上，那么当我们有文件修改的时候应该怎么办呢？&lt;/p&gt;
@@ -561,8 +971,7 @@ images/large/ images/offline.jpg
 &lt;/ul&gt;
 
 &lt;p&gt;其中最重要的就是&lt;code&gt;updateready&lt;/code&gt;这个事件，我们可以利用JavaScript绑定这个事件，在缓存更新的时候自动刷新来应用这些更新，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// Check if a new cache is available on page load.
+&lt;pre class="highlight text"&gt;// Check if a new cache is available on page load.
 window.addEventListener(&amp;#39;load&amp;#39;, function(e) {
 
   window.applicationCache.addEventListener(&amp;#39;updateready&amp;#39;, function(e) {
@@ -579,8 +988,7 @@ window.addEventListener(&amp;#39;load&amp;#39;, function(e) {
   }, false);
 
 }, false);
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/pre&gt;
 &lt;h3&gt;AppCache的Debug&lt;/h3&gt;
 
 &lt;p&gt;当我们在本地调试的时候，我们如何知道AppCache是否起效果，并缓存了哪些文件呢？Chrome的开发者工具提供了这些信息，打开开发者工具，在Resource =&amp;gt; Application Cache中就可以看到缓存了哪些文件，如下图所示：&lt;/p&gt;
@@ -599,452 +1007,6 @@ window.addEventListener(&amp;#39;load&amp;#39;, function(e) {
 &lt;li&gt;&lt;a href="http://blog.christian-heindel.de/2011/10/25/debugging-html5-offline-web-applications/"&gt;Debugging HTML5 Offline Web applications&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://appcachefacts.info/"&gt;Appcache Facts&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</content>
-  </entry>
-  <entry>
-    <title>如何构建自动化的前端开发流程</title>
-    <link rel="alternate" href="/2013/03/15/how-to-build-frontend-dev-env.html"/>
-    <id>/2013/03/15/how-to-build-frontend-dev-env.html</id>
-    <published>2013-03-15T08:21:00Z</published>
-    <updated>2013-03-15T08:21:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;我们有许多的第三方库的依赖需要管理；&lt;/li&gt;
-&lt;li&gt;我们有独立的前端测试需要自动运行；&lt;/li&gt;
-&lt;li&gt;我们还有很多代码需要在发布时进行打包压缩；&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;所以构建一个自动化的前端开发流程是非常必要的，但现在前端开发流程的构建是百花齐放，没有一个统一的标准，还有很多依赖于后端的架构来做前端开发管理。例如在Rails开发中，就有各种前端库的gem包。但是这种依赖于后端框架的管理方式有许多问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;许多gem包的维护者并不是前端库的维护者，所以更新不一定即时；&lt;/li&gt;
-&lt;li&gt;不利于前端代码与后端代码做分离；&lt;/li&gt;
-&lt;li&gt;增加了前端开发者的学习和使用成本；&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看&lt;a href="https://github.com/zation/flyingtortoise"&gt;所有的代码&lt;/a&gt;。 &lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;如今的前端开发中，已经不再只是一些简单的静态文件了，对于很多Web App来说，前端代码甚至比后端代码要更加复杂，更加难于管理，例如：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;我们有许多的第三方库的依赖需要管理；&lt;/li&gt;
-&lt;li&gt;我们有独立的前端测试需要自动运行；&lt;/li&gt;
-&lt;li&gt;我们还有很多代码需要在发布时进行打包压缩；&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;所以构建一个自动化的前端开发流程是非常必要的，但现在前端开发流程的构建是百花齐放，没有一个统一的标准，还有很多依赖于后端的架构来做前端开发管理。例如在Rails开发中，就有各种前端库的gem包。但是这种依赖于后端框架的管理方式有许多问题：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;许多gem包的维护者并不是前端库的维护者，所以更新不一定即时；&lt;/li&gt;
-&lt;li&gt;不利于前端代码与后端代码做分离；&lt;/li&gt;
-&lt;li&gt;增加了前端开发者的学习和使用成本；&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;于是现在出现了一些不依赖于后端代码（虽然还是要依赖Node.js⋯⋯）的管理工具，对于前端开发者非常友好，例如：&lt;a href="http://yeoman.io/"&gt;YEMAN&lt;/a&gt;、&lt;a href="http://jamjs.org/"&gt;Jam&lt;/a&gt;、&lt;a href="http://volojs.org/"&gt;volo&lt;/a&gt;、&lt;a href="https://github.com/component/component"&gt;component&lt;/a&gt;、&lt;a href="http://brunch.io/"&gt;Brunch&lt;/a&gt;⋯⋯但是这些工具都或多或少有自己的一些问题，所以我决定用一些更轻量的工具（&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;、&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;）来搭建自己的前端开发流程。本文的例子来自本人正在开发的一个项目，可以在github上查看&lt;a href="https://github.com/zation/flyingtortoise"&gt;所有的代码&lt;/a&gt;。 &lt;/p&gt;
-
-&lt;h3&gt;什么是开发流程？&lt;/h3&gt;
-
-&lt;p&gt;在我看来一个完整的开发流程应该包括：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;本地开发环境的初始化&lt;/li&gt;
-&lt;li&gt;第三方依赖的管理&lt;/li&gt;
-&lt;li&gt;源文件编译&lt;/li&gt;
-&lt;li&gt;自动化测试&lt;/li&gt;
-&lt;li&gt;发布到pipeline和各个环境&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;而现代的开发流程，就是要使上面的各个部分都可以自动化，一个命令就可以使这些流程都自动走完，并且快速的得到错误或通过的反馈，让我们可以方便快速的修复错误和release。&lt;/p&gt;
-
-&lt;h3&gt;本地开发环境的初始化&lt;/h3&gt;
-
-&lt;p&gt;这里我使用的工具是&lt;a href="http://nodejs.org/"&gt;Node.js&lt;/a&gt;和&lt;a href="https://npmjs.org/"&gt;NPM&lt;/a&gt;，它们都基于JavaScript，使用Json来配置，对于前端开发人员非常友好。&lt;/p&gt;
-
-&lt;p&gt;安装完成Node.js和NPM后，在项目根目录下创建NPM的配置文件&lt;code&gt;package.json&lt;/code&gt;：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-    &amp;quot;name&amp;quot;: &amp;quot;Project Name&amp;quot;,
-    &amp;quot;version&amp;quot;: &amp;quot;0.0.1&amp;quot;,
-    &amp;quot;description&amp;quot;: &amp;quot;Project Description&amp;quot;,
-    &amp;quot;repository&amp;quot;: {
-        &amp;quot;type&amp;quot;: &amp;quot;git&amp;quot;,
-        &amp;quot;url&amp;quot;: &amp;quot;git://github.com/path/to/your_project&amp;quot;
-    },
-    &amp;quot;author&amp;quot;: &amp;quot;Author Name&amp;quot;,
-    &amp;quot;license&amp;quot;: &amp;quot;BSD&amp;quot;,
-    &amp;quot;readmeFilename&amp;quot;: &amp;quot;README.md&amp;quot;,
-    &amp;quot;gitHead&amp;quot;: &amp;quot;git head&amp;quot;,
-    &amp;quot;devDependencies&amp;quot;: {
-        &amp;quot;grunt&amp;quot;: &amp;quot;latest&amp;quot;,
-        &amp;quot;grunt-contrib-connect&amp;quot;: &amp;quot;latest&amp;quot;,
-        &amp;quot;grunt-contrib-concat&amp;quot;: &amp;quot;latest&amp;quot;,
-        &amp;quot;grunt-contrib-jasmine&amp;quot;: &amp;quot;latest&amp;quot;,
-        &amp;quot;grunt-contrib-watch&amp;quot;: &amp;quot;latest&amp;quot;,
-        &amp;quot;grunt-contrib-compass&amp;quot;: &amp;quot;latest&amp;quot;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中最重要的一个配置项是&lt;strong&gt;devDependencies&lt;/strong&gt;，这是用于开发的依赖，例如：自动化测试、源文件编译等等，其中各个依赖的作用和用法将会在后面讲到。而前端生产代码的依赖会使用另一个工具来管理，也在后面讲到。创建完成以后运行&lt;code&gt;npm install&lt;/code&gt;，NPM就会将这些依赖都安装到项目根目录的&lt;code&gt;node_modules&lt;/code&gt;文件夹中。&lt;/p&gt;
-
-&lt;h3&gt;第三方依赖的管理&lt;/h3&gt;
-
-&lt;p&gt;这里我使用的工具是&lt;a href="http://twitter.github.com/bower/"&gt;bower&lt;/a&gt;。其实NPM也可以管理，但是NPM并不是读取第三方依赖原始的repository，而是读取自己管理的一个repository，所以更新可能会慢点，并且它使用CommonJS的接口方便Node.js项目的开发，并不是针对纯前端开发的项目；而bower是读取原始的github repository，没有更新延迟的问题，所有包都是针对纯前端开发项目的。&lt;/p&gt;
-
-&lt;p&gt;要使用bower只需要简单的三步：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;安装：&lt;code&gt;npm install bower -g&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;在项目根目录中创建配置文件&lt;code&gt;.bowerrc&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;在项目根目录中创建依赖配置文件&lt;code&gt;components.json&lt;/code&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;我们首先来看看&lt;code&gt;.bowerrc&lt;/code&gt;的内容：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-    &amp;quot;directory&amp;quot; : &amp;quot;components&amp;quot;,
-    &amp;quot;json&amp;quot;      : &amp;quot;component.json&amp;quot;,
-    &amp;quot;endpoint&amp;quot;  : &amp;quot;https://bower.herokuapp.com&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中&lt;strong&gt;directory&lt;/strong&gt;指定了所有的依赖会被安装到哪里；&lt;strong&gt;json&lt;/strong&gt;指定了依赖配置文件的路径；&lt;strong&gt;endpoint&lt;/strong&gt;制定了依赖的repository的寻址服务器，你可以替换为自己的寻址服务器。&lt;/p&gt;
-
-&lt;p&gt;然后我们来看看&lt;code&gt;components.json&lt;/code&gt;的内容：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-    &amp;quot;name&amp;quot;: &amp;quot;Project Name&amp;quot;,
-    &amp;quot;version&amp;quot;: &amp;quot;0.0.1&amp;quot;,
-    &amp;quot;dependencies&amp;quot;: {
-      &amp;quot;jquery&amp;quot;: &amp;quot;latest&amp;quot;,
-      &amp;quot;underscore&amp;quot;: &amp;quot;latest&amp;quot;,
-      &amp;quot;backbone&amp;quot;: &amp;quot;latest&amp;quot;,
-      &amp;quot;jasmine-jquery&amp;quot;: &amp;quot;latest&amp;quot;,
-      &amp;quot;jasmine-ajax&amp;quot;: &amp;quot;git@github.com:pivotal/jasmine-ajax.git&amp;quot;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中最重要的就是&lt;strong&gt;dependencies&lt;/strong&gt;，它指定了所有前端开发依赖的包。所有bower包含的依赖都可以在&lt;a href="http://sindresorhus.com/bower-components/"&gt;这里&lt;/a&gt;查到，对于bower没有包含的依赖也可以直接指定github的repository，例如：&lt;code&gt;&amp;quot;jasmine-ajax&amp;quot;: &amp;quot;git@github.com:pivotal/jasmine-ajax.git&amp;quot;&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;最后运行&lt;code&gt;bower install&lt;/code&gt;就可以在components文件夹中看到所有第三方依赖的文件了。但是bower有一个问题，就是它将所有github repository中的文件都下载下来了，其中有许多是我们不需要的文件。下面我们会将我们需要的文件提取出来打包放到我们指定的目录中。&lt;/p&gt;
-
-&lt;h3&gt;源文件编译&lt;/h3&gt;
-
-&lt;p&gt;这里我使用的工具是&lt;a href="http://gruntjs.com/"&gt;grunt&lt;/a&gt;，他本身主要是基于Node.js的文件操作包，其中有许多插件可以让我们完成js文件的compile和compress、sass到css的转换等等操作。要使用它需要先安装命令行工具：&lt;code&gt;npm install grunt-cli -g&lt;/code&gt;，然后在项目根目录中创建文件&lt;code&gt;Gruntfile.js&lt;/code&gt;，这个文件用于定义各种task，我们首先定义一个task将从bower下载的第三方依赖都打包到文件&lt;code&gt;app/js/lib.js&lt;/code&gt;中：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
-
-    var dependencies = [
-        &amp;#39;components/jquery/jquery.js&amp;#39;,
-        &amp;#39;components/underscore/underscore.js&amp;#39;,
-        &amp;#39;components/backbone/backbone.js&amp;#39;];
-
-    grunt.initConfig({
-        concat: {
-            js: {
-                src: dependencies,
-                dest: &amp;#39;app/js/lib.js&amp;#39;
-            }
-        }
-    });
-
-    grunt.loadNpmTasks(&amp;#39;grunt-contrib-concat&amp;#39;);
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里的grunt-contrib-concat就是grunt的一个插件，用于文件的合并操作，我们已经在前面的&lt;code&gt;package.json&lt;/code&gt;中引入了。&lt;code&gt;js&lt;/code&gt;是task name；&lt;code&gt;src&lt;/code&gt;指定了合并的源文件地址；&lt;code&gt;dest&lt;/code&gt;指定了合并的目标文件。这样当我们运行&lt;code&gt;grunt concat:js&lt;/code&gt;后，所有的依赖文件都会被合并为&lt;code&gt;app/js/lib.js&lt;/code&gt;。这样做的好处是我们可以控制每个依赖的引入顺序，但是麻烦的是每次引入新的依赖都需要手动加入到&lt;code&gt;dependencies&lt;/code&gt;数组中。这个暂时没有更好的解决方案，因为不是所有的包都在自己的&lt;code&gt;components.js&lt;/code&gt;中声明了main文件，很多时候必须自己手动指定。&lt;/p&gt;
-
-&lt;p&gt;JavaScript文件编译完成以后就是CSS文件，在现代的前端开发中，我们已经很少直接写CSS文件了，一般都使用SASS或者LESS。grunt也提供了这种支持，这里我使用的是&lt;a href="https://github.com/gruntjs/grunt-contrib-compass"&gt;grunt-contrib-compass&lt;/a&gt;：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
-
-    var sasses = &amp;#39;sass&amp;#39;;
-
-    grunt.initConfig({
-        compass: {
-            development: {
-                options: {
-                    sassDir: sasses,
-                    cssDir: &amp;#39;app/css&amp;#39;
-                }
-            }
-        }
-    });
-
-    grunt.loadNpmTasks(&amp;#39;grunt-contrib-compass&amp;#39;);
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后运行&lt;code&gt;grunt compass:development&lt;/code&gt;就可以完成CSS文件的编译了。&lt;/p&gt;
-
-&lt;h3&gt;自动化测试&lt;/h3&gt;
-
-&lt;p&gt;这里我使用的自动化测试工具是&lt;a href="http://pivotal.github.com/jasmine/"&gt;Jasmine&lt;/a&gt;，它grunt中同样有一个插件：&lt;a href="https://github.com/gruntjs/grunt-contrib-jasmine"&gt;grunt-contrib-jasmine&lt;/a&gt;。下面我们来看看如何在&lt;code&gt;Gruntfile.js&lt;/code&gt;中定义测试的task：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
-
-    var sources = &amp;#39;app/js/**/*.js&amp;#39;,
-        specs = &amp;#39;spec/**/*Spec.js&amp;#39;;
-
-    grunt.initConfig({
-        jasmine: {
-            test: {
-                src: [sources],
-                options: {
-                    specs: specs,
-                    helpers: [&amp;#39;spec/helper/**/*.js&amp;#39;],
-                    vendor: &amp;#39;app/js/lib.js&amp;#39;
-                }
-            }
-        }
-    });
-
-    grunt.loadNpmTasks(&amp;#39;grunt-contrib-jasmine&amp;#39;);
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;配置完成以后就可以运行&lt;code&gt;grunt jasmine:test&lt;/code&gt;来跑测试，但问题是每次写完代码都要手动执行一次非常麻烦，最好可以每次代码有更改都自动跑一次，让我们可以更快的得到反馈。grunt的&lt;a href="https://github.com/gruntjs/grunt-contrib-watch"&gt;watch插件&lt;/a&gt;就提供了这种支持：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function(grunt) {
-
-    var sources = &amp;#39;app/js/**/*.js&amp;#39;,
-        specs = &amp;#39;spec/**/*Spec.js&amp;#39;;
-
-    grunt.initConfig({
-        jasmine: {
-            test: {
-                src: [sources],
-                options: {
-                    specs: specs,
-                    helpers: [&amp;#39;spec/helper/**/*.js&amp;#39;],
-                    vendor: &amp;#39;app/js/lib.js&amp;#39;
-                }
-            }
-        },
-        watch: {
-            test: {
-                files: [sources, specs],
-                tasks: [&amp;#39;jasmine:test&amp;#39;]
-            }
-        }
-    });
-
-    grunt.loadNpmTasks(&amp;#39;grunt-contrib-jasmine&amp;#39;);
-    grunt.loadNpmTasks(&amp;#39;grunt-contrib-watch&amp;#39;);
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;files&lt;/code&gt;指定了需要监听变动的文件；&lt;code&gt;tasks&lt;/code&gt;指定了修改后自动触发的task。现在只要我们运行&lt;code&gt;grunt watch:test&lt;/code&gt;，那么有任何源文件、测试文件的改动，Jasmine测试都会自动运行了。有时候我们也希望测试的结果显示在网页上，便于我们做js的调试。那么可以将&lt;code&gt;tasks: [&amp;#39;jasmine:test&amp;#39;]&lt;/code&gt;改为&lt;code&gt;tasks: [&amp;#39;jasmine:test:build&amp;#39;]&lt;/code&gt;，然后打开根目录下的&lt;code&gt;_SpecRunner.html&lt;/code&gt;文件，就可以在网页中看到测试结果了，再加上一些Chrome的&lt;a href="https://chrome.google.com/webstore/detail/live-reload/pccddenngcbofbojodpghgpbheckgddn"&gt;Livereload插件&lt;/a&gt;，就可以不用刷新实时的看到测试结果，效率非常之高。虽然grunt插件中也有&lt;a href="https://github.com/gruntjs/grunt-contrib-livereload"&gt;livereload&lt;/a&gt;，但是与grunt-contrib-watch无法很好的集成，所以我没有使用这种方式。&lt;/p&gt;
-
-&lt;h3&gt;CI Pipeline&lt;/h3&gt;
-
-&lt;p&gt;由于我的项目是host在github上，所以我选择&lt;a href="https://travis-ci.org/"&gt;travis-ci&lt;/a&gt;作为我的CI服务器。要启用travis-ci需要以下几步：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;在&lt;a href="https://travis-ci.org/"&gt;travis-ci&lt;/a&gt;中注册一个账号，获取一个token；&lt;/li&gt;
-&lt;li&gt;在你的github项目的Settings--&amp;gt;Service Hooks中找到Travis，填入token并且启用；&lt;/li&gt;
-&lt;li&gt;回到&lt;a href="https://travis-ci.org/"&gt;travis-ci&lt;/a&gt;，在Accounts--&amp;gt;Repositories中打开你的项目的service hook&lt;/li&gt;
-&lt;li&gt;Push一个&lt;code&gt;.travis.yml&lt;/code&gt;到github，触发第一次build。&lt;/li&gt;
-&lt;li&gt;修改&lt;code&gt;package.json&lt;/code&gt;的&lt;code&gt;scripts&lt;/code&gt;项，指定运行测试的命令&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;下面我们来看看如何配置&lt;code&gt;.travis.yml&lt;/code&gt;：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;language: node_js
-node_js:
-  - &amp;quot;0.8&amp;quot;
-before_script:
-  - npm install -g grunt-cli
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;由于我们的环境是基于Node.js搭建的，所以在&lt;strong&gt;language&lt;/strong&gt;设置了node&lt;em&gt;js；而**node&lt;/em&gt;js&lt;strong&gt;指定了Node.js的版本；&lt;/strong&gt;before_script**指定了在测试运行前需要执行的命令，由于我们的脚本都是基于grunt的，所以需要先安装grunt的命令行包。&lt;/p&gt;
-
-&lt;p&gt;然后再修改&lt;code&gt;package.json&lt;/code&gt;：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-    ⋯⋯
-    &amp;quot;scripts&amp;quot;: {
-        &amp;quot;test&amp;quot;: &amp;quot;grunt jasmine:test&amp;quot;
-    }
-    ⋯⋯
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;将修改以后的&lt;code&gt;package.json&lt;/code&gt;push到github上，再次触发一个新的build，你可以看到你之前错误的build已经绿了。&lt;/p&gt;
-
-&lt;p&gt;这里还有一个小提示：如何让build状态显示在项目的readme中？很简单，只需要在README.md中加入以下代码就可以了：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[![Build Status](https://travis-ci.org/path/to/your_repository.png?branch=master)](http://travis-ci.org/path/to/your_repository)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;到这里基本的环境搭建就完成了，当然我们还可以使用grund的&lt;code&gt;registerTask&lt;/code&gt;来定义一个任务序列，还可以加入template的编译⋯⋯这些都可以通过grunt来灵活设置。最重要的是现在别人拿到一个项目的代码以后，可以通过一些命令来快速的搭建本地环境，方便的进行测试和开发，而且没有依赖与后端的开发环境，只要定义好接口，前端开发可以完全独立开了。虽然这其中还有很多问题没有解决，例如：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;如何让第三方依赖自申明main文件&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;package.json&lt;/code&gt;与&lt;code&gt;components.json&lt;/code&gt;其实有些重复&lt;/li&gt;
-&lt;li&gt;Live Reload还需要Chrome插件才能完成&lt;/li&gt;
-&lt;li&gt;⋯⋯&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这正是由于现在前端开发环境还没有后端开发的那种标准化，也正是挑战和机遇之所在！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>使用CSS3制作一个有趣的搜索框</title>
-    <link rel="alternate" href="/2013/02/04/use_css3_to_create_innovation_search_box.html"/>
-    <id>/2013/02/04/use_css3_to_create_innovation_search_box.html</id>
-    <published>2013-02-04T05:29:00Z</published>
-    <updated>2013-02-04T05:29:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;img alt="CSS3" src="/images/CSS3.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：&lt;a href="http://www.slideshare.net/findfado/ux-enhancing-experiences"&gt;UX: Enhancing Experiences with Animation&lt;/a&gt;。）&lt;/p&gt;
-
-&lt;p&gt;如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括&lt;strong&gt;tansform&lt;/strong&gt;、&lt;strong&gt;animation&lt;/strong&gt;、&lt;strong&gt;keyframes&lt;/strong&gt;。最终效果情况本站右上角。&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;&lt;img alt="CSS3" src="/images/CSS3.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;动画效果在交互设计中占据着一个非常重要的位置，因为当我们在设计一个产品的时候，我们不仅仅是在设计它的外观，更是在设计它的行为。举例来说，一个好的演员可以利用他的动作、肢体语言使观众感受到角色的内心与特点，甚至将观众带入到相同的内心中，感同身受。同理，一系列好的动画设计，可以让使用者更容易了解产品的用法，感受到产品的特点，从而提升用户体验，甚至是让用户发出“Awesome! I love it！”的感叹。（关于动画到底是如何提升用户体验的，请看Alfredo Aponte的PPT：&lt;a href="http://www.slideshare.net/findfado/ux-enhancing-experiences"&gt;UX: Enhancing Experiences with Animation&lt;/a&gt;。）&lt;/p&gt;
-
-&lt;p&gt;如今CSS3的日趋成熟，使我们制作网页中动画效果的方式更加的方便和多样，下面让我们来看看使用CSS3如何制作一个有趣的搜索框，所使用到的属性包括&lt;strong&gt;tansform&lt;/strong&gt;、&lt;strong&gt;animation&lt;/strong&gt;、&lt;strong&gt;keyframes&lt;/strong&gt;。最终效果情况本站右上角。&lt;/p&gt;
-
-&lt;h3&gt;使用transform绘制搜索框的“尾巴”&lt;/h3&gt;
-
-&lt;p&gt;通常的搜索框图标都由一个圆圈加一个“尾巴”组成，例如下面的图片：&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Search Box" src="/images/search_box.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;一般我们都使用图片来完成这个效果，但是图片会给我们的动画效果造成很大的限制，所以这里我们使用CSS3来实现它。首先是HTML结构：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;div class=&amp;quot;search-container&amp;quot;&amp;gt;
-    &amp;lt;input placeholder=&amp;quot;Search for article title or tags&amp;quot; class=&amp;quot;search&amp;quot; type=&amp;quot;text&amp;quot;&amp;gt;
-    &amp;lt;div class=&amp;quot;search-qualifier&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
-&amp;lt;/div&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里其实我希望只有一个&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;就可以实现，尾巴就在&lt;code&gt;input:after&lt;/code&gt;中实现，这样可以避免无意义的HTML标签。但是&lt;code&gt;:before&lt;/code&gt;和&lt;code&gt;:after&lt;/code&gt;这种伪类是将内容插入到某个容器中，但是如果这个容器是自闭和标签（例如：&lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt;、&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;），则这些伪类是不起效果的。所以这里我只能加入一个无意义的&lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;，仅仅用于显示“尾巴”了。&lt;/p&gt;
-
-&lt;p&gt;下面我们来看看如何将&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;变成一个圆圈（这里我就省略不同浏览器的前缀了）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.search {
-    height: 18px;
-    width: 18px;
-    border-radius: 18px;
-    background: white;
-    border: 3px solid #999999;
-    outline: none;
-    padding: 3px;
-    font-size: 0;
-    box-shadow: inset 0 0 2px #999999, 0 0 2px #999999;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;只要将&lt;code&gt;border-radius&lt;/code&gt;设置为边长，或者大于边长，&lt;code&gt;&amp;lt;input&amp;gt;&lt;/code&gt;就会变成一个圆圈了。&lt;/p&gt;
-
-&lt;p&gt;下面我们将&lt;code&gt;&amp;lt;div class=&amp;quot;search-qualifier&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;&lt;/code&gt;设置为一个短横条，然后再将他以左边中心为原点顺时针旋转45度，一个搜索框的“尾巴”就出现了。来看看具体的代码：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.search-qualifier {
-     display: block;
-     height: 8px;
-     width: 0;
-     border: 3px solid #999;
-     border-radius: 3px;
-     content: &amp;quot;&amp;quot;;
-     position: absolute;
-     top: 24px;
-     right: 2px;
-     transform: rotate(-45deg);
-     transform-origin: 50% 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里要解释一下CSS3的新属性：&lt;strong&gt;transform&lt;/strong&gt;。它是用于对元素做2D或者3D变换的，包括旋转、缩放、移动和倾斜等等。&lt;code&gt;transform: rotate(-45deg)&lt;/code&gt;使&lt;code&gt;search-qualifier&lt;/code&gt;顺时针旋转45度，然后使用&lt;code&gt;transform-origin: 50% 0&lt;/code&gt;指定旋转的原点为左边的中心。具体可以参考&lt;a href="http://www.w3schools.com/cssref/css3_pr_transform.asp"&gt;w3schools&lt;/a&gt;上面的详细说明。&lt;/p&gt;
-
-&lt;h3&gt;使用animation和keyframe让“尾巴”动起来&lt;/h3&gt;
-
-&lt;p&gt;如果只是使用CSS3绘制这样的图形其实意义不大，与图片相比只是方便程序员调整大小，但是如果我们加入一些动画就不一样了，如果是好的动画效果，它会给用户心理上的惊喜，提高用户体验。下面我们就让“尾巴”可以左右摆动起来！&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@keyframes qualifier-shaking {
-    0% {
-      transform: rotate(-75deg);
-    }
-    100% {
-      transform: rotate(-30deg);
-    }
-}
-
-.search-qualifier {
-    ...
-    animation: qualifier-shaking 1s infinite alternate;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里要解释一下CSS3的新属性：&lt;strong&gt;keyframes&lt;/strong&gt;和&lt;strong&gt;animation&lt;/strong&gt;。前者用于定义动画过程，后者用于调用动画。具体定义可以参考w3shcools：&lt;a href="http://www.w3schools.com/cssref/css3_pr_keyframes.asp"&gt;keyframes&lt;/a&gt;、&lt;a href="http://www.w3schools.com/cssref/css3_pr_animation.asp"&gt;animation&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;我们首先利用&lt;code&gt;keyframes&lt;/code&gt;定义了一个名为“qualifier-shaking”的动画：在动画开始的时候，“尾巴”的旋转角度为75度，然后顺时针旋转到30度，动画结束。动画定义完成后，就是调用动画了，我们使用&lt;code&gt;animation&lt;/code&gt;来调用动画：“qualifier-shaking”表明了要调用的动画名称；“1s”是动画执行时间；“infinite”是动画执行次数，这里是执行无限次；“alternate”表明在动画多次执行过程中每次都是从头开始执行，还是以往复执行的方式。&lt;/p&gt;
-
-&lt;p&gt;仅仅是左右摇摆还是太单调了一点，我们希望这个“尾巴”可以动得更调皮一些。首先他会隐藏起来，然后每隔一段时间冒个头，摇摆一下再缩回去。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@keyframes qualifier-shaking {
-    0% {
-        height: 0;
-        border-width: 0;
-    }
-    40% {
-        height: 0;
-        border-width: 0;
-    }
-    43% {
-        transform: rotate(-45deg);
-        height: 8px;
-        border-width: 3px;
-    }
-    46% {
-        transform: rotate(-75deg);
-    }
-    49% {
-        transform: rotate(-30deg);
-    }
-    52% {
-        transform: rotate(-45deg);
-        height: 8px;
-        border-width: 3px;
-    }
-    57% {
-        transform: rotate(-45deg);
-        height: 8px;
-        border-width: 3px;
-    }
-    60% {
-        height: 0;
-        border-width: 0;
-    }
-    100% {
-        height: 0;
-        border-width: 0;
-    }
-}
-
-.search-qualifier {
-    ...
-    animation: qualifier-shaking 6s infinite;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里我们设置更多的动画段，首尾两端都让“尾巴”隐藏，然后利用&lt;code&gt;height&lt;/code&gt;和&lt;code&gt;border-width&lt;/code&gt;的改变让“尾巴”冒头和缩回，其余都跟上一个例子相同。这里的animation也设置了更长的执行时间。&lt;/p&gt;
-
-&lt;p&gt;到此为止，一个有趣的CSS3搜索框就做好了。在现代的前端开发中，CSS已经可以完成动画的操作了，那么我们就尽量用CSS来完成，js最多就只用作改变class来触发动画。因为现在js负责的前端逻辑处理已经很多了，再给js加上动画处理的代码很容易导致项目js代码的爆炸。同时CSS3动画有来自浏览器自身的支持，效率和效果上都会 更好一些。&lt;/p&gt;
 </content>
   </entry>
 </feed>

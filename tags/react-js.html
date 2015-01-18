@@ -15,7 +15,7 @@
   <![endif]-->
 </head>
 
-<body class="detail">
+<body class="tag">
   <div class="main-container">
     <header class="nav-container">
       <div class="search-container">
@@ -63,114 +63,91 @@
 
     <section class="content">
         <article class="article">
-    <header class="article-title">
-      <h1>
-        国内项目天坑记（二）
-      </h1>
-      
-        <h2>——Gruntfile的模块化</h2>
-      
-    </header>
     <ul class="extro-info">
       <li class="date">
-        2014. 06. 09
+        2015. 01. 15
       </li>
       
         <li class="tag">
-          <a href="/tags/grunt.html">Grunt</a>
+          
+          <a class="" href="/tags/javascript.html">Javascript</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/backbone-js.html">Backbone.js</a>
+        </li>
+      
+        <li class="tag">
+          
+            
+          
+          <a class="active" href="/tags/react-js.html">React.js</a>
         </li>
       
       <li class="comment">
         <a class="ds-thread-count"
-          data-thread-key="grunt_config_as_modules"
-          href="#comment"></a>
+          data-thread-key="replace_backbonejs_view_with_reactj_2"
+          href="/2015/01/15/replace_backbonejs_view_with_reactj_2.html#comment"></a>
       </li>
     </ul>
-    
+    <header class="article-title">
+      <h1>
+        <a href="/2015/01/15/replace_backbonejs_view_with_reactj_2.html">用React.js替换Backbone.js的View（二）</a>
+      </h1>
+      
+        <h2>——Todo MVC示例</h2>
+      
+    </header>
     <div class="article-content">
-      <p>在大型项目中用过Grunt的都知道，当自动化的配置和task多了一个，一个Gruntfile.js文件可能有好几百行，这样维护非常困难，于是对Gruntfile的模块化势在必行。感谢<a href="http://zhuanlan.zhihu.com/tla42">墨磊</a>同学帮助我们做了模块化！以下内容都是他的实践。</p>
+      <p>Backbone.js和React.js在设计思想上都借鉴了<a href="http://en.wikipedia.org/wiki/Reactive_programming">Reactive Programming</a>，即：当Model修改时，这种变更可以反向传播到View，使得View同时被更改，也就是双向绑定。但Backbone.js需要你自己来写如何修改View，而在React.js中，你只需要关心如何根据Model来显示View，如何修改可以完全交给React.js。也就是说他们都在做一种简化，而React.js做的更加彻底，这也是它的核心思想和优点。</p>
 
-<p>本质上Gruntfile.js就是一个node.js代码文件，所以我们可以很方便的用<a href="http://www.commonjs.org">CommonJS</a>的规范将Gruntfile.js模块化。下面我们首先来看看模块化以后的grunt目录结构：</p>
-<pre class="highlight text">Gruntfile.js
-grunt/
-    compile/
-        compass.js
-        concat.js
-        uglify.js
-        ...
-    dev/
-        jshint.js
-        connect.js
-        ...
-    config.js
-    tasks.js
-</pre>
-<p>这里要提一下grunt模块划分，一般是根据task的不同来划分的。而<a href="http://gulpjs.com/">gulp</a>是根据处理的文件类型的不同来划分的。</p>
-
-<p>Gruntfile.js所做的事情就很简单了，只是加载tasks.js：</p>
-<pre class="highlight text">&#39;use strict&#39;;
-
-module.exports = function (grunt) {
-    // load tasks
-    require(&#39;./grunt/tasks.js&#39;)(grunt);
-};
-</pre>
-<p>tasks.js负责加载和注册所有的tasks和config.js：</p>
-<pre class="highlight text">module.exports = function (grunt) {
-
-    require(&#39;./config.js&#39;)(grunt);
-
-    grunt.loadTasks(&#39;./grunt/compile&#39;);
-    grunt.loadTasks(&#39;./grunt/dev&#39;);
-
-    grunt.registerTask(&#39;some tasks&#39;, function () {
-        //...
-    });
-
-    return grunt;
-};
-</pre>
-<p><strong>注意：</strong>这里<code>grunt.loadTasks()</code>方法的路径是相对于Gruntfile.js的。</p>
-
-<p>config.js负责配置项目相关的属性：</p>
-<pre class="highlight text">module.exports = function (grunt) {
-    grunt.initConfig({
-        // configurable paths
-        server: {
-            hostname: &#39;0.0.0.0&#39;,
-            hostport: &#39;9000&#39;
-        },
-        testServer: {
-            hostname: &#39;localhost&#39;,
-            hostport: &#39;9001&#39;
-        },
-        yeoman: {
-            app: &#39;app&#39;,
-            dist: &#39;dist&#39;,
-            test: &#39;test&#39;,
-            tmp: &#39;.tmp&#39;
-        }
-    });
-
-    return grunt;
-};
-</pre>
-<p>compile文件夹下的tasks是在build production package的时候用到的，dev文件夹下的tasks是在开发环境中用到的，这里也可以根据项目的实际情况进行分类。</p>
-
-<p>这里我认为还可以做优化的地方在于：</p>
-
-<ul>
-<li>使用.json配置文件代替.js配置文件，并且预先设订好对于不同环境的配置文件，例如：config.json.development, config.json.production, config.json.staging, config.json.test&hellip; 不同的环境中就使用不同的配置文件，这样让所有的配置文件都可以做版本管理，而且也更加统一。</li>
-<li>使用npm将这些配置代码都打包，放到另一个独立的github repo中，这样可以简化项目结构和代码，同时也利于这些代码在其他项目中的共用。</li>
-</ul>
-
-<p>这些优化我已经在新的项目中进行过尝试了，效果挺不错的，后面会写一篇更加详细的文章来进行介绍。</p>
+<p>真正的学习还是需要写代码，所以这里用经典的<a href="https://github.com/tastejs/todomvc">Todo MVC</a>作为示例。所有的代码可以在我的<a href="https://github.com/zation/backbone-to-react">Github</a>上找到。</p>
 
     </div>
   </article>
-  <div id="comment">
-    <div class="ds-thread" data-thread-key="grunt_config_as_modules"></div>
-  </div>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
+        2015. 01. 13
+      </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/javascript.html">Javascript</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/backbone-js.html">Backbone.js</a>
+        </li>
+      
+        <li class="tag">
+          
+            
+          
+          <a class="active" href="/tags/react-js.html">React.js</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="replace_backbonejs_view_with_reactj_1"
+          href="/2015/01/13/replace_backbonejs_view_with_reactj_1.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2015/01/13/replace_backbonejs_view_with_reactj_1.html">用React.js替换Backbone.js的View（一）</a>
+      </h1>
+      
+        <h2>——Backbone.js View的陷阱以及React.js的优点</h2>
+      
+    </header>
+    <div class="article-content">
+      <p>最近终于找到时间，学习了一下Facebook出品的<a href="http://facebook.github.io/react/">React.js</a>，发现虽然没有很深的体会到性能上的好处，但是这种编程方式带来的好处确实是很大的。这里我准备跟Backbone.js的View做一下对比，同时下一篇文章中提供一个示例说明一下如何用React.js替换Backbone.js的View。</p>
+
+    </div>
+  </article>
 
     </section>
   </div>

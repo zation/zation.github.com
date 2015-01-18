@@ -8,7 +8,7 @@
   <meta name="description"
   content="经历过各种技术和职位，最终发现前端开发才是我的归宿，现为ThoughtWorks前端程序员，专注于实践优秀的前端代码架构。同时也是ThoughtWorks UX Group一员，关注用户体验以及响应式设计、视差滚动等新兴设计元素。">
 
-  <link href="/stylesheets/main.css?1401972436" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/stylesheets/main.css?1421599046" media="screen" rel="stylesheet" type="text/css" />
   <link href="/images/favicon.png?1401972413" rel="icon" type="image/png" />
   <!--[if lt IE 9]>
     <script src="/javascripts/html5shiv-printshiv.js?1401972413" type="text/javascript"></script>
@@ -113,8 +113,7 @@
 <h3>CSS代码组织的问题</h3>
 
 <p>我们在写程序的时候，总是希望可以清楚的了解模块之间的依赖，这样可以方便程序人员理解代码，也方便监控我们的依赖不要过多。假设我们页面的CSS代码已经根据组件和功能划分为不同的模块和CSS文件，其中还有一些第三方的CSS库（reset）：</p>
-
-<pre><code>style/
+<pre class="highlight text">style/
     reset.css
     layout.css
     menu.css
@@ -123,11 +122,9 @@
         form.css
         button.css
         input.css
-</code></pre>
-
+</pre>
 <p>相对应的页面<code>header</code>就会有如下的引用：</p>
-
-<pre><code>&lt;header&gt;
+<pre class="highlight text">&lt;header&gt;
     &lt;link rel=&quot;stylesheet&quot; href=&quot;style/reset.css&quot;/&gt;
     &lt;link rel=&quot;stylesheet&quot; href=&quot;style/layout.css&quot;/&gt;
     &lt;link rel=&quot;stylesheet&quot; href=&quot;style/menu.css&quot;/&gt;
@@ -136,16 +133,14 @@
     &lt;link rel=&quot;stylesheet&quot; href=&quot;style/form/button.css&quot;/&gt;
     &lt;link rel=&quot;stylesheet&quot; href=&quot;style/form/input.css&quot;/&gt;
 &lt;/header&gt;
-</code></pre>
-
+</pre>
 <p>这样我们所有的依赖都在HTML中，不利于我们快速的看到样式之间的依赖，也会产生很多额外的HTTP请求，降低页面性能。我们也可以使用<code>@import</code>在CSS文件内部管理引用，但这同样会产生额外的HTTP请求。</p>
 
 <h3>利用<code>@import</code>管理代码</h3>
 
 <p>当我们希望在CSS代码中就管理所有依赖，并且不会产生额外的request时，就应该用到Sass了。
 下面我们看看如果使用了Sass应该是什么样子的：</p>
-
-<pre><code>style/
+<pre class="highlight text">style/
     screen.scss
     _reset.scss
     _layout.scss
@@ -155,34 +150,27 @@
         _form.scss
         _button.scss
         _input.scss
-</code></pre>
-
+</pre>
 <p>在<code>_form.scss</code>中，我们将管理所有的表单及表单控件的样式：</p>
-
-<pre><code>@import &quot;button&quot;;
+<pre class="highlight text">@import &quot;button&quot;;
 @import &quot;input&quot;;
 
 form {
     ⋯⋯
 }
-</code></pre>
-
+</pre>
 <p>在<code>screen.scss</code>中，我们将管理所有页面样式的依赖：</p>
-
-<pre><code>@import &quot;reset&quot;;
+<pre class="highlight text">@import &quot;reset&quot;;
 @import &quot;layout&quot;;
 @import &quot;menu&quot;;
 @import &quot;document&quot;;
 @import &quot;form&quot;;
-</code></pre>
-
+</pre>
 <p>其中文件名前面的下划线是告诉Sass该文件只是一个模块，不用单独生成css文件，所以最后生成的css文件只有一个：<code>screen.css</code>，于是我们只需要一个request就可以引入所有的css文件，写起来也非常方便：</p>
-
-<pre><code>&lt;header&gt;
+<pre class="highlight text">&lt;header&gt;
     &lt;link rel=&quot;stylesheet&quot; href=&quot;style/screen.css&quot;/&gt;
 &lt;/header&gt;
-</code></pre>
-
+</pre>
 <p>可能有人会担心这样调试起来会不会很麻烦？但其实如果我们使用Chrome的inspection，我们根本不必接触源代码就可以很好的调试了。</p>
 
 <p>同时，Compass已经提供了丰富的CSS库，其中包括了rese，所以我们可以直接删除<code>_reset.scss</code>，只在<code>screen.scss</code>中引入就可以了。</p>
@@ -254,7 +242,7 @@ form {
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1418545548" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1421599046" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

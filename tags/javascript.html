@@ -8,7 +8,7 @@
   <meta name="description"
   content="经历过各种技术和职位，最终发现前端开发才是我的归宿，现为ThoughtWorks前端程序员，专注于实践优秀的前端代码架构。同时也是ThoughtWorks UX Group一员，关注用户体验以及响应式设计、视差滚动等新兴设计元素。">
 
-  <link href="/stylesheets/main.css?1401972436" media="screen" rel="stylesheet" type="text/css" />
+  <link href="/stylesheets/main.css?1421599046" media="screen" rel="stylesheet" type="text/css" />
   <link href="/images/favicon.png?1401972413" rel="icon" type="image/png" />
   <!--[if lt IE 9]>
     <script src="/javascripts/html5shiv-printshiv.js?1401972413" type="text/javascript"></script>
@@ -65,14 +65,14 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
-        2013. 01. 22
+        2015. 01. 15
       </li>
       
         <li class="tag">
           
             
           
-          <a class="active" href="/tags/javascript.html">JavaScript</a>
+          <a class="active" href="/tags/javascript.html">Javascript</a>
         </li>
       
         <li class="tag">
@@ -80,30 +80,71 @@
           <a class="" href="/tags/backbone-js.html">Backbone.js</a>
         </li>
       
+        <li class="tag">
+          
+          <a class="" href="/tags/react-js.html">React.js</a>
+        </li>
+      
       <li class="comment">
         <a class="ds-thread-count"
-          data-thread-key="backbone_refator"
-          href="/2013/01/22/backbone_refator.html#comment"></a>
+          data-thread-key="replace_backbonejs_view_with_reactj_2"
+          href="/2015/01/15/replace_backbonejs_view_with_reactj_2.html#comment"></a>
       </li>
     </ul>
     <header class="article-title">
       <h1>
-        <a href="/2013/01/22/backbone_refator.html">利用Backbone.js重构项目代码</a>
+        <a href="/2015/01/15/replace_backbonejs_view_with_reactj_2.html">用React.js替换Backbone.js的View（二）</a>
       </h1>
+      
+        <h2>——Todo MVC示例</h2>
       
     </header>
     <div class="article-content">
-      <p>进入现在这个项目已经一年多了，这是我呆过时间最长的一个项目，见证了项目的前端从简单的一些效果到有了复杂的逻辑，最后需要借助JavaScript的MVC框架来重构前端代码，以避免前端代码爆炸失控。具体来说我们的前端代码在增长过程中遇到了以下问题：</p>
+      <p>Backbone.js和React.js在设计思想上都借鉴了<a href="http://en.wikipedia.org/wiki/Reactive_programming">Reactive Programming</a>，即：当Model修改时，这种变更可以反向传播到View，使得View同时被更改，也就是双向绑定。但Backbone.js需要你自己来写如何修改View，而在React.js中，你只需要关心如何根据Model来显示View，如何修改可以完全交给React.js。也就是说他们都在做一种简化，而React.js做的更加彻底，这也是它的核心思想和优点。</p>
 
-<ul>
-<li>多个页面组件根据同一数据来源做更新显示时，会有不少逻辑上重复的代码，或者过多的回调嵌套；</li>
-<li>由于缺乏一个消息传递机制，导致全局变量很多；</li>
-<li>组件之间耦合太深，单个组件很难被重用；</li>
-<li>数据被写在DOM元素的属性中，当显示需求改变时很难只修改DOM而不破坏功能；</li>
-<li>测试代码中需要准备大量的html fixture，每个测试都是很大的集成测试，难以重构、相当耗时。</li>
-</ul>
+<p>真正的学习还是需要写代码，所以这里用经典的<a href="https://github.com/tastejs/todomvc">Todo MVC</a>作为示例。所有的代码可以在我的<a href="https://github.com/zation/backbone-to-react">Github</a>上找到。</p>
 
-<p>当你遇到其中一个或几个问题时，请开始考虑用<a href="http://backbonejs.org/">Backbone.js</a>来重构吧，越是问题严重的时候重构的风险越大，花费的时间和精力也越多，最后可能是遗留一大堆垃圾代码而草草了结项目。</p>
+    </div>
+  </article>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
+        2015. 01. 13
+      </li>
+      
+        <li class="tag">
+          
+            
+          
+          <a class="active" href="/tags/javascript.html">Javascript</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/backbone-js.html">Backbone.js</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/react-js.html">React.js</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="replace_backbonejs_view_with_reactj_1"
+          href="/2015/01/13/replace_backbonejs_view_with_reactj_1.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2015/01/13/replace_backbonejs_view_with_reactj_1.html">用React.js替换Backbone.js的View（一）</a>
+      </h1>
+      
+        <h2>——Backbone.js View的陷阱以及React.js的优点</h2>
+      
+    </header>
+    <div class="article-content">
+      <p>最近终于找到时间，学习了一下Facebook出品的<a href="http://facebook.github.io/react/">React.js</a>，发现虽然没有很深的体会到性能上的好处，但是这种编程方式带来的好处确实是很大的。这里我准备跟Backbone.js的View做一下对比，同时下一篇文章中提供一个示例说明一下如何用React.js替换Backbone.js的View。</p>
 
     </div>
   </article>
@@ -156,7 +197,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1418545548" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1421599046" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
