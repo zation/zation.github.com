@@ -125,16 +125,19 @@
 </ul>
 
 <p>将他们放在images/icons中：</p>
-<pre class="highlight text">stylesheets/
+
+<pre><code>stylesheets/
     images/
         icons/
             blogger.png
             flickr.png
             ⋯⋯
     _icons.scss
-</pre>
+</code></pre>
+
 <p>在<code>_icons.scss</code>中只需要很简单的设置，我们就可以使用Compass提供的Sprites功能了：</p>
-<pre class="highlight text">@import &quot;images/icons/*.png&quot;;
+
+<pre><code>@import &quot;images/icons/*.png&quot;;
 
 a[title=&quot;sprites-example-blogger&quot;] {
     @include icons-sprite(blogger);
@@ -145,9 +148,11 @@ a[title=&quot;sprites-example-flickr&quot;] {
 }
 
 ⋯⋯
-</pre>
+</code></pre>
+
 <p><strong>注意：</strong>这里Compass使用了一种&quot;Magic Import&quot;，就是说我们使用时include的方法名，是根据我们的文件夹名字（import的路径中最后一个文件夹）自动生成的。例如，当我们把图片放在social文件夹时，我们的代码就应该写成这样（感谢NB的Ruby元编程）：</p>
-<pre class="highlight text">@import &quot;images/social/*.png&quot;;
+
+<pre><code>@import &quot;images/social/*.png&quot;;
 
 a[title=&quot;sprites-example-blogger&quot;] {
     @include social-sprite(blogger);
@@ -158,7 +163,8 @@ a[title=&quot;sprites-example-flickr&quot;] {
 }
 
 ⋯⋯
-</pre>
+</code></pre>
+
 <p>最后我们来看看使用Compass Sprites做成的图标链接：</p>
 
 <p><a title="sprites-example-blogger" href="http://www.zation.com">blogger</a>
@@ -174,25 +180,32 @@ a[title=&quot;sprites-example-flickr&quot;] {
 <p>缓存可以使我们的用户更加快速的访问我们的网站，但是同样也产生了问题：当我们修改了背景图片但是没有修改图片名时，缓存服务器会认为该图片并没有改变，而直接返回之前缓存的，导致样式在用户端出现问题。现在只要我们使用了Compass的images提供的mixin，就可以解决这个问题。</p>
 
 <p>假如我们现在有一个图片foo.png放在images文件夹中：</p>
-<pre class="highlight text">stylesheets/
+
+<pre><code>stylesheets/
     images/
         foo.png
     backgrond.scss
-</pre>
+</code></pre>
+
 <p>现在我们在<code>background.scss</code>中使用Compass来设置背景图片：</p>
-<pre class="highlight text">.comapss {
+
+<pre><code>.comapss {
     @include background(image-url(&quot;foo.png&quot;));
 }
-</pre>
+</code></pre>
+
 <p>那么所生成的CSS将会是：</p>
-<pre class="highlight text">.compass {
+
+<pre><code>.compass {
     background: url(/images/foo.png?1320727111);
 }
-</pre>
+</code></pre>
+
 <p>如果要使用相对路径，需要在<code>config.rb</code>中设置<code>relative_assets = true</code>，这里到底是使用绝对路径还是使用相对路径，可以根据项目中是否有context path来决定，如果有的话建议使用相对路径。</p>
 
 <p>默认生成的cache buster是一串数字，根据每次Compass的compile生成。很多项目中已经有了完善的cache buster机制了，这里我们可以在<code>config.rb</code>中重写<code>asset_cache_buster</code>这个block来集成自己的项目中。在这个block中返回一个hash（<code>{:path =&gt; &quot;path&quot;, :query =&gt; &quot;query&quot;</code>）可以设置cache buster为指定的路径或query string；如果返回一个string则自动使用query string。下面是一段来自<a href="http://compass-style.org/help/tutorials/configuration-reference/">Compass Configuration Reference</a>的示例代码：</p>
-<pre class="highlight text">asset_cache_buster do |path, real_path|
+
+<pre><code>asset_cache_buster do |path, real_path|
     if File.exists?(real_path)
         pathname = Pathname.new(path)
         modified_time = File.mtime(real_path).strftime(&quot;%s&quot;)
@@ -201,7 +214,8 @@ a[title=&quot;sprites-example-flickr&quot;] {
         {:path =&gt; new_path, :query =&gt; nil}
     end
 end
-</pre>
+</code></pre>
+
     </div>
   </article>
   <div id="comment">
@@ -256,7 +270,7 @@ end
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1421846303" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1421846882" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

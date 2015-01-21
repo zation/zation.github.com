@@ -178,14 +178,16 @@
 <p>前端第三方插件的管理工具现在除了<a href="http://bower.io/">bower</a>，我不知道有其他的选择了。</p>
 
 <p>对于自身代码的依赖管理工具，并不是选择哪一个框架的问题，基本都是选择<a href="http://requirejs.org/">require.js</a>，问题在于要不要用这个工具。由于Backbone.js并没有提供模块化和依赖管理的功能，所以我们还是尝试了使用require.js来管理自身依赖，但是实际情况是我们只把require.js用作一个打包代码的工具，而不是加载代码的工具，同时在修改文件名称或路径的时候非常麻烦，因为require.js的依赖是由文件的路径和名称确定的。解决这个问题的方式是使用模块名来定义模块，例如：</p>
-<pre class="highlight text">//Explicitly defines the &quot;foo/title&quot; module:
+
+<pre><code>//Explicitly defines the &quot;foo/title&quot; module:
 define(&quot;foo/title&quot;,
     [&quot;my/cart&quot;, &quot;my/inventory&quot;],
     function(cart, inventory) {
         //Define foo/title object in here.
    }
 );
-</pre>
+</code></pre>
+
 <p>这样不管如何移动或重命名文件都不会有问题了。</p>
 
 <h4>Test Framework</h4>
@@ -259,7 +261,7 @@ define(&quot;foo/title&quot;,
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1421846303" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1421846882" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

@@ -129,28 +129,30 @@
 <p>这里我使用的工具是<a href="http://nodejs.org/">Node.js</a>和<a href="https://npmjs.org/">NPM</a>，它们都基于JavaScript，使用Json来配置，对于前端开发人员非常友好。</p>
 
 <p>安装完成Node.js和NPM后，在项目根目录下创建NPM的配置文件<code>package.json</code>：</p>
-<pre class="highlight json"><span class="p">{</span><span class="w">
-    </span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Project Name&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Project Description&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;repository&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git&quot;</span><span class="p">,</span><span class="w">
-        </span><span class="s2">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git://github.com/path/to/your_project&quot;</span><span class="w">
-    </span><span class="p">},</span><span class="w">
-    </span><span class="s2">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Author Name&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BSD&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;readmeFilename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;README.md&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;gitHead&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git head&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;devDependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="s2">&quot;grunt&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-        </span><span class="s2">&quot;grunt-contrib-connect&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-        </span><span class="s2">&quot;grunt-contrib-concat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-        </span><span class="s2">&quot;grunt-contrib-jasmine&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-        </span><span class="s2">&quot;grunt-contrib-watch&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-        </span><span class="s2">&quot;grunt-contrib-compass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></pre>
+
+<pre><code>{
+    &quot;name&quot;: &quot;Project Name&quot;,
+    &quot;version&quot;: &quot;0.0.1&quot;,
+    &quot;description&quot;: &quot;Project Description&quot;,
+    &quot;repository&quot;: {
+        &quot;type&quot;: &quot;git&quot;,
+        &quot;url&quot;: &quot;git://github.com/path/to/your_project&quot;
+    },
+    &quot;author&quot;: &quot;Author Name&quot;,
+    &quot;license&quot;: &quot;BSD&quot;,
+    &quot;readmeFilename&quot;: &quot;README.md&quot;,
+    &quot;gitHead&quot;: &quot;git head&quot;,
+    &quot;devDependencies&quot;: {
+        &quot;grunt&quot;: &quot;latest&quot;,
+        &quot;grunt-contrib-connect&quot;: &quot;latest&quot;,
+        &quot;grunt-contrib-concat&quot;: &quot;latest&quot;,
+        &quot;grunt-contrib-jasmine&quot;: &quot;latest&quot;,
+        &quot;grunt-contrib-watch&quot;: &quot;latest&quot;,
+        &quot;grunt-contrib-compass&quot;: &quot;latest&quot;
+    }
+}
+</code></pre>
+
 <p>其中最重要的一个配置项是<strong>devDependencies</strong>，这是用于开发的依赖，例如：自动化测试、源文件编译等等，其中各个依赖的作用和用法将会在后面讲到。而前端生产代码的依赖会使用另一个工具来管理，也在后面讲到。创建完成以后运行<code>npm install</code>，NPM就会将这些依赖都安装到项目根目录的<code>node_modules</code>文件夹中。</p>
 
 <h3>第三方依赖的管理</h3>
@@ -166,27 +168,31 @@
 </ol>
 
 <p>我们首先来看看<code>.bowerrc</code>的内容：</p>
-<pre class="highlight json"><span class="p">{</span><span class="w">
-    </span><span class="s2">&quot;directory&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;components&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;json&quot;</span><span class="w">      </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;component.json&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;endpoint&quot;</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://bower.herokuapp.com&quot;</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></pre>
+
+<pre><code>{
+    &quot;directory&quot; : &quot;components&quot;,
+    &quot;json&quot;      : &quot;component.json&quot;,
+    &quot;endpoint&quot;  : &quot;https://bower.herokuapp.com&quot;
+}
+</code></pre>
+
 <p>其中<strong>directory</strong>指定了所有的依赖会被安装到哪里；<strong>json</strong>指定了依赖配置文件的路径；<strong>endpoint</strong>制定了依赖的repository的寻址服务器，你可以替换为自己的寻址服务器。</p>
 
 <p>然后我们来看看<code>components.json</code>的内容：</p>
-<pre class="highlight json"><span class="p">{</span><span class="w">
-    </span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Project Name&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s2">&quot;dependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="s2">&quot;jquery&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="s2">&quot;underscore&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="s2">&quot;backbone&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="s2">&quot;jasmine-jquery&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="s2">&quot;jasmine-ajax&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git@github.com:pivotal/jasmine-ajax.git&quot;</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></pre>
+
+<pre><code>{
+    &quot;name&quot;: &quot;Project Name&quot;,
+    &quot;version&quot;: &quot;0.0.1&quot;,
+    &quot;dependencies&quot;: {
+      &quot;jquery&quot;: &quot;latest&quot;,
+      &quot;underscore&quot;: &quot;latest&quot;,
+      &quot;backbone&quot;: &quot;latest&quot;,
+      &quot;jasmine-jquery&quot;: &quot;latest&quot;,
+      &quot;jasmine-ajax&quot;: &quot;git@github.com:pivotal/jasmine-ajax.git&quot;
+    }
+}
+</code></pre>
+
 <p>其中最重要的就是<strong>dependencies</strong>，它指定了所有前端开发依赖的包。所有bower包含的依赖都可以在<a href="http://sindresorhus.com/bower-components/">这里</a>查到，对于bower没有包含的依赖也可以直接指定github的repository，例如：<code>&quot;jasmine-ajax&quot;: &quot;git@github.com:pivotal/jasmine-ajax.git&quot;</code>。</p>
 
 <p>最后运行<code>bower install</code>就可以在components文件夹中看到所有第三方依赖的文件了。但是bower有一个问题，就是它将所有github repository中的文件都下载下来了，其中有许多是我们不需要的文件。下面我们会将我们需要的文件提取出来打包放到我们指定的目录中。</p>
@@ -194,7 +200,8 @@
 <h3>源文件编译</h3>
 
 <p>这里我使用的工具是<a href="http://gruntjs.com/">grunt</a>，他本身主要是基于Node.js的文件操作包，其中有许多插件可以让我们完成js文件的compile和compress、sass到css的转换等等操作。要使用它需要先安装命令行工具：<code>npm install grunt-cli -g</code>，然后在项目根目录中创建文件<code>Gruntfile.js</code>，这个文件用于定义各种task，我们首先定义一个task将从bower下载的第三方依赖都打包到文件<code>app/js/lib.js</code>中：</p>
-<pre class="highlight text">module.exports = function(grunt) {
+
+<pre><code>module.exports = function(grunt) {
 
     var dependencies = [
         &#39;components/jquery/jquery.js&#39;,
@@ -212,11 +219,13 @@
 
     grunt.loadNpmTasks(&#39;grunt-contrib-concat&#39;);
 };
-</pre>
+</code></pre>
+
 <p>这里的grunt-contrib-concat就是grunt的一个插件，用于文件的合并操作，我们已经在前面的<code>package.json</code>中引入了。<code>js</code>是task name；<code>src</code>指定了合并的源文件地址；<code>dest</code>指定了合并的目标文件。这样当我们运行<code>grunt concat:js</code>后，所有的依赖文件都会被合并为<code>app/js/lib.js</code>。这样做的好处是我们可以控制每个依赖的引入顺序，但是麻烦的是每次引入新的依赖都需要手动加入到<code>dependencies</code>数组中。这个暂时没有更好的解决方案，因为不是所有的包都在自己的<code>components.js</code>中声明了main文件，很多时候必须自己手动指定。</p>
 
 <p>JavaScript文件编译完成以后就是CSS文件，在现代的前端开发中，我们已经很少直接写CSS文件了，一般都使用SASS或者LESS。grunt也提供了这种支持，这里我使用的是<a href="https://github.com/gruntjs/grunt-contrib-compass">grunt-contrib-compass</a>：</p>
-<pre class="highlight text">module.exports = function(grunt) {
+
+<pre><code>module.exports = function(grunt) {
 
     var sasses = &#39;sass&#39;;
 
@@ -233,13 +242,15 @@
 
     grunt.loadNpmTasks(&#39;grunt-contrib-compass&#39;);
 };
-</pre>
+</code></pre>
+
 <p>然后运行<code>grunt compass:development</code>就可以完成CSS文件的编译了。</p>
 
 <h3>自动化测试</h3>
 
 <p>这里我使用的自动化测试工具是<a href="http://pivotal.github.com/jasmine/">Jasmine</a>，它grunt中同样有一个插件：<a href="https://github.com/gruntjs/grunt-contrib-jasmine">grunt-contrib-jasmine</a>。下面我们来看看如何在<code>Gruntfile.js</code>中定义测试的task：</p>
-<pre class="highlight text">module.exports = function(grunt) {
+
+<pre><code>module.exports = function(grunt) {
 
     var sources = &#39;app/js/**/*.js&#39;,
         specs = &#39;spec/**/*Spec.js&#39;;
@@ -259,9 +270,11 @@
 
     grunt.loadNpmTasks(&#39;grunt-contrib-jasmine&#39;);
 };
-</pre>
+</code></pre>
+
 <p>配置完成以后就可以运行<code>grunt jasmine:test</code>来跑测试，但问题是每次写完代码都要手动执行一次非常麻烦，最好可以每次代码有更改都自动跑一次，让我们可以更快的得到反馈。grunt的<a href="https://github.com/gruntjs/grunt-contrib-watch">watch插件</a>就提供了这种支持：</p>
-<pre class="highlight text">module.exports = function(grunt) {
+
+<pre><code>module.exports = function(grunt) {
 
     var sources = &#39;app/js/**/*.js&#39;,
         specs = &#39;spec/**/*Spec.js&#39;;
@@ -288,7 +301,8 @@
     grunt.loadNpmTasks(&#39;grunt-contrib-jasmine&#39;);
     grunt.loadNpmTasks(&#39;grunt-contrib-watch&#39;);
 };
-</pre>
+</code></pre>
+
 <p><code>files</code>指定了需要监听变动的文件；<code>tasks</code>指定了修改后自动触发的task。现在只要我们运行<code>grunt watch:test</code>，那么有任何源文件、测试文件的改动，Jasmine测试都会自动运行了。有时候我们也希望测试的结果显示在网页上，便于我们做js的调试。那么可以将<code>tasks: [&#39;jasmine:test&#39;]</code>改为<code>tasks: [&#39;jasmine:test:build&#39;]</code>，然后打开根目录下的<code>_SpecRunner.html</code>文件，就可以在网页中看到测试结果了，再加上一些Chrome的<a href="https://chrome.google.com/webstore/detail/live-reload/pccddenngcbofbojodpghgpbheckgddn">Livereload插件</a>，就可以不用刷新实时的看到测试结果，效率非常之高。虽然grunt插件中也有<a href="https://github.com/gruntjs/grunt-contrib-livereload">livereload</a>，但是与grunt-contrib-watch无法很好的集成，所以我没有使用这种方式。</p>
 
 <h3>CI Pipeline</h3>
@@ -304,28 +318,34 @@
 </ol>
 
 <p>下面我们来看看如何配置<code>.travis.yml</code>：</p>
-<pre class="highlight text">language: node_js
+
+<pre><code>language: node_js
 node_js:
   - &quot;0.8&quot;
 before_script:
   - npm install -g grunt-cli
-</pre>
+</code></pre>
+
 <p>由于我们的环境是基于Node.js搭建的，所以在<strong>language</strong>设置了node<em>js；而**node</em>js<strong>指定了Node.js的版本；</strong>before_script**指定了在测试运行前需要执行的命令，由于我们的脚本都是基于grunt的，所以需要先安装grunt的命令行包。</p>
 
 <p>然后再修改<code>package.json</code>：</p>
-<pre class="highlight text">{
+
+<pre><code>{
     ⋯⋯
     &quot;scripts&quot;: {
         &quot;test&quot;: &quot;grunt jasmine:test&quot;
     }
     ⋯⋯
 }
-</pre>
+</code></pre>
+
 <p>将修改以后的<code>package.json</code>push到github上，再次触发一个新的build，你可以看到你之前错误的build已经绿了。</p>
 
 <p>这里还有一个小提示：如何让build状态显示在项目的readme中？很简单，只需要在README.md中加入以下代码就可以了：</p>
-<pre class="highlight text">[![Build Status](https://travis-ci.org/path/to/your_repository.png?branch=master)](http://travis-ci.org/path/to/your_repository)
-</pre>
+
+<pre><code>[![Build Status](https://travis-ci.org/path/to/your_repository.png?branch=master)](http://travis-ci.org/path/to/your_repository)
+</code></pre>
+
 <p>到这里基本的环境搭建就完成了，当然我们还可以使用grund的<code>registerTask</code>来定义一个任务序列，还可以加入template的编译⋯⋯这些都可以通过grunt来灵活设置。最重要的是现在别人拿到一个项目的代码以后，可以通过一些命令来快速的搭建本地环境，方便的进行测试和开发，而且没有依赖与后端的开发环境，只要定义好接口，前端开发可以完全独立开了。虽然这其中还有很多问题没有解决，例如：</p>
 
 <ul>
@@ -391,7 +411,7 @@ before_script:
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1421846303" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1421846882" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

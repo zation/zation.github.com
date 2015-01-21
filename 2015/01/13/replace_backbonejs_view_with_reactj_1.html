@@ -105,7 +105,8 @@
 <h4>绑定的事件没有解绑而造成的内存泄露</h4>
 
 <p>对于某个View，如果在它内部绑定事件的方式不正确，会造成<code>remove</code>的时候没有解绑，最后造成内存泄露。例如：</p>
-<pre class="highlight text">var SomeModelView = Backbone.View.extend({
+
+<pre><code>var SomeModelView = Backbone.View.extend({
     initialize: function() {
         this.model.on(&#39;change&#39;, this.render, this);
     },
@@ -113,9 +114,11 @@
         // render a template
     }
 });
-</pre>
+</code></pre>
+
 <p>有两种方式可以解决这个问题，第一个是使用<code>listenTo</code>：</p>
-<pre class="highlight text">var SomeModelView = Backbone.View.extend({
+
+<pre><code>var SomeModelView = Backbone.View.extend({
     initialize: function() {
         this.listenTo(this.model, &#39;change&#39;, this.render);
     },
@@ -123,9 +126,11 @@
         // render a template
     }
 });
-</pre>
+</code></pre>
+
 <p>第二个是显式的在<code>close</code>方法中解绑：</p>
-<pre class="highlight text">var SomeModelView = Backbone.View.extend({
+
+<pre><code>var SomeModelView = Backbone.View.extend({
     initialize: function() {
         this.model.on(&#39;change&#39;, this.render, this);
     },
@@ -136,7 +141,8 @@
         // render a template
     }
 });
-</pre>
+</code></pre>
+
 <p><strong>注：</strong>如果没有特殊情况，都推荐使用第一种解决方案。</p>
 
 <p>其实以上的问题还不是真正的麻烦，真正的麻烦在于所有的View都需要以调用<code>remove</code>的方式来删除，否则不仅是model或collection上面的事件无法解绑，DOM事件都会没有解绑，从而造成事件重复绑定或内存泄露的问题。而对于一个Backbone.js的应用来说，一个View有十多个内嵌了N层的SubView是很正常的情况，如何保证这些SubView都被remove掉了是非常大的问题，例如在切换页面的时候，需要首先删除一个页面级别的View再插入另一个。<a href="http://mikeygee.com/blog/backbone.html">这里</a>有一篇文章详细叙述了如何解决这个问题，我这里就不复述了。</p>
@@ -144,7 +150,8 @@
 <h4>DOM的render可能效率很低</h4>
 
 <p>如果多次使用append来插入SubView，由于每次都会导致浏览器重新计算Element的位置和大小，所以可能效率会很低，例如：</p>
-<pre class="highlight text">var SomeCollectionView = Backbone.View.extend({
+
+<pre><code>var SomeCollectionView = Backbone.View.extend({
     initialize: function() {
         var self = this;
         this._views = [];
@@ -164,9 +171,11 @@
         });
     }
 });
-</pre>
+</code></pre>
+
 <p>这个时候我们可以使用<code>documentFragment</code>来在内存中先把我们要插入的DOM组织好，再一次性的完成append操作：</p>
-<pre class="highlight text">render: function() {
+
+<pre><code>render: function() {
     this.$el.empty();
     var container = document.createDocumentFragment();
     // render each subview, appending to our root element
@@ -175,7 +184,8 @@
     });
     this.$el.append(container);
 }
-</pre>
+</code></pre>
+
 <p>看起来这也不是真正麻烦的问题，至少我们还有解决方案，但是如果是一个大量数据的collection需要render，那么就需要我们自己在render的时候做增量式的操作，否则效率无论如何都提高不起来，这往往在老的浏览器或者移动端是无法接受的。</p>
 
 <h3>React.js的优点</h3>
@@ -266,7 +276,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1421846303" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1421846882" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
