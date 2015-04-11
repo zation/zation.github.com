@@ -5,10 +5,439 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2015-01-15T23:54:00Z</updated>
+  <updated>2015-04-09T14:46:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>聊一聊一个基于Flux的前端系统——基础架构以及演进</title>
+    <link rel="alternate" href="/2015/04/09/basic_architecture_and_evolution_for_a_flux_front_end_system.html"/>
+    <id>/2015/04/09/basic_architecture_and_evolution_for_a_flux_front_end_system.html</id>
+    <published>2015-04-09T14:46:00Z</published>
+    <updated>2015-04-09T14:46:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;在最近的一个项目中，我们团队尝试了Flux + React.js的架构，在这种架构中我们获得了很多的好处：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;数据流更加清晰和简单，使得我们的开发和debug也可以按照一个清晰和标准的方式进行；&lt;/li&gt;
+&lt;li&gt;数据处理这一层的职责更加清晰，使得我们可以更容易的进行数据维护、缓存的处理；&lt;/li&gt;
+&lt;li&gt;在界面的处理上只用关心界面的最终状态，不需要维护中间过程；&lt;/li&gt;
+&lt;li&gt;……&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面我们就来聊一聊我们团队在这种架构中的一些实践，希望可以对大家有用。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;在最近的一个项目中，我们团队尝试了Flux + React.js的架构，在这种架构中我们获得了很多的好处：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;数据流更加清晰和简单，使得我们的开发和debug也可以按照一个清晰和标准的方式进行；&lt;/li&gt;
+&lt;li&gt;数据处理这一层的职责更加清晰，使得我们可以更容易的进行数据维护、缓存的处理；&lt;/li&gt;
+&lt;li&gt;在界面的处理上只用关心界面的最终状态，不需要维护中间过程；&lt;/li&gt;
+&lt;li&gt;……&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面我们就来聊一聊我们团队在这种架构中的一些实践，希望可以对大家有用。&lt;/p&gt;
+
+&lt;h3&gt;基础架构以及Why&lt;/h3&gt;
+
+&lt;p&gt;在这个项目中我们采用的基础架构是reflux.js + react.js + 一些小的liberay，例如：director.js，jquery.js，lodash.js。&lt;/p&gt;
+
+&lt;h4&gt;reflux.js&lt;/h4&gt;
+
+&lt;p&gt;选用reflux.js作为Flux的实现，是因为现在reflux.js是Github上最受欢迎的一个实现，并且提供了非常实际的便捷。它和Facebook Flux主要的不同在于：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;没有了dispatcher这一层，actions直接是listenable的；&lt;/li&gt;
+&lt;li&gt;stores可以直接listen actions，而不需要用swtich去区分一大堆Action types；&lt;/li&gt;
+&lt;li&gt;stores提供了很多方便的方法使得view可以很方便的监听；&lt;/li&gt;
+&lt;li&gt;提供了一种比较好的思路来处理API请求这种异步actions。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面是一个例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var Reflux = require(&amp;#39;reflux&amp;#39;);
+var React = require(&amp;#39;react&amp;#39;);
+
+var UserAction = Reflux.createActions({
+    &amp;#39;login&amp;#39;: {children: [&amp;#39;success&amp;#39;, &amp;#39;failed&amp;#39;]}
+});
+
+UsersAction.login.listen(function(data) {
+    $.post(&amp;#39;/api/users/Action/login&amp;#39;, data).then(this.success, this.failed);
+});
+
+var UserStore = Reflux.createStore({
+    listenables: UserAction,
+    onLoginSuccess: function(payload) {
+        this.trigger(payload);
+    },
+    onLoginFailed: function(payload) {
+        this.trigger(payload);
+    }
+});
+
+var UserComponent = React.createClass({
+    mixins: [Reflux.connect(UserStore, &amp;#39;user&amp;#39;)],
+    render: function() {
+        return &amp;lt;span&amp;gt;{this.state.user.name}&amp;lt;/span&amp;gt;;
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在我看来最大的好处就是，少写了很多代码，并且代码的可读性还挺好的。&lt;/p&gt;
+
+&lt;h4&gt;liberaies&lt;/h4&gt;
+
+&lt;p&gt;在这个项目中我们选用了很多小而专的liberay，而不是选用一个大而全的framework（例如：Angular.js，Ember.js），是因为选用那样的framework风险比较大，替换成本很高，一旦出现了像Angular.js 2.0这样的升级，对团队来说比较痛苦。而选用小liberay的集合，要替换其中某一部分是很容易的。并且不会被framework的principle和DSL所绑架，比较好行程适用于自己项目domain的principle和DSL。&lt;/p&gt;
+
+&lt;p&gt;下面来介绍一下我们用到的liberay：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;director.js是一个Server端和Client端通用的router工具。&lt;/li&gt;
+&lt;li&gt;jquery.js就不用介绍了。选这个主要是用来做来项目中的Ajax call、promise工具，原因也是被逼无奈，我们用到的很多插件都基于它，为了不增加额外的加载量，也就只有将就用它了。&lt;/li&gt;
+&lt;li&gt;lodash.js这个也不用介绍了，比underscore.js性能更高，功能更强。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;架构的演进&lt;/h3&gt;
+
+&lt;p&gt;前面介绍了我们项目的基础架构，由于我们是用了各种小liberay，并且都是我们自己选的，那么就没有一个现成的架构来告诉我们这样架构的最佳实践是什么，一切都需要我们自己去探索和演进。下面我就来介绍一下项目各个部分的演进路线是什么样的，以及为什么会出现这样的演进。&lt;/p&gt;
+
+&lt;h4&gt;页面render的lifecircle&lt;/h4&gt;
+
+&lt;p&gt;项目开始时是非常简单的render方式，就是当route改变时，router根据最新的route去选择某个component render到页面中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var Router = require(&amp;#39;director&amp;#39;).Router;
+var $ = require(&amp;#39;jquery&amp;#39;);
+
+var router = new Router({
+    &amp;#39;/login&amp;#39;: function() {
+        React.render(React.createElement(LoginComponent), $(&amp;#39;.container&amp;#39;).get(0));
+    }
+}).configure();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后我发现在很多时候我需要在程序中去控制页面跳转，例如：登录成功以后跳转到首页。于是我就在登录后用 &lt;code&gt;window.location.hash = &amp;#39;/&amp;#39;&lt;/code&gt; 去做跳转。后来我发现程序中到处都是 &lt;code&gt;window.location.hash = &amp;#39;xxx&amp;#39;&lt;/code&gt;，到处修改这种全局变量不是一个好的实践，并且这样在未来做isomophic也会很难。于是我决定用Flux的方式来处理这一部分逻辑。很显然，这里的Store存储的是当前的route，Action所触发的是route的改变，于是我们增加了RouteStore和RouteAction：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var RouteAction = Reflux.createActions([&amp;#39;navigateTo&amp;#39;]);
+
+var RouteStore = Reflux.createStore({
+    listenables: RouteActions,
+
+    onNavigateTo: function(newRoute) {
+        this.trigger(newRoute);
+    }
+});
+
+RouteStore.listen(function(newRoute) {
+  router.setRoute(newRoute);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样所有的 &lt;code&gt;window.location.hash = &amp;#39;xxx&amp;#39;&lt;/code&gt; 都被替换成了 &lt;code&gt;RouteAction.navigateTo(&amp;#39;xxx&amp;#39;)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;后来当页面增加，我发现在route配置中出现了很多重复的代码，例如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var router = new Router({
+    &amp;#39;/login&amp;#39;: function() {
+        React.render(React.createElement(HeaderComponent), $(&amp;#39;.header&amp;#39;).get(0));
+        React.render(React.createElement(LoginComponent), $(&amp;#39;.container&amp;#39;).get(0));
+    },
+    &amp;#39;/register&amp;#39;: function() {
+        React.render(React.createElement(HeaderComponent), $(&amp;#39;.header&amp;#39;).get(0));
+        React.render(React.createElement(RegisterComponent), $(&amp;#39;.container&amp;#39;).get(0));
+    },
+    &amp;#39;/profile&amp;#39;: function() {
+        React.render(React.createElement(HeaderComponent), $(&amp;#39;.header&amp;#39;).get(0));
+        React.render(React.createElement(ProfileComponent), $(&amp;#39;.container&amp;#39;).get(0));
+    }
+}).configure();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同样，我希望把这种layout和page的render也用Flux的方式来进行管理。那么这里Store所存储的就是页面的component，Action所触发的就是页面component的改变，于是我增加了PageStore和PageAction，同时把各种layout放到PageComponent中管理：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var PageAction = Reflux.createActions([&amp;#39;render&amp;#39;]);
+
+var PageStore = Reflux.createStore({
+    listenables: PageActions,
+
+    onRender: function(component, props) {
+        this.trigger({
+            component: component,
+            props: props
+        });
+    }
+});
+
+var PageComponent = React.createClass({
+    mixins: [Reflux.connect(PageStore, &amp;#39;page&amp;#39;)],
+
+    render: function() {
+        return (
+            &amp;lt;div&amp;gt;
+                &amp;lt;HeaderComponent /&amp;gt;
+                &amp;lt;PageComponent {...this.state.page.props} /&amp;gt;
+            &amp;lt;/div&amp;gt;
+        );
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后我们route的配置就可以很简单了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var router = new Router({
+    &amp;#39;/login&amp;#39;: function() {
+        PageAction.render(LoginComponent);
+    },
+    &amp;#39;/register&amp;#39;: function() {
+        PageAction.render(RegisterComponent);
+    },
+    &amp;#39;/profile&amp;#39;: function() {
+        PageAction.render(ProfileComponent);
+    }
+}).configure();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最近我们还加上了一个需求，就是对于profile页面，只能让登录的用户进入，对于这种需求在这种架构下就很好添加了，只需要修改PageAction:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var PageAction = Reflux.createActions([&amp;#39;render&amp;#39;, &amp;#39;renderIfLogin&amp;#39;]);
+
+PageAction.renderIfLogin.preEmit = function(component, props) {
+    if (userIsLogin) {
+        PageAction.render(component, props);
+    } else {
+        RouteAction.navigateTo(&amp;#39;/login&amp;#39;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后在profile页面，我们调用&lt;code&gt;PageAction.renderIfLogin(ProfileComponent)&lt;/code&gt;这样如果用户没有登录，就会被自动跳转到登录页面。&lt;/p&gt;
+
+&lt;p&gt;现在我们来总结一下当前的页面render lifecircle：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    URL  ===trigger===&amp;gt;  Router  ===call===&amp;gt; PageAction.render 
+     /\                                            ||
+     ||                                          trigger         
+  tirgger                                          ||
+     ||                                            \/
+    界面 &amp;lt;==render== PageComponent &amp;lt;==trigger== PageStore
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;整个就是一个基于事件的单向数据流了！&lt;/p&gt;
+
+&lt;h4&gt;Store与Action&lt;/h4&gt;
+
+&lt;p&gt;这里用UsersStore和UsersAction作为示例。其实最开始的时候，它们是UserStore以及UserAction，因为系统中最开始只需要记录和操作当前登录的user：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var UserAction = Reflux.createActions({
+    asyncResult: true,
+    children: [&amp;#39;login&amp;#39;, &amp;#39;register&amp;#39;]
+});
+
+UserAction.login.listen(function(data) {
+    $.post(&amp;#39;/api/users/Action/login&amp;#39;, data).then(this.loginCompleted);
+});
+
+UserAction.register.listen(function(data) {
+    $.post(&amp;#39;/api/users&amp;#39;, data).then(this.registerCompleted);
+});
+
+var UserStore = Reflux.createStore({
+    listenables: UserAction,
+    onLoginCompleted: function(payload) {
+        this.trigger(payload);
+    },
+    onRegisterCompleted: function(payload) {
+        this.trigger(payload);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当时的UserStore非常简单，没有任何逻辑，只是把API返回的数据trigger给View就完了。但是当我们增加了显示当前所有user list的需求，我们就必须又增加一个UsersStore和UsersAction：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var UsersAction = Reflux.createActions({
+    asyncResult: true,
+    children: [&amp;#39;fetch&amp;#39;]
+});
+
+UsersAction.fetch.listen(function(data) {
+    $.get(&amp;#39;/api/users&amp;#39;, data).then(this.fetchCompleted);
+});
+
+var UsersStore = Reflux.createStore({
+    listenables: UsersAction,
+    onFetchCompleted: function(payload) {
+        this.trigger(payload);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是如果只是简单的这么写，就会有一个陷阱，因为UsersStore其实是包含了UserStore的，也就是说当前user的数据需要在两个地方维护；并且同样一个Domain，被分成了两个Action + 两个Store，也非常奇怪。基于以上两点，我决定针对同一个Domain，只会有一个Action和一个Store与之对应，这样概念上更好理解，并且不会出样同一份数据，要在两处维护的麻烦。于是UserAction和UserStore就被合并到了UsersAction和UsersStore中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var UsersAction = Reflux.createActions({
+    asyncResult: true,
+    children: [&amp;#39;fetchAll&amp;#39;, &amp;#39;login&amp;#39;, &amp;#39;register&amp;#39;]
+});
+
+UsersAction.fetchAll.listen(function(data) {
+    $.get(&amp;#39;/api/users&amp;#39;, data).then(this.fetchCompleted);
+});
+
+UsersAction.login.listen(function(data) {
+    $.post(&amp;#39;/api/users/Action/login&amp;#39;, data).then(this.loginCompleted);
+});
+
+UsersAction.register.listen(function(data) {
+    $.post(&amp;#39;/api/users&amp;#39;, data).then(this.registerCompleted);
+});
+
+var users = [];
+var UsersStore = Reflux.createStore({
+    listenables: UsersAction,
+    onFetchAllCompleted: function(payload) {
+        users = payload;
+        this.trigger(users);
+    },
+    onLoginCompleted: function(payload) {
+        var index = users.findIndx({id: payload.id});
+        if (index &amp;lt; 0) {
+            users.push(payload);
+        } else {
+            users[index] = payload;
+        }
+        this.trigger(users);
+    },
+    onRegisterCompleted: function(payload) {
+        users.push(payload);
+        this.trigger(users);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样的架构我们使用了很长一段时间，但是当Domain的数量增加以后，我们发现每个Store做的事情其实都一样：把API返回的数据，根据ID merge进他自己的list里面。对于这种重复性很高，通用性有很强的逻辑，我们把它抽出来做成了一个Node Package，叫做&lt;a href="https://github.com/zation/traction"&gt;traction&lt;/a&gt;。它可以根据一个指定的key，将两个数据进行merge，可以是从Object到Array，也可以是Array到Array，具体说明可以参考它的README。&lt;/p&gt;
+
+&lt;p&gt;于是我们的Store代码就可以进一步简化为：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var traction = require(&amp;#39;traction&amp;#39;);
+
+var users = [];
+var UsersStore = Reflux.createStore({
+    listenables: UsersAction,
+    onFetchAllCompleted: function(payload) {
+        users = traction.merge(payload).to(users).basedOn(&amp;#39;id&amp;#39;);
+        this.trigger(users);
+    },
+    onLoginCompleted: function(payload) {
+        users = traction.merge(payload).to(users).basedOn(&amp;#39;id&amp;#39;);
+        this.trigger(users);
+    },
+    onRegisterCompleted: function(payload) {
+        users = traction.merge(payload).to(users).basedOn(&amp;#39;id&amp;#39;);
+        this.trigger(users);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后我们发现其实Store里面监听不同的Action所做的事情都是一样的，那么我们可以进一步简化：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var UsersAction = Reflux.createActions([&amp;#39;fetchAll&amp;#39;, &amp;#39;login&amp;#39;, &amp;#39;register&amp;#39;, &amp;#39;save&amp;#39;]);
+
+UsersAction.fetchAll.listen(function(data) {
+    $.get(&amp;#39;/api/users&amp;#39;, data).then(this.save);
+});
+
+UsersAction.login.listen(function(data) {
+    $.post(&amp;#39;/api/users/Action/login&amp;#39;, data).then(this.save);
+});
+
+UsersAction.register.listen(function(data) {
+    $.post(&amp;#39;/api/users&amp;#39;, data).then(this.save);
+});
+
+var users = [];
+var UsersStore = Reflux.createStore({
+    listenables: UsersAction,
+    onSave: function(payload) {
+        users = traction.merge(payload).to(users).basedOn(&amp;#39;id&amp;#39;);
+        this.trigger(users);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后我们又遇到新的问题了，就是在很多地方我要拿到当前的user，而在上面那样统一处理以后我就没有办法拿到了。针对这个问题有两种解决方案：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;添加一个CurrentUserStore，要那当前user，就可以监听这个Store。但是这样就会又导致同一份数据在两个地方维护的问题，所以这并不是一个推荐的解决方案。&lt;/li&gt;
+&lt;li&gt;在UsersStore中，针对当前user的那一条数据添加一个flag，例如：isLogin，然后我在其他地方就可以使用 &lt;code&gt;users.find(&amp;#39;isLogin&amp;#39;)&lt;/code&gt; 来拿到当前登录的那个user了。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;要使用第二个解决方案，我们需要对login的action和UsersStore都进行一些改造，下面是一个示例：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;UsersAction.login.listen(function(data) {
+    $.post(&amp;#39;/api/users/Action/login&amp;#39;, data).then(function(data) {
+        this.save(data, true);
+    });
+});
+
+var users = [];
+var UsersStore = Reflux.createStore({
+    listenables: UsersAction,
+    onSave: function(payload, isLogin) {
+        if (isLogin) {
+            payload.isLogin = true;
+        }
+        users = traction.merge(payload).to(users).basedOn(&amp;#39;id&amp;#39;);
+        this.trigger(users);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看到这里好像还少了点什么？对，就是错误处理。很多时候我们需要显示Server端的错误，或者是当401的时候跳转到登录页面。针对这个我们的处理方式是有一个全局的ExceptionAction和ExceptionStore：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;var ExceptionAction = Reflux.createActions([&amp;#39;serverError&amp;#39;]);
+
+ExceptionAction.serverError.preEmit = function(error) {
+    if (error.status === 401) {
+        RouteActions.navigateTo(&amp;#39;/login&amp;#39;);
+    }
+}
+
+var ExceptionStore = Reflux.createStore({
+    listenables: ExceptionActions,
+
+    onServerError: function(payload) {
+        this.trigger(payload);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;需要显示Server端错误信息的Component就可以监听ExceptionStore了。&lt;/p&gt;
+
+&lt;p&gt;到这里为之就是我们Action和Store的当前形态了。其实现在可以看出来，当merge数据的逻辑被抽出来以后，Store就是一个缓存了，后面要做的一件事情可能就是，Action需要根据Store的状态来决定到底是从API去读数据，还是从某个Client缓存（例如：LocalStorage）读数据。&lt;/p&gt;
+
+&lt;p&gt;最后我们来总结一下关于Action和Store的一些最佳实践：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;不要在Action做任何针对数据的逻辑处理，把最纯粹的数据交给Store来处理；&lt;/li&gt;
+&lt;li&gt;针对同一个Domain只能有一个Store与之对应，对Action同理；&lt;/li&gt;
+&lt;li&gt;Store在维护自身数据的时候需要考虑到很多情况，例如：单个数据的添加/修改、多个数据的添加/修改。推荐使用&lt;a href="https://github.com/zation/traction"&gt;traction&lt;/a&gt;来进行处理；&lt;/li&gt;
+&lt;li&gt;对于Store中需要特殊存储的数据，建议使用一个flag来标识，而不是再增加一个Store。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;遗留的一些问题&lt;/h3&gt;
+
+&lt;h4&gt;重复的数据请求&lt;/h4&gt;
+
+&lt;p&gt;由于我们现在项目中，fetchAction的触发都是由需要那个数据的Component自己触发的，这样就有可能导致一个页面中重复发出同一个请求。例如：每个页面都会有一个header，header中会显示用户名，那么header就会去调用 &lt;code&gt;UsersAction.fetchCurrent&lt;/code&gt;；在profile页面，显示profile信息的component肯定也需要user信息，那么他也会去调用 &lt;code&gt;UsersAction.fetchCurrent&lt;/code&gt;。这样在profile页面就会有两个同样的请求发出。&lt;/p&gt;
+
+&lt;h4&gt;如何做数据缓存？&lt;/h4&gt;
+
+&lt;p&gt;对于数据缓存我们已经有了一些方向，例如：对于缓存的操作，是由Store来进行；对于是从缓存来读取数据，还是从API读取数据，是由Action来决定。但问题是如果要由Action来决定，那么Action又需要知道Store的状态，现在能想到的方法就是Store上有个 &lt;code&gt;getData&lt;/code&gt; 的接口让Action来获取数据，然后Action就可以做判断了。不过我们希望可以有更好的方式，也许Action可以不用持有Store就可以完成这个判断？&lt;/p&gt;
+
+&lt;p&gt;大家对于这两个问题有什么看法，欢迎大家在评论中与我讨论，也欢迎来信讨论，我的电子邮件是 &lt;a href="mailto:zation1@gmail.com"&gt;zation1@gmail.com&lt;/a&gt;。谢谢！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>用React.js替换Backbone.js的View（二）——Todo MVC示例</title>
     <link rel="alternate" href="/2015/01/15/replace_backbonejs_view_with_reactj_2.html"/>
@@ -922,163 +1351,6 @@ define(&amp;quot;foo/title&amp;quot;,
 &lt;p&gt;所以最终我们的选择是Mocha + Chai + Sinon。&lt;/p&gt;
 
 &lt;p&gt;在这些选型完成以后，我们还遇到了不少问题，有一些解决了，成为了项目的亮点，有一些没有解决，就变成了项目天坑的一部分。后面我们会逐个介绍我们遇到的问题和优化，希望对别人能够有所帮助。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>打造离线使用的Mobile Web App</title>
-    <link rel="alternate" href="/2013/05/28/build_offline_mobile_web_app.html"/>
-    <id>/2013/05/28/build_offline_mobile_web_app.html</id>
-    <published>2013-05-28T06:28:00Z</published>
-    <updated>2013-05-28T06:28:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;img title="HTML5" alt="HTML5" src="/images/appcache/html5.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;最近公司举办技术大赛，我和同事一起制作了一个叫做&lt;a href="http://10khours.me"&gt;10K Hours&lt;/a&gt;的Mobile Web App，可以帮助你通过一万小时的努力，成为某个领域的专家。正好前段时间翻译了一本书&lt;a href="http://book.douban.com/subject/10580867/"&gt;《HTML5 Mobile Development Cookbook》&lt;/a&gt;，中文译本&lt;a href="http://book.douban.com/subject/24706036/"&gt;在此&lt;/a&gt;。其中讲到了不少移动端Web开发的Best Practices，正好就用到了10K Hours这个应用上。其中我觉得非常有用但是又让人头痛的一个功能就是AppCache：它可以让用户在访问一次网页以后，下次再来时不能访问网络的情况下，也可以使用这个Web App；但是当页面资源被缓存以后，非常难去更新它们⋯⋯下面就是App Cache的详细介绍和使用技巧&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;&lt;img title="HTML5" alt="HTML5" src="/images/appcache/html5.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;最近公司举办技术大赛，我和同事一起制作了一个叫做&lt;a href="http://10khours.me"&gt;10K Hours&lt;/a&gt;的Mobile Web App，可以帮助你通过一万小时的努力，成为某个领域的专家。正好前段时间翻译了一本书&lt;a href="http://book.douban.com/subject/10580867/"&gt;《HTML5 Mobile Development Cookbook》&lt;/a&gt;，中文译本&lt;a href="http://book.douban.com/subject/24706036/"&gt;在此&lt;/a&gt;。其中讲到了不少移动端Web开发的Best Practices，正好就用到了10K Hours这个应用上。其中我觉得非常有用但是又让人头痛的一个功能就是AppCache：它可以让用户在访问一次网页以后，下次再来时不能访问网络的情况下，也可以使用这个Web App；但是当页面资源被缓存以后，非常难去更新它们⋯⋯下面就是App Cache的详细介绍和使用技巧：&lt;/p&gt;
-
-&lt;h3&gt;什么是AppCache&lt;/h3&gt;
-
-&lt;p&gt;下面是来自&lt;a href="http://www.w3.org/TR/2011/WD-html5-20110525/offline.html"&gt;W3C&lt;/a&gt;的解释：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;In order to enable users to continue interacting with Web applications and documents even when their network connection is unavailable — for instance, because they are traveling outside of their ISP&amp;#39;s coverage area — authors can provide a manifest which lists the files that are needed for the Web application to work offline and which causes the user&amp;#39;s browser to keep a copy of the files for use offline.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;简单来说就是可以让开发者在网络出问题的情况下，可以部分或全部访问网站的静态资源。&lt;/p&gt;
-
-&lt;p&gt;可能有些朋友会疑惑AppCache与浏览器自动缓存和localStorage的区别，这里我简单讲一下：在默认设置下，浏览器会根据request header自动缓存静态文件，但是在请求该文件时还是会发出http request，而一旦被AppCache缓存住的文件就不会发送http request，除非人工触发缓存更新；localStorage也是一种缓存，但是它缓存的是数据，而AppCache缓存的是文件。&lt;/p&gt;
-
-&lt;h3&gt;如何使用AppCache&lt;/h3&gt;
-
-&lt;p&gt;要引入AppCache一般有三个步骤：&lt;/p&gt;
-
-&lt;h4&gt;1. 声明manifest文件&lt;/h4&gt;
-
-&lt;p&gt;manifest可以告诉浏览器网站的cache行为，下面是一个完整的manifest文件示例：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;CACHE MANIFEST
-# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)
-
-CACHE:
-index.html
-stylesheet.css
-images/logo.png
-scripts/main.js
-
-NETWORK:
-myApp/api
-http://api.twitter.com
-
-FALLBACK:
-images/large/ images/offline.jpg
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;CACHE MANIFEST&lt;/code&gt;表明该文件用于AppCache的配置，必须放在第一行&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)&lt;/code&gt;是一个时间戳，用于触发缓存文件的更新，这个会在后面详细讲到。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;CACHE&lt;/code&gt;指定需要被缓存的文件。这些文件会被缓存到AppCache中，以后这些文件都会从AppCache中加载。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;NETWORK&lt;/code&gt;指定不需要被缓存的文件。这些文件不会被缓存到AppCache中，一般用于一些动态的页面或数据。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：一些浏览器会给缓存容量加入上限，比如Chrome浏览器就是使用一个共有的缓存池，如果超出上限，以前缓存的文件有可能会被清除掉。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;FALLBACK&lt;/code&gt;指定当网络不可用时的替代文件，这些文件在网络可用时不会从AppCache中读取，只有当网络不可用时才会从AppCache中读取。示例中指定当&lt;code&gt;images/large/&lt;/code&gt;中的任意文件无法访问时，都从AppCache中读取&lt;code&gt;images/offline.jpg&lt;/code&gt;文件。&lt;/p&gt;
-
-&lt;p&gt;我们一般使用&lt;code&gt;.appcache&lt;/code&gt;作为manifest文件的后缀，这个是WHATWG的建议，同时也获得了更多浏览器的支持。&lt;/p&gt;
-
-&lt;h4&gt;2. 在页面中引入manifest文件&lt;/h4&gt;
-
-&lt;p&gt;引入manifest文件需要在html标签中加入manifest属性，其值为manifest文件地址，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;html manifest=&amp;quot;example.appcache&amp;quot;&amp;gt;
-  ...
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：你需要在每个用到AppCache的页面都加入manifest属性，除非该页面就在缓存列表中，而拥有manifest属性的页面会自动被缓存住，不需要再加入缓存列表了。&lt;/p&gt;
-
-&lt;h4&gt;3. 修改服务器端的mime-type&lt;/h4&gt;
-
-&lt;p&gt;为了让服务器端可以正确的处理manifest文件，需要在mine-type中加入&lt;code&gt;text/cache-manifest&lt;/code&gt;。比如在Apache服务器中，可以添加以下行到配置文件中：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;AddType text/cache-manifest .appcache
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;更新缓存&lt;/h3&gt;
-
-&lt;p&gt;完成manifest文件的配置以后，你会发现你的页面加载速度暴增，可以算是秒载，但是你也会悲催的发现，任何文件的修改将不会被反应到页面上，那么当我们有文件修改的时候应该怎么办呢？&lt;/p&gt;
-
-&lt;h4&gt;修改manifest文件&lt;/h4&gt;
-
-&lt;p&gt;有两种情况可以导致缓存更新：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;用户清除缓存数据。&lt;/li&gt;
-&lt;li&gt;manifest文件修改。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;所以我们要更新缓存，其实只有一个办法，那就是修改manifest文件。这个时候我们就可以看到在上个例子中那个被注释掉的时间戳（&lt;code&gt;# Time: Wed May 22 2013 17:07:07 GMT+0800 (CST)&lt;/code&gt;）的作用了，每当任意一个被缓存的文件修改后，我们都应该修改manifest文件的时间戳，让浏览器知道有文件更改，应该更新缓存。&lt;/p&gt;
-
-&lt;p&gt;当浏览器检测到manifest文件更改以后，它会发起请求更新所有被缓存的文件，但是这时候还不会马上更新到页面中，还需要用户再次刷新页面，才能看到新的内容。也就是说，当我们有文件修改以后，需要用户刷新两次才能看到新的内容，这个对于用户来说是很奇怪的体验。这个时候我们可以利用AppCache提供的一些接口来解决这个问题。&lt;/p&gt;
-
-&lt;h4&gt;AppCache接口&lt;/h4&gt;
-
-&lt;p&gt;AppCache提供了以下的事件接口：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;checking&lt;/code&gt;：客户端正在检查manifest文件的更新，或者尝试下载manifest文件时触发。注意：这个事件总是首先触发的。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;noupdate&lt;/code&gt;：客户端检查manifest文件，并且manifest文件没有更新时触发。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;downloading&lt;/code&gt;：客户端发现manifest文件需要更新并开始更新，或者开始下载manifest中列举的缓存文件时触发。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;progress&lt;/code&gt;：客户端下载manifest中列巨额的缓存文件时触发。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;cached&lt;/code&gt;：manifest中的文件被下载，并且被缓存以后触发。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;updateready&lt;/code&gt;：当新的缓存文件下载完成后触发，可以利用swapCache()来应用新的文件。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;其中最重要的就是&lt;code&gt;updateready&lt;/code&gt;这个事件，我们可以利用JavaScript绑定这个事件，在缓存更新的时候自动刷新来应用这些更新，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// Check if a new cache is available on page load.
-window.addEventListener(&amp;#39;load&amp;#39;, function(e) {
-
-  window.applicationCache.addEventListener(&amp;#39;updateready&amp;#39;, function(e) {
-    if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-      // Browser downloaded a new app cache.
-      // Swap it in and reload the page to get the new hotness.
-      window.applicationCache.swapCache();
-      if (confirm(&amp;#39;A new version of this site is available. Load it?&amp;#39;)) {
-        window.location.reload();
-      }
-    } else {
-      // Manifest didn&amp;#39;t changed. Nothing new to server.
-    }
-  }, false);
-
-}, false);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;AppCache的Debug&lt;/h3&gt;
-
-&lt;p&gt;当我们在本地调试的时候，我们如何知道AppCache是否起效果，并缓存了哪些文件呢？Chrome的开发者工具提供了这些信息，打开开发者工具，在Resource =&amp;gt; Application Cache中就可以看到缓存了哪些文件，如下图所示：&lt;/p&gt;
-
-&lt;p&gt;&lt;img title="AppCache Debug" alt="AppCache Debug" src="/images/appcache/debug.png?1401972413" /&gt;&lt;/p&gt;
-
-&lt;p&gt;但是在这里不能对Cache进行删除操作，也不能看到其他网站的Cache。如果想看到所有网站的AppCache信息，并且删除其中某一个的话，可以进入&lt;a href="chrome://appcache-internals/"&gt;chrome://appcache-internals/&lt;/a&gt;，这个管理页面会列出所有浏览器中的AppCache信息，包括manifest地址、缓存大小、更新时间、创建时间等等⋯⋯&lt;/p&gt;
-
-&lt;h3&gt;延伸&lt;/h3&gt;
-
-&lt;p&gt;到这里我们就已经讲解了关于AppCache的基础知识，这里还有一些推荐阅读的资料，同时也是我的参考资料：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="http://www.w3.org/TR/2011/WD-html5-20110525/offline.html"&gt;W3C关于AppCache的标准文档&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.html5rocks.com/en/tutorials/appcache/beginner/"&gt;A Beginner&amp;#39;s Guide to Using the Application Cache&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://blog.christian-heindel.de/2011/10/25/debugging-html5-offline-web-applications/"&gt;Debugging HTML5 Offline Web applications&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://appcachefacts.info/"&gt;Appcache Facts&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </content>
   </entry>
 </feed>

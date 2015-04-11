@@ -65,6 +65,52 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
+        2015. 04. 09
+      </li>
+      
+        <li class="tag">
+          <a href="/tags/javascript.html">Javascript</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/react-js.html">React.js</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/flux.html">Flux</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="basic_architecture_and_evolution_for_a_flux_front_end_system"
+          href="/2015/04/09/basic_architecture_and_evolution_for_a_flux_front_end_system.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2015/04/09/basic_architecture_and_evolution_for_a_flux_front_end_system.html">聊一聊一个基于Flux的前端系统</a>
+      </h1>
+      
+        <h2>——基础架构以及演进</h2>
+      
+    </header>
+    <div class="article-content">
+      <p>在最近的一个项目中，我们团队尝试了Flux + React.js的架构，在这种架构中我们获得了很多的好处：</p>
+
+<ul>
+<li>数据流更加清晰和简单，使得我们的开发和debug也可以按照一个清晰和标准的方式进行；</li>
+<li>数据处理这一层的职责更加清晰，使得我们可以更容易的进行数据维护、缓存的处理；</li>
+<li>在界面的处理上只用关心界面的最终状态，不需要维护中间过程；</li>
+<li>……</li>
+</ul>
+
+<p>下面我们就来聊一聊我们团队在这种架构中的一些实践，希望可以对大家有用。</p>
+
+    </div>
+  </article>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
         2015. 01. 15
       </li>
       
@@ -667,7 +713,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1423851139" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1428735377" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
