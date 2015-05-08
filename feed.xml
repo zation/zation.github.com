@@ -5,10 +5,135 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2015-04-09T14:46:00Z</updated>
+  <updated>2015-05-06T14:41:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>如何在阿里云上部署私有的Docker Registry</title>
+    <link rel="alternate" href="/2015/05/06/how_to_deploy_docker_registry_on_aliyun.html"/>
+    <id>/2015/05/06/how_to_deploy_docker_registry_on_aliyun.html</id>
+    <published>2015-05-06T14:41:00Z</published>
+    <updated>2015-05-06T14:41:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;&lt;img title="Aliyun and Docker" alt="Aliyun and Docker" src="/images/aliyun_docker.png?1431086065" /&gt;&lt;/p&gt;
+
+&lt;p&gt;关于什么是Docker，为什么要使用Docker，使用Docker的基础知识这里就先不赘述了，有很多的参考资料都有了详尽的介绍，比如说这本Gitbook：&lt;a href="https://www.gitbook.com/book/yeasy/docker_practice/details"&gt;《
+Docker —— 从入门到实践》&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;这里先简要介绍一下为什么要在阿里云上部署私有的Docker Registry：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用&lt;a href="https://registry.hub.docker.com/"&gt;Docker Hub&lt;/a&gt;来存放Docker Image，经常会出现Push/Pull timeout，你们懂的；&lt;/li&gt;
+&lt;li&gt;我司现在各个Server都是放在阿里云上的，如果我们把Docker Registry也放在阿里云上，那么我们做release的速度就会相当快；&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;背景介绍完了，下面我们就来看看具体如何部署吧。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;&lt;img title="Aliyun and Docker" alt="Aliyun and Docker" src="/images/aliyun_docker.png?1431086065" /&gt;&lt;/p&gt;
+
+&lt;p&gt;关于什么是Docker，为什么要使用Docker，使用Docker的基础知识这里就先不赘述了，有很多的参考资料都有了详尽的介绍，比如说这本Gitbook：&lt;a href="https://www.gitbook.com/book/yeasy/docker_practice/details"&gt;《
+Docker —— 从入门到实践》&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;这里先简要介绍一下为什么要在阿里云上部署私有的Docker Registry：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用&lt;a href="https://registry.hub.docker.com/"&gt;Docker Hub&lt;/a&gt;来存放Docker Image，经常会出现Push/Pull timeout，你们懂的；&lt;/li&gt;
+&lt;li&gt;我司现在各个Server都是放在阿里云上的，如果我们把Docker Registry也放在阿里云上，那么我们做release的速度就会相当快；&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;背景介绍完了，下面我们就来看看具体如何部署吧。&lt;/p&gt;
+
+&lt;h3&gt;什么是Docker Registry&lt;/h3&gt;
+
+&lt;p&gt;也许一些Docker的新人，对于什么是Registry还不太清楚，这里我大概讲解一下，了解的人可以直接略过这一部分了。&lt;/p&gt;
+
+&lt;p&gt;Docker Registry就是可以存放很多Docker Repository的服务器。举个例子，比如我们在内网192.168.0.1的5000端口上创建了一个Registry，并且其中有一个ubuntu 12.04的Image，那么我们就可以用下面这个命令来获取它：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ docker pull 192.168.0.1:5000/ubuntu:12.04
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中&lt;strong&gt;192.168.0.1:5000&lt;/strong&gt;就是Registry的服务器地址和端口，&lt;strong&gt;ubuntu&lt;/strong&gt;就是Repository的名字，&lt;strong&gt;12.04&lt;/strong&gt;指示了版本号，也具体指向了一个Image。所以也可以这么理解：定位一个Image的方式是Registry + Repository + Version。&lt;/p&gt;
+
+&lt;p&gt;Docker Registry主要有两种：公开的和私有的。最大的公开Registry就是&lt;a href="https://registry.hub.docker.com/"&gt;Docker Hub&lt;/a&gt;，不过他也提供了私有Registry的服务，每个帐号可以有一个免费的Private Image，如果多了就要付费。但是对于国内来说他是基本很难连上的。私有Registry就是个人或者公司搭建的，通过网络隔离或者某种认证手段，只允许内部访问。&lt;/p&gt;
+
+&lt;h3&gt;在阿里云上安装Docker&lt;/h3&gt;
+
+&lt;p&gt;由于我们的Registry会使用最新的2.0版本，所以安装的Docker也必须是最新的1.6版本，apt-get还是1.5，所以这里我们使用官方的脚本进行安装：&lt;code&gt;wget -qO- https://get.docker.com/ | sh&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;安装完成以后你会发现，再启动Docker的时候有报错：&lt;code&gt;Could not find a free IP address range for xxx&lt;/code&gt;。没错，这就是阿里云的坑，具体原因和解决方案可以参考&lt;a href="http://hanjianwei.com/2014/07/30/docker-on-aliyun/"&gt;这里&lt;/a&gt;，简单来说的话就是：修改&lt;code&gt;/etc/network/interface&lt;/code&gt;，去掉172那段的路由，然后运行&lt;code&gt;$ route del -net 172.16.0.0/12&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;现在运行&lt;code&gt;$ service docker start&lt;/code&gt;就可以启动Docker了。&lt;/p&gt;
+
+&lt;h3&gt;安装并运行Docker Registry&lt;/h3&gt;
+
+&lt;p&gt;在服务器上安装Docker Registry主要有两种方式：本地安装；通过Image安装。这里我推荐用Image安装，因为安装最快，启动也方便。&lt;/p&gt;
+
+&lt;p&gt;Docker官方已经很贴心的将一个完整的Docker Registry打包成了一个Image，我们只需要把它run起来就“可以了”：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ docker run -d -p 5000:5000 registry:2.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后Docker会检查你本地有没有registry:2.0这个镜像，如果没有的话它就会默认从Docker Hub上面Pull下来，然后就会run起来了。&lt;/p&gt;
+
+&lt;p&gt;安装和启动完成以后，可以访问一下&lt;a href="http://localhost:5000/v2/"&gt;http://localhost:5000/v2/&lt;/a&gt;，如果看到服务器返回了一个空的JSON&lt;code&gt;{}&lt;/code&gt;，那么说明运行已经成功了。大家以为大功就要告成了吗？其实征途才刚刚开始啊！&lt;/p&gt;
+
+&lt;h3&gt;从本地把Image Push到Docker Registry中&lt;/h3&gt;
+
+&lt;p&gt;我是万万没有想到，这临门一脚的一步，却是最难的一步，也是最费时间精力的一步，我为什么要写这篇博客，就是希望大家可以在这一步少走弯路。&lt;/p&gt;
+
+&lt;p&gt;假设我们现在本地有一个叫做hello-world的Image，而我们阿里云上的Registry的IP是120.1.1.1，端口是5000。当我们想要把hello-world Push到阿里云的Registry中时，首先我们要指定它的Registry：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ docker tag hello-world:latest 120.0.0.1:5000/hello-world:latest
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后我们很自然的就会去运行Push命令：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ docker push 120.0.0.1:5000/hello-world:latest
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;于是你就看到下面这个错误了：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;FATA[0000] Error response from daemon: v1 ping attempt failed with error: Get https://120.0.0.1:5000/v1/_ping: tls: oversized record received with length 20527. If this private registry supports only HTTP or HTTPS with an unknown CA certificate, please add &lt;code&gt;--insecure-registry 120.0.0.1:5000&lt;/code&gt; to the daemon&amp;#39;s arguments. In the case of HTTPS, if you have access to the registry&amp;#39;s CA certificate, no need for the flag; simply place the CA certificate at /etc/docker/certs.d/120.0.0.1:5000/ca.crt&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这是由于我们并没有把一个通过认证的安全证书加到Registry服务器中。这里就涉及到如何添加安全证书，以及如何设置安全认证，关于这两点官方都有很详尽的文档，可以参考&lt;a href="https://docs.docker.com/registry/deploying/#configure-tls-on-a-registry-server"&gt;Configure TLS on a registry server&lt;/a&gt;，以及&lt;a href="https://docs.docker.com/registry/configuration/#auth"&gt;Registry Configuration Reference&lt;/a&gt;。但是还是有一些场景是不需要安全证书以及安全认证的，关于如何绕过这些安全配置，我就没有找到一个很好的教程了。下面就是我自己摸索出来的配置方式，总得来说就是我们要在执行Pull和Push的地方配置好&lt;code&gt;insecure-registry&lt;/code&gt;这个参数：&lt;/p&gt;
+
+&lt;h4&gt;对于开发环境（Windows，OSX）&lt;/h4&gt;
+
+&lt;p&gt;一般我们都使用了boot2docker，所以这里是基于boot2docker的配置。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;$ boot2docker ssh&lt;/code&gt; 进入到运行Docker的虚拟机中；&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$ sudo vi /var/lib/boot2docker/profile&lt;/code&gt; 添加配置  &lt;code&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000&amp;quot;&lt;/code&gt;，这里的&lt;code&gt;120.0.0.1:5000&lt;/code&gt;就是你的Registry所在服务器的IP和端口号。如果你需要向多个Registry Push，或者从多个Registry Pull，那么你可以添加多个&lt;code&gt;insecure-registry&lt;/code&gt;，例如：&lt;code&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000 --insecure-registry 120.0.0.2:5000&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$ exit&lt;/code&gt; 退出以后，重启Docker &lt;code&gt;$ boot2docker restart&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;现在终于可以在本地环境build镜像，然后往我们搭建起来的Registry Push了。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4&gt;对于生产环境（Ubuntu，CentOS）&lt;/h4&gt;
+
+&lt;p&gt;跟开发环境差别不大，目的都是一样的，只是手段不同。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;ssh到我们需要部署镜像的生产服务器上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$ sudo vi /etc/default/docker&lt;/code&gt; 添加 &lt;code&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$ service docker restart&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;现在可以在生产服务器上Pull放在我们私有Registry中的Image了。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;到这里整个配置就完成了，我感觉最坑爹的地方在于，这个&lt;code&gt;insecure-registry&lt;/code&gt;的配置其实是针对Pull这个操作的，但是Push也需要这个配置，而且这个配置在Push/Pull的时候不能指定，必须在启动Docker的时候指定，每次改了还得重启Docker……社区对于这个丧病的行为已经诸多意见了，例如这个issue：&lt;a href="https://github.com/docker/docker/issues/8887"&gt;&amp;ndash;insecure-registry should be on &amp;ldquo;docker pull&amp;rdquo;&lt;/a&gt;，但是目前为止Docker还没有修改。甚至有人还在这个issue里面贴出了更加丧病的work around，就是使用ssh tunnel：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ docker pull host:5000/image #fails
+$ ssh -N -L 5000:host:5000 user@host
+$ docker pull localhost:5000/image #works
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;希望Docker的后续版本可以更加方便的向私有Registry Pull和Push，或者是有更加方便的配置安全证书和安全认证的方式。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>聊一聊基于Flux的前端系统——基础架构以及演进</title>
     <link rel="alternate" href="/2015/04/09/basic_architecture_and_evolution_for_a_flux_front_end_system.html"/>
@@ -1216,141 +1341,6 @@ module.exports = function (grunt) {
 &lt;/ul&gt;
 
 &lt;p&gt;这些优化我已经在新的项目中进行过尝试了，效果挺不错的，后面会写一篇更加详细的文章来进行介绍。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>国内项目天坑记（一）——大型官方网站中的前端选型</title>
-    <link rel="alternate" href="/2014/06/05/frontend_architecture_in_a_large_corp_portal_site.html"/>
-    <id>/2014/06/05/frontend_architecture_in_a_large_corp_portal_site.html</id>
-    <published>2014-06-05T13:08:00Z</published>
-    <updated>2014-06-05T13:08:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;img title="Architecture" alt="Architecture" src="/images/architecture.jpg?1402338328" /&gt;&lt;/p&gt;
-
-&lt;p&gt;一年多的时间没有写博客了，这段时间一直在加班加点的赶一个国内官方网站项目，基本12*6的工作时间让博客荒废了这么久，现在终于有些时间总结整理一下这个项目中的一些坑和经验。之所以叫做天坑记而不是填坑记，是因为该坑连绵不绝，是一个堪称有生之年的坑……&lt;/p&gt;
-
-&lt;p&gt;项目开始的初期，面临着很多许多技术选型，选的好可以让后面的开发事半功倍，选的不好……就只能自己埋的坑自己填了。&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;&lt;img title="Architecture" alt="Architecture" src="/images/architecture.jpg?1402338328" /&gt;&lt;/p&gt;
-
-&lt;p&gt;一年多的时间没有写博客了，这段时间一直在加班加点的赶一个国内官方网站项目，基本12*6的工作时间让博客荒废了这么久，现在终于有些时间总结整理一下这个项目中的一些坑和经验。之所以叫做天坑记而不是填坑记，是因为该坑连绵不绝，是一个堪称有生之年的坑……&lt;/p&gt;
-
-&lt;p&gt;项目开始的初期，面临着很多许多技术选型，选的好可以让后面的开发事半功倍，选的不好……就只能自己埋的坑自己填了。&lt;/p&gt;
-
-&lt;h3&gt;选型的注意事项&lt;/h3&gt;
-
-&lt;p&gt;现在回过头来看，做技术选型有下面几个要点：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;不要选择团队不熟悉的技术。即使一些新的技术看起来非常诱人又具有挑战性，除非团队中有牛人签了卖身契和军令状保证可以搞定因为新技术所产生的问题。实在逼不得已也要选一个学习成本低，文档和社区资源丰富的。我们团队的很多加班就是因为选择了一个我们不熟悉又没什么文档和社区资源的CMS系统……所以技术选型一定要根据团队成员已有的技术来考虑。&lt;/li&gt;
-&lt;li&gt;前期做好充足的技术调研。项目风险的最大爆发点，就在于未知，只有前期花功夫做好了技术调研，才可以控制好项目风险，做到心中有底，特别在有其他系统需要集成或者有老系统需要改造的情况下，更要了解好已有的系统接口和数据库是否可以满足新的业务需求。&lt;/li&gt;
-&lt;li&gt;在需求上与客户达成基本一致。我们所有的技术选型都是基于需求的，如果基本需求没有理解好，或者没有与客户达成一致，那么中后期很有能有整个技术架构无法满足业务需求的情况，这个时候如果要推翻已有架构重新开发，那将是一个巨大的风险，甚至可能项目失败。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;在做技术选型的过程中，团队可以快速开发一些demo让客户试用，来验证我们选择的技术是否可以满足客户的需求，同时验证一些技术难点是否可以解决，还可以让团队成员先预热一下。&lt;/p&gt;
-
-&lt;h3&gt;前端框架的选型&lt;/h3&gt;
-
-&lt;p&gt;这个项目的主要需求包括三部分：&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;由于是官网网站，所以肯定会有针对新闻公告、活动促销、业务介绍等的内容管理和发布系统。&lt;/li&gt;
-&lt;li&gt;客户希望在官方网站上，提供几个核心业务的自助功能，方便用户也降低自己人力的成本。&lt;/li&gt;
-&lt;li&gt;兼容性需求：完全兼容IE8及以上的IE浏览器，和Chrome, Firefox, Safari等现代浏览器，对于IE6, IE7可以样式不一致，但是功能要可用。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;由此可以引申出下面的一些前端技术要求：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;网站的自助查询部分要求可以根据API返回的数据，动态渲染页面。&lt;/li&gt;
-&lt;li&gt;前端框架不能够太新，否则会导致IE6, IE7上功能不可用。&lt;/li&gt;
-&lt;li&gt;由于是官方网站，对于网站的样式有很高的要求，所以样式代码肯定会很多，需要有一个很好的管理方式。&lt;/li&gt;
-&lt;li&gt;网站中可能会有很多重复的部分，需要我们选择的框架可以方便的写可复用的组件。&lt;/li&gt;
-&lt;li&gt;官网网站的访问量很大，同时国内的带宽有限，需要选择体积较小的框架。&lt;/li&gt;
-&lt;li&gt;出于ThoughtWorks的传统，我们需要选择一个利于自动化和测试的框架。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;根据上面的要求，我们确定我们需要以下类型的架构：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;JS MVC Framework: 负责与API交互，并动态选软页面。&lt;/li&gt;
-&lt;li&gt;CSS Framework: 帮助我们快速搭建网站，并且很好的管理CSS代码。&lt;/li&gt;
-&lt;li&gt;Automation Framework: 自动化的打包、压缩代码，启动开发环境，运行测试。&lt;/li&gt;
-&lt;li&gt;Dependency Manager: 管理各种依赖，包括我们自身代码的以及第三方库的。&lt;/li&gt;
-&lt;li&gt;Test Framework: 可以与Automation Framework方便的集成，运行我们的测试代码，并且可以方便的mock API。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4&gt;JS MVC Framework&lt;/h4&gt;
-
-&lt;p&gt;我们考虑的选项有：&lt;a href="http://backbonejs.org/"&gt;Backbone.js&lt;/a&gt;，&lt;a href="http://angularjs.org/"&gt;Angular.js&lt;/a&gt;。其他还有更多的选项可以在&lt;a href="http://todomvc.com/"&gt;TodoMVC&lt;/a&gt;找到，由于其他的框架都不是团队所熟悉的，所以我们不予考虑。&lt;/p&gt;
-
-&lt;p&gt;Backbone.js的特点是：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;非常小巧，加上&lt;a href="http://underscorejs.org/"&gt;Underscore.js&lt;/a&gt;也才11.5kb。&lt;/li&gt;
-&lt;li&gt;学习曲线平滑，所有的代码加注释也只有1000多行，通过他自己的&lt;a href="http://backbonejs.org/docs/backbone.html"&gt;Annotated Source&lt;/a&gt;，半天就能看完所有的代码。他本身的概念也没有那么多，掌握好Event, Model, Collection, View四个概念就够了。&lt;/li&gt;
-&lt;li&gt;兼容性好，由于没有太多特殊的功能，所以他可以兼容更多的浏览器。&lt;/li&gt;
-&lt;li&gt;项目越大越复杂会导致代码越难维护。由于Backbone.js中的View做了非常多的事情，包括绑定数据、绑定交互事件、与Model交互、管理sub view等等，所以往往view会越来越膨胀；同时因为Backbone.js的简单，意味着我们自己要写更多的代码，越大的项目中Backbone.js与Angular.js的差距越大。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Angular.js的特点是：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;从2009年就已经诞生，发展到现在功能和社区都非常强大，已经形成了一套从开发理念、配套工具到各种第三方工具都比较完善的生态圈。&lt;/li&gt;
-&lt;li&gt;由于功能强大和独特的开发理念，导致学习曲线非常陡峭。我们需要掌握他的DI, scope, directive等等各种概念，其中特别是由于自有directive导致的scope问题往往让熟手都摸不着头脑。&lt;/li&gt;
-&lt;li&gt;文件比较大，minify以后还是有100多kb。&lt;/li&gt;
-&lt;li&gt;基本不支持IE6, IE7.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;综上所述，Backbone.js比较适合兼容性要求比较高的中小型项目，而Angular.js比较适合全站Single Page Application的大型项目，同时兼容性要求不高。最后我们选择了Backbone.js。&lt;/p&gt;
-
-&lt;h4&gt;CSS Framework&lt;/h4&gt;
-
-&lt;p&gt;我们考虑的选项有：&lt;a href="http://sass-lang.com/"&gt;SASS&lt;/a&gt;，&lt;a href="http://lesscss.org/"&gt;LESS&lt;/a&gt;。其他的选择还有&lt;a href="http://learnboost.github.io/stylus/"&gt;Stylus&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;总的来说这两者本身没有太大区别，虽然LESS号称更加简单，但SASS也没有复杂难用多少，而LESS也具有了所有的关键功能。重要的区别在于SASS有Compass这个工具，可以解决不同浏览器的某些CSS写法不同的问题，可以帮助我们生成Sprites（可以参考我的&lt;a href="http://www.zation.me/2013/01/13/sass_compass_best_practices_3.html"&gt;这篇博客&lt;/a&gt;）。&lt;/p&gt;
-
-&lt;p&gt;由于SASS有更好的社区支持（&lt;a href="http://compass-style.org/"&gt;Compass&lt;/a&gt;, &lt;a href="https://github.com/owainlewis/gravity"&gt;Gravity&lt;/a&gt;, and &lt;a href="]"&gt;Susy&lt;/a&gt;），所以我们最后选择了SASS。&lt;/p&gt;
-
-&lt;h4&gt;Automation&lt;/h4&gt;
-
-&lt;p&gt;这里我们只有一个考虑，就是Grunt，当然还有其他选择，比如&lt;a href="http://gulpjs.com/"&gt;Gulp&lt;/a&gt;，但是由于Yeoman的主要generator还是使用的Grunt，并且使用新工具也有一定的熟悉时间和风险，所以我们最终还是选择了Yeoman + Grunt。&lt;/p&gt;
-
-&lt;h4&gt;Dependency Manager&lt;/h4&gt;
-
-&lt;p&gt;前端第三方插件的管理工具现在除了&lt;a href="http://bower.io/"&gt;bower&lt;/a&gt;，我不知道有其他的选择了。&lt;/p&gt;
-
-&lt;p&gt;对于自身代码的依赖管理工具，并不是选择哪一个框架的问题，基本都是选择&lt;a href="http://requirejs.org/"&gt;require.js&lt;/a&gt;，问题在于要不要用这个工具。由于Backbone.js并没有提供模块化和依赖管理的功能，所以我们还是尝试了使用require.js来管理自身依赖，但是实际情况是我们只把require.js用作一个打包代码的工具，而不是加载代码的工具，同时在修改文件名称或路径的时候非常麻烦，因为require.js的依赖是由文件的路径和名称确定的。解决这个问题的方式是使用模块名来定义模块，例如：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;//Explicitly defines the &amp;quot;foo/title&amp;quot; module:
-define(&amp;quot;foo/title&amp;quot;,
-    [&amp;quot;my/cart&amp;quot;, &amp;quot;my/inventory&amp;quot;],
-    function(cart, inventory) {
-        //Define foo/title object in here.
-   }
-);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这样不管如何移动或重命名文件都不会有问题了。&lt;/p&gt;
-
-&lt;h4&gt;Test Framework&lt;/h4&gt;
-
-&lt;p&gt;我们考虑的选项有：&lt;a href="http://jasmine.github.io/"&gt;Jasmine&lt;/a&gt;，&lt;a href="http://visionmedia.github.io/mocha/"&gt;Mocha&lt;/a&gt; + &lt;a href="http://chaijs.com/"&gt;Chai&lt;/a&gt; + &lt;a href="http://sinonjs.org/"&gt;Sinon&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;关于Jasmine和Mocha的优缺点，曾经在Yeoman从Jasmine切换到Mocha的时候引发过&lt;a href="https://github.com/yeoman/yeoman/issues/117"&gt;讨论&lt;/a&gt;，包括：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;String diffs&lt;/li&gt;
-&lt;li&gt;Test coverage reporting&lt;/li&gt;
-&lt;li&gt;Simpler async test interface&lt;/li&gt;
-&lt;li&gt;……&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;所以最终我们的选择是Mocha + Chai + Sinon。&lt;/p&gt;
-
-&lt;p&gt;在这些选型完成以后，我们还遇到了不少问题，有一些解决了，成为了项目的亮点，有一些没有解决，就变成了项目天坑的一部分。后面我们会逐个介绍我们遇到的问题和优化，希望对别人能够有所帮助。&lt;/p&gt;
 </content>
   </entry>
 </feed>

@@ -65,6 +65,49 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
+        2015. 05. 06
+      </li>
+      
+        <li class="tag">
+          <a href="/tags/docker.html">Docker</a>
+        </li>
+      
+        <li class="tag">
+          <a href="/tags/ops.html">Ops</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="how_to_deploy_docker_registry_on_aliyun"
+          href="/2015/05/06/how_to_deploy_docker_registry_on_aliyun.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2015/05/06/how_to_deploy_docker_registry_on_aliyun.html">如何在阿里云上部署私有的Docker Registry</a>
+      </h1>
+      
+    </header>
+    <div class="article-content">
+      <p><img title="Aliyun and Docker" alt="Aliyun and Docker" src="/images/aliyun_docker.png?1431086065" /></p>
+
+<p>关于什么是Docker，为什么要使用Docker，使用Docker的基础知识这里就先不赘述了，有很多的参考资料都有了详尽的介绍，比如说这本Gitbook：<a href="https://www.gitbook.com/book/yeasy/docker_practice/details">《
+Docker —— 从入门到实践》</a>。</p>
+
+<p>这里先简要介绍一下为什么要在阿里云上部署私有的Docker Registry：</p>
+
+<ul>
+<li>使用<a href="https://registry.hub.docker.com/">Docker Hub</a>来存放Docker Image，经常会出现Push/Pull timeout，你们懂的；</li>
+<li>我司现在各个Server都是放在阿里云上的，如果我们把Docker Registry也放在阿里云上，那么我们做release的速度就会相当快；</li>
+</ul>
+
+<p>背景介绍完了，下面我们就来看看具体如何部署吧。</p>
+
+    </div>
+  </article>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
         2015. 04. 09
       </li>
       
@@ -713,7 +756,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1429154065" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1431086067" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
