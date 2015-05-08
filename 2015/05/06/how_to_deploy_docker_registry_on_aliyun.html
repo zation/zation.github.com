@@ -119,9 +119,20 @@ Docker —— 从入门到实践》</a>。</p>
 
 <h3>在阿里云上安装Docker</h3>
 
-<p>由于我们的Registry会使用最新的2.0版本，所以安装的Docker也必须是最新的1.6版本，apt-get还是1.5，所以这里我们使用官方的脚本进行安装：<code>wget -qO- https://get.docker.com/ | sh</code>。</p>
+<p>由于我们的Registry会使用最新的2.0版本，所以安装的Docker也必须是最新的1.6版本，apt-get还是1.5，所以这里我们使用官方的脚本进行安装：</p>
 
-<p>安装完成以后你会发现，再启动Docker的时候有报错：<code>Could not find a free IP address range for xxx</code>。没错，这就是阿里云的坑，具体原因和解决方案可以参考<a href="http://hanjianwei.com/2014/07/30/docker-on-aliyun/">这里</a>，简单来说的话就是：修改<code>/etc/network/interface</code>，去掉172那段的路由，然后运行<code>$ route del -net 172.16.0.0/12</code>。</p>
+<pre><code class="bash">wget -qO- https://get.docker.com/ | sh
+</code></pre>
+
+<p>安装完成以后你会发现，再启动Docker的时候有报错：</p>
+
+<pre><code class="log">Could not find a free IP address range for xxx
+</code></pre>
+
+<p>没错，这就是阿里云的坑，具体原因和解决方案可以参考<a href="http://hanjianwei.com/2014/07/30/docker-on-aliyun/">这里</a>，简单来说的话就是：修改<code>/etc/network/interface</code>，去掉172那段的路由，然后运行</p>
+
+<pre><code class="bash">$ route del -net 172.16.0.0/12
+</code></pre>
 
 <p>现在运行<code>$ service docker start</code>就可以启动Docker了。</p>
 
@@ -164,23 +175,58 @@ Docker —— 从入门到实践》</a>。</p>
 
 <p>一般我们都使用了boot2docker，所以这里是基于boot2docker的配置。</p>
 
-<ol>
-<li><code>$ boot2docker ssh</code> 进入到运行Docker的虚拟机中；</li>
-<li><code>$ sudo vi /var/lib/boot2docker/profile</code> 添加配置  <code>DOCKER_OPTS=&quot;--insecure-registry 120.0.0.1:5000&quot;</code>，这里的<code>120.0.0.1:5000</code>就是你的Registry所在服务器的IP和端口号。如果你需要向多个Registry Push，或者从多个Registry Pull，那么你可以添加多个<code>insecure-registry</code>，例如：<code>DOCKER_OPTS=&quot;--insecure-registry 120.0.0.1:5000 --insecure-registry 120.0.0.2:5000&quot;</code></li>
-<li><code>$ exit</code> 退出以后，重启Docker <code>$ boot2docker restart</code></li>
-<li>现在终于可以在本地环境build镜像，然后往我们搭建起来的Registry Push了。</li>
-</ol>
+<p>进入到运行Docker的虚拟机中</p>
+
+<pre><code class="bash">$ boot2docker ssh
+</code></pre>
+
+<p>修改Docker启动配置文件</p>
+
+<pre><code class="bash">$ sudo vi /var/lib/boot2docker/profile
+</code></pre>
+
+<p>添加配置</p>
+
+<blockquote>
+<p>DOCKER_OPTS=&ldquo;&ndash;insecure-registry 120.0.0.1:5000&rdquo;</p>
+</blockquote>
+
+<p>这里的<code>120.0.0.1:5000</code>就是你的Registry所在服务器的IP和端口号。如果你需要向多个Registry Push，或者从多个Registry Pull，那么你可以添加多个<code>insecure-registry</code>，例如：</p>
+
+<blockquote>
+<p>DOCKER_OPTS=&ldquo;&ndash;insecure-registry 120.0.0.1:5000 &ndash;insecure-registry 120.0.0.2:5000&rdquo;</p>
+</blockquote>
+
+<p>退出Docker虚拟机后重启Docker</p>
+
+<pre><code class="bash">$ boot2docker restart
+</code></pre>
+
+<p>现在终于可以在本地环境build镜像，然后往我们搭建起来的Registry Push了。</p>
 
 <h4>对于生产环境（Ubuntu，CentOS）</h4>
 
 <p>跟开发环境差别不大，目的都是一样的，只是手段不同。</p>
 
-<ol>
-<li>ssh到我们需要部署镜像的生产服务器上</li>
-<li><code>$ sudo vi /etc/default/docker</code> 添加 <code>DOCKER_OPTS=&quot;--insecure-registry 120.0.0.1:5000&quot;</code></li>
-<li><code>$ service docker restart</code></li>
-<li>现在可以在生产服务器上Pull放在我们私有Registry中的Image了。</li>
-</ol>
+<p>ssh到我们需要部署镜像的生产服务器上，修改Docker启动配置文件</p>
+
+<pre><code class="bash">$ sudo vi /etc/default/docker
+</code></pre>
+
+<p>添加配置</p>
+
+<blockquote>
+<p>DOCKER_OPTS=&ldquo;&ndash;insecure-registry 120.0.0.1:5000&rdquo;</p>
+</blockquote>
+
+<p>重启Docker</p>
+
+<pre><code class="bash">$ service docker restart
+</code></pre>
+
+<p>现在可以在生产服务器上Pull放在我们私有Registry中的Image了。</p>
+
+<h3>总结</h3>
 
 <p>到这里整个配置就完成了，我感觉最坑爹的地方在于，这个<code>insecure-registry</code>的配置其实是针对Pull这个操作的，但是Push也需要这个配置，而且这个配置在Push/Pull的时候不能指定，必须在启动Docker的时候指定，每次改了还得重启Docker……社区对于这个丧病的行为已经诸多意见了，例如这个issue：<a href="https://github.com/docker/docker/issues/8887">&ndash;insecure-registry should be on &ldquo;docker pull&rdquo;</a>，但是目前为止Docker还没有修改。甚至有人还在这个issue里面贴出了更加丧病的work around，就是使用ssh tunnel：</p>
 
@@ -245,7 +291,7 @@ $ docker pull localhost:5000/image #works
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1431086067" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1431089057" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

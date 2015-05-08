@@ -61,9 +61,20 @@ Docker —— 从入门到实践》&lt;/a&gt;。&lt;/p&gt;
 
 &lt;h3&gt;在阿里云上安装Docker&lt;/h3&gt;
 
-&lt;p&gt;由于我们的Registry会使用最新的2.0版本，所以安装的Docker也必须是最新的1.6版本，apt-get还是1.5，所以这里我们使用官方的脚本进行安装：&lt;code&gt;wget -qO- https://get.docker.com/ | sh&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;由于我们的Registry会使用最新的2.0版本，所以安装的Docker也必须是最新的1.6版本，apt-get还是1.5，所以这里我们使用官方的脚本进行安装：&lt;/p&gt;
 
-&lt;p&gt;安装完成以后你会发现，再启动Docker的时候有报错：&lt;code&gt;Could not find a free IP address range for xxx&lt;/code&gt;。没错，这就是阿里云的坑，具体原因和解决方案可以参考&lt;a href="http://hanjianwei.com/2014/07/30/docker-on-aliyun/"&gt;这里&lt;/a&gt;，简单来说的话就是：修改&lt;code&gt;/etc/network/interface&lt;/code&gt;，去掉172那段的路由，然后运行&lt;code&gt;$ route del -net 172.16.0.0/12&lt;/code&gt;。&lt;/p&gt;
+&lt;pre&gt;&lt;code class="bash"&gt;wget -qO- https://get.docker.com/ | sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;安装完成以后你会发现，再启动Docker的时候有报错：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="log"&gt;Could not find a free IP address range for xxx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;没错，这就是阿里云的坑，具体原因和解决方案可以参考&lt;a href="http://hanjianwei.com/2014/07/30/docker-on-aliyun/"&gt;这里&lt;/a&gt;，简单来说的话就是：修改&lt;code&gt;/etc/network/interface&lt;/code&gt;，去掉172那段的路由，然后运行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ route del -net 172.16.0.0/12
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;现在运行&lt;code&gt;$ service docker start&lt;/code&gt;就可以启动Docker了。&lt;/p&gt;
 
@@ -106,23 +117,58 @@ Docker —— 从入门到实践》&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;一般我们都使用了boot2docker，所以这里是基于boot2docker的配置。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;$ boot2docker ssh&lt;/code&gt; 进入到运行Docker的虚拟机中；&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;$ sudo vi /var/lib/boot2docker/profile&lt;/code&gt; 添加配置  &lt;code&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000&amp;quot;&lt;/code&gt;，这里的&lt;code&gt;120.0.0.1:5000&lt;/code&gt;就是你的Registry所在服务器的IP和端口号。如果你需要向多个Registry Push，或者从多个Registry Pull，那么你可以添加多个&lt;code&gt;insecure-registry&lt;/code&gt;，例如：&lt;code&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000 --insecure-registry 120.0.0.2:5000&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;$ exit&lt;/code&gt; 退出以后，重启Docker &lt;code&gt;$ boot2docker restart&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;现在终于可以在本地环境build镜像，然后往我们搭建起来的Registry Push了。&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;进入到运行Docker的虚拟机中&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ boot2docker ssh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;修改Docker启动配置文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ sudo vi /var/lib/boot2docker/profile
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;添加配置&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;DOCKER_OPTS=&amp;ldquo;&amp;ndash;insecure-registry 120.0.0.1:5000&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这里的&lt;code&gt;120.0.0.1:5000&lt;/code&gt;就是你的Registry所在服务器的IP和端口号。如果你需要向多个Registry Push，或者从多个Registry Pull，那么你可以添加多个&lt;code&gt;insecure-registry&lt;/code&gt;，例如：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;DOCKER_OPTS=&amp;ldquo;&amp;ndash;insecure-registry 120.0.0.1:5000 &amp;ndash;insecure-registry 120.0.0.2:5000&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;退出Docker虚拟机后重启Docker&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ boot2docker restart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;现在终于可以在本地环境build镜像，然后往我们搭建起来的Registry Push了。&lt;/p&gt;
 
 &lt;h4&gt;对于生产环境（Ubuntu，CentOS）&lt;/h4&gt;
 
 &lt;p&gt;跟开发环境差别不大，目的都是一样的，只是手段不同。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;ssh到我们需要部署镜像的生产服务器上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;$ sudo vi /etc/default/docker&lt;/code&gt; 添加 &lt;code&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;$ service docker restart&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;现在可以在生产服务器上Pull放在我们私有Registry中的Image了。&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;ssh到我们需要部署镜像的生产服务器上，修改Docker启动配置文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ sudo vi /etc/default/docker
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;添加配置&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;DOCKER_OPTS=&amp;ldquo;&amp;ndash;insecure-registry 120.0.0.1:5000&amp;rdquo;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;重启Docker&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="bash"&gt;$ service docker restart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;现在可以在生产服务器上Pull放在我们私有Registry中的Image了。&lt;/p&gt;
+
+&lt;h3&gt;总结&lt;/h3&gt;
 
 &lt;p&gt;到这里整个配置就完成了，我感觉最坑爹的地方在于，这个&lt;code&gt;insecure-registry&lt;/code&gt;的配置其实是针对Pull这个操作的，但是Push也需要这个配置，而且这个配置在Push/Pull的时候不能指定，必须在启动Docker的时候指定，每次改了还得重启Docker……社区对于这个丧病的行为已经诸多意见了，例如这个issue：&lt;a href="https://github.com/docker/docker/issues/8887"&gt;&amp;ndash;insecure-registry should be on &amp;ldquo;docker pull&amp;rdquo;&lt;/a&gt;，但是目前为止Docker还没有修改。甚至有人还在这个issue里面贴出了更加丧病的work around，就是使用ssh tunnel：&lt;/p&gt;
 
