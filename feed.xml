@@ -127,17 +127,15 @@ Docker —— 从入门到实践》&lt;/a&gt;。&lt;/p&gt;
 &lt;pre&gt;&lt;code class="bash"&gt;$ sudo vi /var/lib/boot2docker/profile
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;添加配置&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;DOCKER_OPTS=&amp;ldquo;&amp;ndash;insecure-registry 120.0.0.1:5000&amp;rdquo;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;添加配置
+&lt;code&gt;bash
+EXTRA_ARGS=&amp;quot;--insecure-registry 120.0.0.1:5000&amp;quot;
+&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;这里的&lt;code&gt;120.0.0.1:5000&lt;/code&gt;就是你的Registry所在服务器的IP和端口号。如果你需要向多个Registry Push，或者从多个Registry Pull，那么你可以添加多个&lt;code&gt;insecure-registry&lt;/code&gt;，例如：&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;DOCKER_OPTS=&amp;ldquo;&amp;ndash;insecure-registry 120.0.0.1:5000 &amp;ndash;insecure-registry 120.0.0.2:5000&amp;rdquo;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class="bash"&gt;EXTRA_ARGS=&amp;quot;--insecure-registry 120.0.0.1:5000 --insecure-registry 120.0.0.2:5000&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;退出Docker虚拟机后重启Docker&lt;/p&gt;
 
@@ -157,9 +155,8 @@ Docker —— 从入门到实践》&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;添加配置&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;DOCKER_OPTS=&amp;ldquo;&amp;ndash;insecure-registry 120.0.0.1:5000&amp;rdquo;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class="bash"&gt;DOCKER_OPTS=&amp;quot;--insecure-registry 120.0.0.1:5000&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;重启Docker&lt;/p&gt;
 
