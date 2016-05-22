@@ -65,6 +65,50 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
+        2016. 05. 04
+      </li>
+      
+        <li class="tag">
+          
+            
+          
+          <a class="active" href="/tags/javascript.html">Javascript</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/react.html">React</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/redux.html">Redux</a>
+        </li>
+      
+      <li class="comment">
+        <a class="ds-thread-count"
+          data-thread-key="redux-practices-1"
+          href="/2016/05/04/redux-practices-1.html#comment"></a>
+      </li>
+    </ul>
+    <header class="article-title">
+      <h1>
+        <a href="/2016/05/04/redux-practices-1.html">Redux架构实践（一）</a>
+      </h1>
+      
+        <h2>——Single Source of Truth</h2>
+      
+    </header>
+    <div class="article-content">
+      <p>在现代前后端分离的系统架构中，后端负责数据处理，前端负责数据展示。这种架构能够有效的分离数据处理和数据展示的逻辑，让同一套数据处理逻辑可以被不同的数据展示逻辑复用。这里的复用现在大部分是基于Restful的API协议。</p>
+
+<p>理想是很丰满的，现实缺很残酷。在有复杂的业务数据结构的情况下，我们常常会遇到不同的API返回了同样的数据，如果不同的component的显示直接依赖于API数据的返回，很有可能就会有不同的component对于同样的数据所显示的结果不一样的bug。再加上缓存、用户修改数据等等复杂情况，显示不一致的问题可能更加严重，所以为了解决这个问题，Single source of truth（以下使用中文名称：单一数据源）的概念被提出来了。下面我们就来看看如何在Redux的架构中实现单一数据源的。</p>
+
+    </div>
+  </article>
+  <article class="article">
+    <ul class="extro-info">
+      <li class="date">
         2015. 04. 09
       </li>
       
@@ -248,7 +292,7 @@
 </ul>
     </div>
   </footer>
-  <script src="/javascripts/main.js?1447233592" type="text/javascript"></script>
+  <script src="/javascripts/main.js?1463909763" type="text/javascript"></script>
   <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

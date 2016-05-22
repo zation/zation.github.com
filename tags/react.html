@@ -65,47 +65,44 @@
         <article class="article">
     <ul class="extro-info">
       <li class="date">
-        2012. 12. 31
+        2016. 05. 04
       </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/javascript.html">Javascript</a>
+        </li>
       
         <li class="tag">
           
             
           
-          <a class="active" href="/tags/personal.html">personal</a>
+          <a class="active" href="/tags/react.html">React</a>
+        </li>
+      
+        <li class="tag">
+          
+          <a class="" href="/tags/redux.html">Redux</a>
         </li>
       
       <li class="comment">
         <a class="ds-thread-count"
-          data-thread-key="summary_of_2012"
-          href="/2012/12/31/summary_of_2012.html#comment"></a>
+          data-thread-key="redux-practices-1"
+          href="/2016/05/04/redux-practices-1.html#comment"></a>
       </li>
     </ul>
     <header class="article-title">
       <h1>
-        <a href="/2012/12/31/summary_of_2012.html">不在这里重生，就在这里死去</a>
+        <a href="/2016/05/04/redux-practices-1.html">Redux架构实践（一）</a>
       </h1>
       
-        <h2>——我在ThoughtWorks的2012</h2>
+        <h2>——Single Source of Truth</h2>
       
     </header>
     <div class="article-content">
-      <p><img title="2012" alt="2012" src="/images/2012.png?1401972413" /></p>
+      <p>在现代前后端分离的系统架构中，后端负责数据处理，前端负责数据展示。这种架构能够有效的分离数据处理和数据展示的逻辑，让同一套数据处理逻辑可以被不同的数据展示逻辑复用。这里的复用现在大部分是基于Restful的API协议。</p>
 
-<p>在2012的尾巴上回头看去，这几乎就是工作的一年。整整一年我都在西安出差，除了偶尔回成都见见朋友和亲人，就是在公寓与公司之间工作、学习。但这样的一年里，我却有了很多新的尝试和改变：</p>
-
-<ul>
-<li>我在西安电子科技大学给大学生做了演讲</li>
-<li>我在公司做了两次系统的CSS Session</li>
-<li>翻译了《HTML5 Mobile Development Cookbook》</li>
-<li>在Openparty上show了一把现场写jasmine测试</li>
-<li>学习了别人听都没听过的乐器——陶笛</li>
-<li>通宵爬上了华山，却在穿越莫不知名的山峰时以为自己就要死在上面</li>
-<li>我开始阅读经济、创业方面的书籍</li>
-<li>⋯⋯</li>
-</ul>
-
-<p>但是更多的，使我思维和观念的转变。</p>
+<p>理想是很丰满的，现实缺很残酷。在有复杂的业务数据结构的情况下，我们常常会遇到不同的API返回了同样的数据，如果不同的component的显示直接依赖于API数据的返回，很有可能就会有不同的component对于同样的数据所显示的结果不一样的bug。再加上缓存、用户修改数据等等复杂情况，显示不一致的问题可能更加严重，所以为了解决这个问题，Single source of truth（以下使用中文名称：单一数据源）的概念被提出来了。下面我们就来看看如何在Redux的架构中实现单一数据源的。</p>
 
     </div>
   </article>

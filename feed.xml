@@ -5,10 +5,265 @@
   <id>http://blog.url.com/</id>
   <link href="http://zation.me/"/>
   <link href="http://zation.me/feed.xml" rel="self"/>
-  <updated>2015-05-06T14:41:00Z</updated>
+  <updated>2016-05-04T15:09:00Z</updated>
   <author>
     <name>Zation</name>
   </author>
+  <entry>
+    <title>Redux架构实践（一）——Single Source of Truth</title>
+    <link rel="alternate" href="/2016/05/04/redux-practices-1.html"/>
+    <id>/2016/05/04/redux-practices-1.html</id>
+    <published>2016-05-04T15:09:00Z</published>
+    <updated>2016-05-04T15:09:00Z</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <summary type="html">&lt;p&gt;在现代前后端分离的系统架构中，后端负责数据处理，前端负责数据展示。这种架构能够有效的分离数据处理和数据展示的逻辑，让同一套数据处理逻辑可以被不同的数据展示逻辑复用。这里的复用现在大部分是基于Restful的API协议。&lt;/p&gt;
+
+&lt;p&gt;理想是很丰满的，现实缺很残酷。在有复杂的业务数据结构的情况下，我们常常会遇到不同的API返回了同样的数据，如果不同的component的显示直接依赖于API数据的返回，很有可能就会有不同的component对于同样的数据所显示的结果不一样的bug。再加上缓存、用户修改数据等等复杂情况，显示不一致的问题可能更加严重，所以为了解决这个问题，Single source of truth（以下使用中文名称：单一数据源）的概念被提出来了。下面我们就来看看如何在Redux的架构中实现单一数据源的。&lt;/p&gt;
+</summary>
+    <content type="html">&lt;p&gt;在现代前后端分离的系统架构中，后端负责数据处理，前端负责数据展示。这种架构能够有效的分离数据处理和数据展示的逻辑，让同一套数据处理逻辑可以被不同的数据展示逻辑复用。这里的复用现在大部分是基于Restful的API协议。&lt;/p&gt;
+
+&lt;p&gt;理想是很丰满的，现实缺很残酷。在有复杂的业务数据结构的情况下，我们常常会遇到不同的API返回了同样的数据，如果不同的component的显示直接依赖于API数据的返回，很有可能就会有不同的component对于同样的数据所显示的结果不一样的bug。再加上缓存、用户修改数据等等复杂情况，显示不一致的问题可能更加严重，所以为了解决这个问题，Single source of truth（以下使用中文名称：单一数据源）的概念被提出来了。下面我们就来看看如何在Redux的架构中实现单一数据源的。&lt;/p&gt;
+
+&lt;h3&gt;多数据来源的问题&lt;/h3&gt;
+
+&lt;p&gt;我们首先来想象一个书单应用：用户可以创建多个书单，然后将书籍添加到各种书单中。那么会有下面几个API：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;获取书单列表&lt;/strong&gt;，GET /api/booklists&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;[{
+    id: 1,
+    name: &amp;#39;第一个书单&amp;#39;,
+    books: [{
+        id: 1,
+        name: &amp;#39;西游记&amp;#39;,
+    }, {
+        id: 2,
+        name: &amp;#39;红楼梦&amp;#39;,
+    }]
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;获取书籍列表&lt;/strong&gt;，GET /api/books&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;[{
+    id: 1,
+    name: &amp;#39;西游记&amp;#39;,
+}, {
+    id: 2,
+    name: &amp;#39;红楼梦&amp;#39;,
+}, {
+    id: 3,
+    name: &amp;#39;水浒传&amp;#39;,
+}, {
+    id: 4,
+    name: &amp;#39;三国演义&amp;#39;,
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;编辑书籍名称&lt;/strong&gt;，PUT /api/books/:id&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;{
+    id: 1,
+    name: &amp;#39;新西游记&amp;#39;,
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;作为redux应用，我们的store中就会有两个节点&lt;code&gt;booklists&lt;/code&gt;和&lt;code&gt;books&lt;/code&gt;来存储这两个数据，并且会有两个container &lt;code&gt;BooklistsContainer&lt;/code&gt;和&lt;code&gt;BooksContainer&lt;/code&gt;分别显示书单中的数据和所有书籍的信息。&lt;/p&gt;
+
+&lt;p&gt;假设书单的显示和书籍的编辑都在同一个页面，我们修改了书籍的名字，那么&lt;code&gt;BooklistsContainer&lt;/code&gt;中书籍的名字还是显示了以前的名称，要修复这个问题，我们只能让&lt;code&gt;booklists&lt;/code&gt;的reducer也监听编辑书籍名称的action，同时修改&lt;code&gt;booklists&lt;/code&gt;中嵌套的书籍名称。这种处理方式在数据简单的时候没有问题，但是如果我们在很多其他的地方也使用了书籍的信息，或者书籍的信息不光是名称，还有价格、作者等等更加复杂，嵌套层次更加深的数据，那么这样的数据维护是非常困难的。总结起来主要问题有下面几个：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;每个涉及到书籍信息的reducer都需要监听书籍信息的任何修改（编辑、删除等），这样会造成很多重复逻辑，并且散落在很多reducer中，维护困难，对于新人来说也容易犯错。&lt;/li&gt;
+&lt;li&gt;书籍信息的修改会触发很多reducer的重新计算和store的大范围更新，性能很低。&lt;/li&gt;
+&lt;li&gt;同样的书籍信息被做成了多个拷贝，放在store的不同节点中，浪费内存空间，如果对这些数据做缓存，那还会浪费存储空间。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;如何解决多数据来源的问题&lt;/h3&gt;
+
+&lt;p&gt;我们可以看到产生问题的根本原因，就是书籍信息保存在&lt;code&gt;books&lt;/code&gt;的情况下，&lt;code&gt;booklists&lt;/code&gt;中就含有了冗余信息。那么要解决这个问题的办法就是要去掉这些冗余信息，让每个信息都只有单一的数据来源，所有书籍信息都从&lt;code&gt;books&lt;/code&gt;来，&lt;code&gt;booklists&lt;/code&gt;中只需要存储与之相关的&lt;code&gt;books&lt;/code&gt;主键信息。&lt;/p&gt;
+
+&lt;p&gt;具体做法可以是在&lt;code&gt;booklists&lt;/code&gt;的reducer中，将数据结构变成下面这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;[{
+    id: 1,
+    name: &amp;#39;第一个书单&amp;#39;,
+    books: [1, 2],
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后在&lt;code&gt;BooklistsContainer&lt;/code&gt;的state mapper中，将&lt;code&gt;books&lt;/code&gt;与&lt;code&gt;booklists&lt;/code&gt;的数据merge到一起。这样最后显示的数据一定是正确并且最新的书籍信息。&lt;/p&gt;
+
+&lt;p&gt;但是这样如果在每个reducer里面都做这种map，还是会有很多重复的逻辑，而且API返回的数据可能是array，可能是object，要把这些逻辑统一起来还是挺复杂的。&lt;a href="https://github.com/paularmstrong/normalizr"&gt;normalizr&lt;/a&gt;就是redux的作者，为了解决这两个问题开发的开源库。它只需要你有最简单的schema定义，就可以帮你做到一样的数据转换。&lt;/p&gt;
+
+&lt;p&gt;下面是针对我们实例的schema定义：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;import { arrayOf, Schema } from &amp;#39;normalizr&amp;#39;;
+
+const booklist = new Schema(&amp;#39;booklists&amp;#39;);
+const book = new Schema(&amp;#39;books&amp;#39;);
+booklist.define({ books: arrayOf(book) });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在reducer中，只需要调用&lt;code&gt;normalize&lt;/code&gt;方法，就可以得到我们希望的数据结构：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;import { normalize, arrayOf } from &amp;#39;normalizr&amp;#39;;
+
+const finalResponse = normalize(response, arrayOf(booklist));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;finalResponse&lt;/code&gt;的数据结构就会变成这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;{
+    result: 1,
+    entities: {
+        booklists: {
+            1: {
+                id: 1,
+                name: &amp;#39;第一个书单&amp;#39;,
+                books: [1, 2],
+            }
+        },
+        books: {
+            1: {
+                id: 1,
+                name: &amp;#39;西游记&amp;#39;,
+            }, 
+            2: {
+                id: 2,
+                name: &amp;#39;红楼梦&amp;#39;,
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样我们就可以有一个统一的entities节点，来存储所有API数据，每次API请求都统一在entities的reducer里面做merge就可以了。这样做还有一个好处，就是我们在读取单个数据的时候，就不需要根据id去遍历所有数据了，只需要通过&lt;code&gt;booklists[id]&lt;/code&gt;就能得到。&lt;/p&gt;
+
+&lt;h3&gt;实际使用中会有什么样的坑&lt;/h3&gt;
+
+&lt;p&gt;理想很丰满，现实很残酷，虽然我用很简单的实例介绍了单一数据源和normalizr这种方案的好处，但是实际使用中还是会有很多情况是需要特殊处理的。&lt;/p&gt;
+
+&lt;h4&gt;临时数据&lt;/h4&gt;
+
+&lt;p&gt;是不是所有的API请求都适用于这套处理方式呢？的确，理想中所有API都这样处理以后，数据会非常干净，但是实际中我们不可能一次就把所有的书籍信息都读取到客户端，因为世上所有的书籍信息是一个超级庞大的数据，所以我们更多的时候是有一个搜索书籍的功能。&lt;/p&gt;
+
+&lt;p&gt;搜索的结果其实就是临时的数据，搜索条件变更或者添加到书单中以后，这些搜索结果就没有用处了，需要被清理掉。他的实时性非常高，所以你不用担心数据是否不是最新的；同时他被使用以后就会清除，是一种一次性的数据。对于这种数据就可以不放在entities节点中。entities节点中存放的应该是在app的大部分生命周期都会重复使用的数据。&lt;/p&gt;
+
+&lt;h4&gt;normalizr不能处理的数据&lt;/h4&gt;
+
+&lt;p&gt;normalizr毕竟只是一个简单的数据处理，还有一些情况是处理不了的，比如说booklist中的每个book都有备注：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;[{
+    id: 1,
+    name: &amp;#39;第一个书单&amp;#39;,
+    books: [{
+        id: 1,
+        name: &amp;#39;西游记&amp;#39;,
+        remark: &amp;#39;好看&amp;#39;,
+    }]
+}, {
+    id: 2,
+    name: &amp;#39;第二个书单&amp;#39;,
+    books: [{
+        id: 1,
+        name: &amp;#39;西游记&amp;#39;,
+        remark: &amp;#39;很好看&amp;#39;,
+    }]
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就造成了同一个book，在不同的booklist中，有不同的属性，在normalizr做处理时，就会出现warning，并且只保留最后一个数据：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;{
+    result: 1,
+    entities: {
+        booklists: {
+            1: {
+                id: 1,
+                name: &amp;#39;第一个书单&amp;#39;,
+                books: [1],
+            },
+            2: {
+                id: 2,
+                name: &amp;#39;第二个书单&amp;#39;,
+                books: [1],
+            }
+        },
+        books: {
+            1: {
+                id: 1,
+                name: &amp;#39;西游记&amp;#39;,
+                remark: &amp;#39;很好看&amp;#39;
+            },
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以这样的数据直接交给normalizr就会造成数据丢失。这个问题有两种处理方式：&lt;/p&gt;
+
+&lt;h5&gt;中间表&lt;/h5&gt;
+
+&lt;p&gt;我们可以认为remark并不是book这个domain独有的属性，而是与book和booklist都有关，在数据库设计的时候，我们会用一个中间表来记录这样的数据，这里我们也可以借鉴这样的中间表，在entities中新建一个节点叫做booklistBook，所有同时与booklist和book相关的数据，都放在这里面：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;// booklistBook
+[{
+    booklistId: 1,
+    bookId: 1,
+    remark: &amp;#39;好看&amp;#39;,
+}, {
+    booklistId: 2,
+    bookId: 1,
+    remark: &amp;#39;很好看&amp;#39;,
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是这种处理方式，需要我们在normalizr处理之前，自己先处理一次数据，并且在state mapper部分merge数据的时候比较麻烦。它的好处是让数据结构很清晰。&lt;/p&gt;
+
+&lt;h5&gt;保留在booklist中&lt;/h5&gt;
+
+&lt;p&gt;如果这个remark只在会使用booklist的上下文中使用的话，那么把remark信息放在booklist上会让我们使用的时候非常方便。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="js"&gt;{
+    result: 1,
+    entities: {
+        booklists: {
+            1: {
+                id: 1,
+                name: &amp;#39;第一个书单&amp;#39;,
+                books: [{
+                    id: 1,
+                    remark: &amp;#39;好看&amp;#39;,
+                }],
+            },
+            2: {
+                id: 2,
+                name: &amp;#39;第二个书单&amp;#39;,
+                books: [{
+                    id: 1,
+                    remark: &amp;#39;很好看&amp;#39;,
+                }],
+            }
+        },
+        books: {
+            1: {
+                id: 1,
+                name: &amp;#39;西游记&amp;#39;,
+            },
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里就需要自定义normalizr的merge function了，通过配置&lt;code&gt;mergeIntoEntity&lt;/code&gt;可以到达这个目的。这样做会让数据格式出现不统一的情况，有些关联数据我们就简单的用一个array保存id，有些关联数据的array中除了id还有其他数据。&lt;/p&gt;
+
+&lt;p&gt;这两种方式各有优劣，暂时还没有一个很完美的解决方案。如果小伙伴们有什么建议，欢迎讨论~&lt;/p&gt;
+
+&lt;p&gt;最后怀念一下和&lt;a href="https://github.com/morlay"&gt;大招&lt;/a&gt;还有其他小伙伴一起捣鼓redux的日子，很多好的想法和架构都是从他们身上学习到的。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>如何在阿里云上部署私有的Docker Registry</title>
     <link rel="alternate" href="/2015/05/06/how_to_deploy_docker_registry_on_aliyun.html"/>
@@ -1286,104 +1541,6 @@ gulp.task(&amp;#39;build&amp;#39;, function() {
 &lt;h3&gt;总结&lt;/h3&gt;
 
 &lt;p&gt;虽然我们有了一个非常完美的文档系统，但是文档的本质作用是用于沟通，如果团队内部相互沟通的意愿不强烈，那么再好的工具没有办法用好，也不可能使用某个工具就可以建立起沟通的意愿。所以在团队建设的过程中，沟通、优化、负责等等好的意愿的建立是首位的，然后才是寻找到适合团队的工具来帮助解决问题，更好的发挥意愿。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>国内项目天坑记（二）——Gruntfile的模块化</title>
-    <link rel="alternate" href="/2014/06/09/grunt_config_as_modules.html"/>
-    <id>/2014/06/09/grunt_config_as_modules.html</id>
-    <published>2014-06-09T15:31:00Z</published>
-    <updated>2014-06-09T15:31:00Z</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <summary type="html">&lt;p&gt;在大型项目中用过Grunt的都知道，当自动化的配置和task多了一个，一个Gruntfile.js文件可能有好几百行，这样维护非常困难，于是对Gruntfile的模块化势在必行。感谢&lt;a href="http://zhuanlan.zhihu.com/tla42"&gt;墨磊&lt;/a&gt;同学帮助我们做了模块化！以下内容都是他的实践。&lt;/p&gt;
-</summary>
-    <content type="html">&lt;p&gt;在大型项目中用过Grunt的都知道，当自动化的配置和task多了一个，一个Gruntfile.js文件可能有好几百行，这样维护非常困难，于是对Gruntfile的模块化势在必行。感谢&lt;a href="http://zhuanlan.zhihu.com/tla42"&gt;墨磊&lt;/a&gt;同学帮助我们做了模块化！以下内容都是他的实践。&lt;/p&gt;
-
-&lt;p&gt;本质上Gruntfile.js就是一个node.js代码文件，所以我们可以很方便的用&lt;a href="http://www.commonjs.org"&gt;CommonJS&lt;/a&gt;的规范将Gruntfile.js模块化。下面我们首先来看看模块化以后的grunt目录结构：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Gruntfile.js
-grunt/
-    compile/
-        compass.js
-        concat.js
-        uglify.js
-        ...
-    dev/
-        jshint.js
-        connect.js
-        ...
-    config.js
-    tasks.js
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里要提一下grunt模块划分，一般是根据task的不同来划分的。而&lt;a href="http://gulpjs.com/"&gt;gulp&lt;/a&gt;是根据处理的文件类型的不同来划分的。&lt;/p&gt;
-
-&lt;p&gt;Gruntfile.js所做的事情就很简单了，只是加载tasks.js：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;#39;use strict&amp;#39;;
-
-module.exports = function (grunt) {
-    // load tasks
-    require(&amp;#39;./grunt/tasks.js&amp;#39;)(grunt);
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;tasks.js负责加载和注册所有的tasks和config.js：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function (grunt) {
-
-    require(&amp;#39;./config.js&amp;#39;)(grunt);
-
-    grunt.loadTasks(&amp;#39;./grunt/compile&amp;#39;);
-    grunt.loadTasks(&amp;#39;./grunt/dev&amp;#39;);
-
-    grunt.registerTask(&amp;#39;some tasks&amp;#39;, function () {
-        //...
-    });
-
-    return grunt;
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;这里&lt;code&gt;grunt.loadTasks()&lt;/code&gt;方法的路径是相对于Gruntfile.js的。&lt;/p&gt;
-
-&lt;p&gt;config.js负责配置项目相关的属性：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;module.exports = function (grunt) {
-    grunt.initConfig({
-        // configurable paths
-        server: {
-            hostname: &amp;#39;0.0.0.0&amp;#39;,
-            hostport: &amp;#39;9000&amp;#39;
-        },
-        testServer: {
-            hostname: &amp;#39;localhost&amp;#39;,
-            hostport: &amp;#39;9001&amp;#39;
-        },
-        yeoman: {
-            app: &amp;#39;app&amp;#39;,
-            dist: &amp;#39;dist&amp;#39;,
-            test: &amp;#39;test&amp;#39;,
-            tmp: &amp;#39;.tmp&amp;#39;
-        }
-    });
-
-    return grunt;
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;compile文件夹下的tasks是在build production package的时候用到的，dev文件夹下的tasks是在开发环境中用到的，这里也可以根据项目的实际情况进行分类。&lt;/p&gt;
-
-&lt;p&gt;这里我认为还可以做优化的地方在于：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;使用.json配置文件代替.js配置文件，并且预先设订好对于不同环境的配置文件，例如：config.json.development, config.json.production, config.json.staging, config.json.test&amp;hellip; 不同的环境中就使用不同的配置文件，这样让所有的配置文件都可以做版本管理，而且也更加统一。&lt;/li&gt;
-&lt;li&gt;使用npm将这些配置代码都打包，放到另一个独立的github repo中，这样可以简化项目结构和代码，同时也利于这些代码在其他项目中的共用。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这些优化我已经在新的项目中进行过尝试了，效果挺不错的，后面会写一篇更加详细的文章来进行介绍。&lt;/p&gt;
 </content>
   </entry>
 </feed>
